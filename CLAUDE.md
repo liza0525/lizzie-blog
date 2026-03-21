@@ -130,3 +130,4 @@ Skill은 `/slash-command` 형태로 호출할 수 있는 재사용 가능한 프
 | `review` | 변경된 코드를 타입 안전성 / 레이어 규칙 / 단일 책임 기준으로 검토 |
 | `running` | `npm run dev`로 Next.js 개발 서버 실행 |
 | `stop` | 3000번 포트의 Next.js 개발 서버 종료 |
+| `diff` | 현재 git 변경사항을 파악하고 무엇이 어떻게 바뀌었는지 설명 |
