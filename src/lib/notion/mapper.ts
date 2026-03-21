@@ -5,6 +5,7 @@ import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoint
 import type { Post } from "@/types";
 
 // Notion 페이지 프로퍼티에서 텍스트 추출 헬퍼
+// formula 타입도 지원 — Slug 프로퍼티가 수식일 때 사용
 function extractRichText(
   property: PageObjectResponse["properties"][string]
 ): string {
@@ -13,6 +14,9 @@ function extractRichText(
   }
   if (property.type === "title") {
     return property.title.map((t) => t.plain_text).join("");
+  }
+  if (property.type === "formula" && property.formula.type === "string") {
+    return property.formula.string ?? "";
   }
   return "";
 }

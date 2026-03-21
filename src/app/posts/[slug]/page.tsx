@@ -21,7 +21,7 @@ export const revalidate = 7200;
 // 빌드 시 정적 경로 생성 (SSG)
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const slugs = await getAllSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));
 }
 
 interface PageProps {
@@ -30,7 +30,7 @@ interface PageProps {
 
 export default async function PostPage({ params }: PageProps): Promise<React.JSX.Element> {
   const { slug } = await params;
-  const post = await getPostDetail(slug);
+  const post = await getPostDetail(decodeURIComponent(slug));
 
   if (!post) notFound();
 

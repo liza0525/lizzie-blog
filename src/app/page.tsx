@@ -56,7 +56,7 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
           {posts.map((post: Post) => (
             <Link
               key={post.id}
-              href={`/posts/${post.slug}`}
+              href={`/posts/${encodeURIComponent(post.slug)}`}
               className="group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-950 transition-shadow duration-200"
             >
               {/* 커버 이미지 */}
