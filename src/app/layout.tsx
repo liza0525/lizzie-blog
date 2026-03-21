@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
@@ -8,6 +8,12 @@ const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
   variable: "--font-noto-sans-kr",
+});
+
+const notoSerifKR = Noto_Serif_KR({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-noto-serif-kr",
 });
 
 export const metadata: Metadata = {
@@ -21,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${notoSansKR.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
