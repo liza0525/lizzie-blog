@@ -2,7 +2,7 @@
 
 ## 프로젝트 개요
 Notion을 CMS로 사용하는 개인 개발 기술 블로그.
-Next.js 14 (App Router) + Notion API + Vercel 배포.
+Next.js 16 (App Router) + Notion API + Vercel 배포.
 심플한 디자인, 유지보수성 우선.
 
 ---
@@ -98,7 +98,7 @@ src/
 ---
 
 ## 기술 스택
-- Next.js 14 (App Router)
+- Next.js 16 (App Router)
 - TypeScript (strict)
 - `@notionhq/client` + `notion-to-md`
 - Tailwind CSS
