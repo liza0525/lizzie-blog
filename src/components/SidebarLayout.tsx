@@ -8,7 +8,6 @@ interface SidebarLayoutProps {
   children: ReactNode;
 }
 
-// 햄버거 아이콘 (☰)
 function MenuIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -19,7 +18,6 @@ function MenuIcon() {
   );
 }
 
-// 닫기 아이콘 (✕)
 function CloseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -30,13 +28,13 @@ function CloseIcon() {
 }
 
 export default function SidebarLayout({ sidebar, children }: SidebarLayoutProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex">
-      {/* 사이드바 — wrapper가 width를, 내부 div가 translate를 담당 */}
+      {/* 사이드바 — lg 이상에서만 표시, 햄버거 토글로 열고 닫기 */}
       <div
-        className={`shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
+        className={`hidden lg:block shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
           open ? "w-48" : "w-0"
         }`}
       >
@@ -51,10 +49,11 @@ export default function SidebarLayout({ sidebar, children }: SidebarLayoutProps)
 
       {/* 메인 콘텐츠 */}
       <div className="flex-1 min-w-0">
+        {/* 토글 버튼 — lg 이상에서만 표시 */}
         <button
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "사이드바 닫기" : "사이드바 열기"}
-          className="mb-6 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+          className="hidden lg:block mb-6 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
         >
           {open ? <CloseIcon /> : <MenuIcon />}
         </button>
