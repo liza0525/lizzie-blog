@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Post, PostListPage } from "@/types";
 import HighlightText from "@/components/HighlightText";
+import FormattedDate from "@/components/FormattedDate";
 
 interface PostGridProps {
   initialPosts: Post[];
@@ -118,7 +119,7 @@ export default function PostGrid({
               )}
 
               <div className="flex items-center justify-between mt-auto">
-                <span className="text-xs text-gray-400 dark:text-gray-500">{post.publishedAt}</span>
+                <FormattedDate date={post.publishedAt} className="text-xs text-gray-400 dark:text-gray-500" />
               </div>
             </div>
           </Link>

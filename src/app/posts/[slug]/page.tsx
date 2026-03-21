@@ -15,6 +15,7 @@ import { getPostDetail, getAllSlugs, getAdjacentPosts } from "@/lib/services/pos
 import { extractHeadings } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
+import FormattedDate from "@/components/FormattedDate";
 
 export const revalidate = 7200;
 
@@ -74,7 +75,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
                 {post.description}
               </p>
             )}
-            <p className="text-sm text-gray-400 dark:text-gray-500">{post.publishedAt}</p>
+            <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500" />
           </header>
 
           {/* 커버 이미지 */}
