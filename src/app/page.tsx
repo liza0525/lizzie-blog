@@ -5,6 +5,7 @@ import React, { Suspense } from "react";
 import Link from "next/link";
 import { getPostList, getAllTags } from "@/lib/services/post.service";
 import TagSidebar from "@/components/TagSidebar";
+import HighlightText from "@/components/HighlightText";
 import SidebarLayout from "@/components/SidebarLayout";
 import type { Post } from "@/types";
 
@@ -18,16 +19,19 @@ function getCardImage(post: Post): string {
 }
 
 interface HomePageProps {
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; q?: string }>;
 }
 
 export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
-  const { tag } = await searchParams;
+  const { tag, q } = await searchParams;
   const [allPosts, tags] = await Promise.all([getPostList(), getAllTags()]);
 
-  const posts = tag
-    ? allPosts.filter((p) => p.tags.includes(tag))
-    : allPosts;
+  let posts = allPosts;
+  if (tag) posts = posts.filter((p) => p.tags.includes(tag));
+  if (q) {
+    const lower = q.toLowerCase();
+    posts = posts.filter((p) => p.title.toLowerCase().includes(lower));
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -41,9 +45,10 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
 
       {/* 카드 그리드 */}
       <div>
-        {tag && (
+        {(tag || q) && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            <span className="font-medium text-gray-900 dark:text-white">{tag}</span> 태그의 글{" "}
+            {q && <><span className="font-medium text-gray-900 dark:text-white">"{q}"</span> 검색 결과{" "}</>}
+            {tag && <><span className="font-medium text-gray-900 dark:text-white">{tag}</span> 태그{" "}</>}
             <span className="text-gray-400">({posts.length})</span>
           </p>
         )}
@@ -80,7 +85,7 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
                 )}
 
                 <h2 className="font-bold text-gray-900 dark:text-white text-base leading-snug mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors line-clamp-2">
-                  {post.title}
+                  <HighlightText text={post.title} query={q ?? ""} />
                 </h2>
 
                 {post.description && (
@@ -102,7 +107,7 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
 
         {posts.length === 0 && (
           <p className="text-center text-gray-400 py-24">
-            {tag ? `"${tag}" 태그의 글이 없습니다.` : "아직 게시된 글이 없습니다."}
+            {q ? `"${q}"에 대한 검색 결과가 없습니다.` : tag ? `"${tag}" 태그의 글이 없습니다.` : "아직 게시된 글이 없습니다."}
           </p>
         )}
       </div>

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import SearchInput from "./SearchInput";
 
 export default function Header(): React.JSX.Element {
   return (
@@ -12,7 +13,10 @@ export default function Header(): React.JSX.Element {
         >
           dev.log
         </Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          <Suspense>
+            <SearchInput />
+          </Suspense>
           <nav>
             <ul className="flex gap-8 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               <li>
