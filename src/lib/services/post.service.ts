@@ -20,3 +20,17 @@ export async function getAllSlugs(): Promise<string[]> {
   const posts = await fetchPostList();
   return posts.map((p) => p.slug);
 }
+
+// 전체 태그 목록 (중복 제거, 사용 횟수 포함)
+export async function getAllTags(): Promise<{ name: string; count: number }[]> {
+  const posts = await fetchPostList();
+  const countMap = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      countMap.set(tag, (countMap.get(tag) ?? 0) + 1);
+    }
+  }
+  return Array.from(countMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+}
