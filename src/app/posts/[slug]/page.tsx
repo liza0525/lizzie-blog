@@ -43,9 +43,12 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           {/* 뒤로가기 */}
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-10"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-10"
           >
-            ← 목록으로
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            목록으로
           </Link>
 
           {/* 헤더 */}

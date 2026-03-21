@@ -96,9 +96,6 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
 
                 <div className="flex items-center justify-between mt-auto">
                   <span className="text-xs text-gray-400 dark:text-gray-500">{post.publishedAt}</span>
-                  <span className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
-                    Read →
-                  </span>
                 </div>
               </div>
             </Link>
