@@ -2,27 +2,53 @@
 // 다른 파일에서 @notionhq/client를 직접 import하지 말 것
 
 import { NotionToMarkdown } from "notion-to-md";
-import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { PageObjectResponse, QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { notionClient, DATABASE_ID } from "./client";
 import { mapPageToPost } from "./mapper";
-import type { Post, PostDetail } from "@/types";
+import type { Post, PostDetail, PostListPage } from "@/types";
 
 const n2m = new NotionToMarkdown({ notionClient });
 
-// 발행된 포스트 목록 조회 (최신순)
-export async function fetchPostList(): Promise<Post[]> {
+// 페이지네이션 포스트 목록 조회 (20개씩, 태그 필터 선택)
+export async function fetchPostPage(options: {
+  pageSize: number;
+  cursor?: string;
+  tag?: string;
+}): Promise<PostListPage> {
+  const baseFilter = { property: "Status", status: { equals: "Published" } };
+  const filter: QueryDatabaseParameters["filter"] = options.tag
+    ? { and: [baseFilter, { property: "Tags", multi_select: { contains: options.tag } }] }
+    : baseFilter;
+
   const response = await notionClient.databases.query({
     database_id: DATABASE_ID,
-    filter: {
-      property: "Status",
-      status: { equals: "Published" },
-    },
+    filter,
     sorts: [{ property: "PublishedAt", direction: "descending" }],
+    page_size: options.pageSize,
+    ...(options.cursor ? { start_cursor: options.cursor } : {}),
   });
 
-  return response.results
-    .filter((page): page is PageObjectResponse => "properties" in page)
-    .map(mapPageToPost);
+  return {
+    posts: response.results
+      .filter((p): p is PageObjectResponse => "properties" in p)
+      .map(mapPageToPost),
+    nextCursor: response.next_cursor,
+    hasMore: response.has_more,
+  };
+}
+
+// 전체 포스트 조회 — generateStaticParams, 태그 목록, 검색에 사용
+export async function fetchAllPosts(): Promise<Post[]> {
+  const all: Post[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const page = await fetchPostPage({ pageSize: 100, cursor });
+    all.push(...page.posts);
+    cursor = page.nextCursor ?? undefined;
+  } while (cursor);
+
+  return all;
 }
 
 // slug로 단일 포스트 조회

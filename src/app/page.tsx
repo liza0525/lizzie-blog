@@ -2,21 +2,13 @@
 // ISR: 1시간마다 재생성 (CLAUDE.md 참고)
 
 import React, { Suspense } from "react";
-import Link from "next/link";
-import { getPostList, getAllTags } from "@/lib/services/post.service";
+import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
 import TagSidebar from "@/components/TagSidebar";
-import HighlightText from "@/components/HighlightText";
 import SidebarLayout from "@/components/SidebarLayout";
-import type { Post } from "@/types";
+import PostGrid from "@/components/PostGrid";
+import type { PostListPage } from "@/types";
 
 export const revalidate = 3600;
-
-// coverImage가 없을 때 post id 기반으로 일관된 랜덤 이미지 반환
-function getCardImage(post: Post): string {
-  if (post.coverImage) return post.coverImage;
-  const seed = encodeURIComponent(post.id);
-  return `https://picsum.photos/seed/${seed}/800/450`;
-}
 
 interface HomePageProps {
   searchParams: Promise<{ tag?: string; q?: string }>;
@@ -24,14 +16,15 @@ interface HomePageProps {
 
 export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
   const { tag, q } = await searchParams;
-  const [allPosts, tags] = await Promise.all([getPostList(), getAllTags()]);
 
-  let posts = allPosts;
-  if (tag) posts = posts.filter((p) => p.tags.includes(tag));
-  if (q) {
-    const lower = q.toLowerCase();
-    posts = posts.filter((p) => p.title.toLowerCase().includes(lower));
-  }
+  // 검색 시: 전체 로드 후 필터 (Notion 제목 검색 미지원)
+  // 그 외: 페이지네이션 (20개씩)
+  const [firstPage, tags] = await Promise.all([
+    q
+      ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
+      : getPostPage({ pageSize: 20, tag }),
+    getAllTags(),
+  ]);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -42,72 +35,23 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
           </Suspense>
         }
       >
+        <div>
+          {(tag || q) && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              {q && <><span className="font-medium text-gray-900 dark:text-white">"{q}"</span> 검색 결과{" "}</>}
+              {tag && <><span className="font-medium text-gray-900 dark:text-white">{tag}</span> 태그{" "}</>}
+              <span className="text-gray-400">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
+            </p>
+          )}
 
-      {/* 카드 그리드 */}
-      <div>
-        {(tag || q) && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            {q && <><span className="font-medium text-gray-900 dark:text-white">"{q}"</span> 검색 결과{" "}</>}
-            {tag && <><span className="font-medium text-gray-900 dark:text-white">{tag}</span> 태그{" "}</>}
-            <span className="text-gray-400">({posts.length})</span>
-          </p>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          {posts.map((post: Post) => (
-            <Link
-              key={post.id}
-              href={`/posts/${encodeURIComponent(post.slug)}`}
-              className="group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-950 transition-shadow duration-200"
-            >
-              {/* 커버 이미지 */}
-              <div className="aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={getCardImage(post)}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-
-              {/* 카드 본문 */}
-              <div className="p-5">
-                {post.tags.length > 0 && (
-                  <div className="flex gap-1.5 flex-wrap mb-3">
-                    {post.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <h2 className="font-bold text-gray-900 dark:text-white text-base leading-snug mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors line-clamp-2">
-                  <HighlightText text={post.title} query={q ?? ""} />
-                </h2>
-
-                {post.description && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-4">
-                    {post.description}
-                  </p>
-                )}
-
-                <div className="flex items-center justify-between mt-auto">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">{post.publishedAt}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
+          <PostGrid
+            initialPosts={firstPage.posts}
+            initialCursor={firstPage.nextCursor}
+            initialHasMore={firstPage.hasMore}
+            tag={tag}
+            query={q}
+          />
         </div>
-
-        {posts.length === 0 && (
-          <p className="text-center text-gray-400 py-24">
-            {q ? `"${q}"에 대한 검색 결과가 없습니다.` : tag ? `"${tag}" 태그의 글이 없습니다.` : "아직 게시된 글이 없습니다."}
-          </p>
-        )}
-      </div>
       </SidebarLayout>
     </div>
   );

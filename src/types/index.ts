@@ -18,3 +18,10 @@ export type PostSummary = Omit<Post, never>;
 export interface PostDetail extends Post {
   content: string;        // notion-to-md로 변환된 마크다운
 }
+
+// 페이지네이션 결과
+export interface PostListPage {
+  posts: Post[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}

@@ -2,13 +2,19 @@
 // repository를 조합하고, 컴포넌트에서 직접 쓰는 인터페이스 제공
 
 import {
-  fetchPostList,
+  fetchPostPage,
+  fetchAllPosts,
   fetchPostDetail,
 } from "@/lib/notion/repository";
-import type { Post, PostDetail } from "@/types";
+import type { Post, PostDetail, PostListPage } from "@/types";
 
-export async function getPostList(): Promise<Post[]> {
-  return fetchPostList();
+// 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
+export async function getPostPage(options: {
+  pageSize?: number;
+  cursor?: string;
+  tag?: string;
+}): Promise<PostListPage> {
+  return fetchPostPage({ pageSize: options.pageSize ?? 20, ...options });
 }
 
 export async function getPostDetail(slug: string): Promise<PostDetail | null> {
@@ -17,7 +23,7 @@ export async function getPostDetail(slug: string): Promise<PostDetail | null> {
 
 // 정적 경로 생성용 (Next.js generateStaticParams에서 사용)
 export async function getAllSlugs(): Promise<string[]> {
-  const posts = await fetchPostList();
+  const posts = await fetchAllPosts();
   return posts.map((p) => p.slug);
 }
 
@@ -25,7 +31,7 @@ export async function getAllSlugs(): Promise<string[]> {
 export async function getAdjacentPosts(
   slug: string
 ): Promise<{ prev: Post | null; next: Post | null }> {
-  const posts = await fetchPostList();
+  const posts = await fetchAllPosts();
   const index = posts.findIndex((p) => p.slug === slug);
   if (index === -1) return { prev: null, next: null };
 
@@ -35,9 +41,16 @@ export async function getAdjacentPosts(
   };
 }
 
-// 전체 태그 목록 (중복 제거, 사용 횟수 포함)
+// 제목 검색 — Notion이 제목 검색을 미지원하므로 전체 로드 후 필터링
+export async function searchPosts(query: string): Promise<Post[]> {
+  const posts = await fetchAllPosts();
+  const lower = query.toLowerCase();
+  return posts.filter((p) => p.title.toLowerCase().includes(lower));
+}
+
+// 전체 태그 목록 (중복 제거, 사용 횟수 포함) — 전체 포스트 필요
 export async function getAllTags(): Promise<{ name: string; count: number }[]> {
-  const posts = await fetchPostList();
+  const posts = await fetchAllPosts();
   const countMap = new Map<string, number>();
   for (const post of posts) {
     for (const tag of post.tags) {
