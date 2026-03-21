@@ -21,6 +21,20 @@ export async function getAllSlugs(): Promise<string[]> {
   return posts.map((p) => p.slug);
 }
 
+// 이전/다음 포스트 조회 (publishedAt 기준, 목록은 최신순이므로 index+1이 이전글)
+export async function getAdjacentPosts(
+  slug: string
+): Promise<{ prev: Post | null; next: Post | null }> {
+  const posts = await fetchPostList();
+  const index = posts.findIndex((p) => p.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+
+  return {
+    prev: posts[index + 1] ?? null,  // 더 오래된 글
+    next: posts[index - 1] ?? null,  // 더 최신 글
+  };
+}
+
 // 전체 태그 목록 (중복 제거, 사용 횟수 포함)
 export async function getAllTags(): Promise<{ name: string; count: number }[]> {
   const posts = await fetchPostList();
