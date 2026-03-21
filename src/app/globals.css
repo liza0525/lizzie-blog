@@ -30,3 +30,19 @@ body {
 .prose code, .prose pre {
   font-family: var(--font-noto-sans-kr), sans-serif;
 }
+
+/* sticky 헤더(64px)에 가리지 않도록 앵커 스크롤 여백 */
+.prose h1, .prose h2, .prose h3,
+.prose h4, .prose h5, .prose h6 {
+  scroll-margin-top: 5rem;
+}
+
+.prose h1 { font-size: 2.25rem; }
+
+/* CodeBlock 컴포넌트가 자체 스타일을 가지므로 prose의 pre 기본 스타일 리셋 */
+.prose pre {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
