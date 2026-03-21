@@ -1,3 +1,6 @@
+// 포스트 카드 그리드 — 무한 스크롤 지원
+// IntersectionObserver로 스크롤 바닥 감지 → /api/posts로 다음 페이지 fetch
+// 태그 필터/검색어 변경 시 자동으로 처음부터 다시 로드
 "use client";
 
 import { useEffect, useRef, useState } from "react";

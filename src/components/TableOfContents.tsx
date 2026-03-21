@@ -1,3 +1,6 @@
+// 포스트 우측 목차(TOC) — h1/h2/h3 계층 구조로 렌더링
+// IntersectionObserver로 현재 읽고 있는 섹션을 감지해 활성 항목 하이라이팅
+// rehype-slug가 생성한 헤딩 id를 앵커로 사용
 "use client";
 
 import { useEffect, useState } from "react";

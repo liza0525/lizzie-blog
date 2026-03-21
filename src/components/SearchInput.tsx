@@ -1,3 +1,5 @@
+// 제목 검색 입력창 — URL 쿼리(?q=)로 상태 관리
+// 뒤로가기/앞으로가기 시 URL과 입력값 자동 동기화
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";

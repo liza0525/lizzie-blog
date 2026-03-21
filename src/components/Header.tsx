@@ -1,3 +1,5 @@
+// 전역 헤더 — 블로그 제목(홈 링크), 검색창, 홈 아이콘, 다크모드 토글 포함
+// sticky top-0으로 스크롤해도 항상 상단 고정
 import React, { Suspense } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";

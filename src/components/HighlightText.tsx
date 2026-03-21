@@ -1,3 +1,5 @@
+// 검색어 하이라이팅 — 텍스트에서 query와 일치하는 부분을 <mark>로 감싸 반환
+// 대소문자 무시, 정규식 특수문자 이스케이프 처리
 interface HighlightTextProps {
   text: string;
   query: string;

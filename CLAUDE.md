@@ -33,6 +33,9 @@ Next.js 14 (App Router) + Notion API + Vercel 배포.
 ---
 
 ## 프로젝트 구조
+> **규칙:** 파일/컴포넌트를 추가·삭제·이동할 때마다 아래 구조와 컴포넌트 목록을 반드시 업데이트할 것.
+
+
 ```
 src/
 ├── app/                        # 라우트 레이어
@@ -46,7 +49,18 @@ src/
 │   │   └── mapper.ts           # API 응답 → 내부 타입 변환
 │   └── services/
 │       └── post.service.ts     # 비즈니스 로직 (repository 조합)
-├── components/                 # UI 컴포넌트
+├── components/                 # UI 컴포넌트 (각 파일 상단 주석 필수)
+│   ├── Header.tsx              # 전역 헤더 (블로그 제목, 검색, 홈 아이콘, 다크모드 토글)
+│   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
+│   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
+│   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
+│   ├── TagSidebar.tsx          # 태그 필터 사이드바 (?tag= URL 기반)
+│   ├── SidebarLayout.tsx       # 햄버거 토글 사이드바 레이아웃 (lg 이상)
+│   ├── PostGrid.tsx            # 포스트 카드 그리드 (무한 스크롤)
+│   ├── HighlightText.tsx       # 검색어 하이라이팅
+│   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism)
+│   ├── TableOfContents.tsx     # 포스트 우측 목차 (IntersectionObserver 활성화)
+│   └── FormattedDate.tsx       # 브라우저 로케일 기준 날짜+시간 포맷
 └── types/                      # 공통 타입 정의 (index.ts)
 ```
 
@@ -70,6 +84,16 @@ src/
 - 파일당 하나의 책임
 - 컴포넌트는 함수형으로
 - 주석: "무엇"보다 "왜"를 설명
+
+### 컴포넌트 주석 규칙 (필수)
+- **모든 컴포넌트 파일 최상단에 반드시 주석 작성**
+- 형식: `// 한 줄 역할 요약`으로 시작, 필요 시 2~3줄 추가
+- 포함할 내용: 컴포넌트의 역할, 주요 동작 방식, 주의사항(있을 경우)
+- 예시:
+  ```tsx
+  // 포스트 카드 그리드 — 무한 스크롤 지원
+  // IntersectionObserver로 스크롤 바닥 감지 → /api/posts로 다음 페이지 fetch
+  ```
 
 ---
 

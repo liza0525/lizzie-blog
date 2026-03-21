@@ -1,3 +1,5 @@
+// 다크/라이트 모드 토글 버튼 — next-themes의 useTheme 사용
+// SSR hydration mismatch 방지를 위해 마운트 전 빈 div 렌더링
 "use client";
 
 import { useTheme } from "next-themes";

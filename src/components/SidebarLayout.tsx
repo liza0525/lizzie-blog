@@ -1,3 +1,6 @@
+// 햄버거 토글 사이드바 레이아웃 — lg(1024px) 이상에서만 표시
+// sidebar prop으로 콘텐츠를 받아 좌측 슬라이드 패널로 렌더링
+// 토글 버튼 클릭으로 열고 닫기, 기본값은 닫힌 상태
 "use client";
 
 import { useState } from "react";

@@ -1,3 +1,5 @@
+// 태그 필터 사이드바 — URL 쿼리(?tag=)로 상태 관리
+// 같은 태그 재클릭 시 필터 해제, SidebarLayout 안에서 사용
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";

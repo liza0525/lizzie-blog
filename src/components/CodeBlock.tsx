@@ -1,3 +1,6 @@
+// 마크다운 코드 블록 렌더러 — react-syntax-highlighter(Prism) 기반
+// next-themes의 useTheme으로 다크/라이트 테마 자동 전환
+// 인라인 코드와 블록 코드를 구분해 각각 다른 스타일 적용
 "use client";
 
 import { useTheme } from "next-themes";
