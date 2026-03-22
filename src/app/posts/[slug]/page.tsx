@@ -10,7 +10,6 @@ import { getPost, getAllSlugs } from "@/lib/services/post.service";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
-import ShareButtons from "@/components/ShareButtons";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
 
@@ -70,13 +69,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
               {post.description}
             </p>
           )}
-          <div className="flex items-center justify-between mt-4">
-            <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500" />
-            {/* xl 이상에서는 좌측 sticky 사이드바로 대체 */}
-            <div className="xl:hidden">
-              <ShareButtons title={post.title} />
-            </div>
-          </div>
+          <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500 mt-4 block" />
         </header>
 
         {/* 커버 이미지 */}

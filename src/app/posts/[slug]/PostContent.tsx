@@ -31,8 +31,11 @@ export default async function PostContent({ pageId }: PostContentProps): Promise
             rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlugNoEmoji]}
             components={{
               img: ({ src, alt }) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={src} alt={alt ?? ""} className="rounded-lg w-full" />
+                <figure className="my-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={alt ?? ""} className="rounded-lg w-full" />
+                  {alt && <figcaption className="text-center text-sm text-gray-400 dark:text-gray-500 mt-2">{alt}</figcaption>}
+                </figure>
               ),
               code: (props) => <CodeBlock {...props} />,
             }}

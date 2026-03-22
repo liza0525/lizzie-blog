@@ -16,9 +16,11 @@ export default function Header(): React.JSX.Element {
           Lizzie
         </Link>
         <div className="flex items-center gap-4">
-          <Suspense>
-            <SearchInput />
-          </Suspense>
+          <div className="hidden sm:block">
+            <Suspense>
+              <SearchInput />
+            </Suspense>
+          </div>
           <nav>
             <Link
               href="/"
