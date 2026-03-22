@@ -9,7 +9,7 @@ import type {
 } from "@notionhq/client/build/src/api-endpoints";
 import { notionClient, DATABASE_ID } from "./client";
 import { mapPageToPost } from "./mapper";
-import type { Post, PostDetail, PostListPage } from "@/types";
+import type { Post, PostListPage } from "@/types";
 
 // 페이지네이션 포스트 목록 조회 (20개씩, 태그 필터 선택)
 export async function fetchPostPage(options: {
@@ -139,11 +139,3 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   return parent;
 }
 
-// 포스트 상세 (메타 + 본문) 조회
-export async function fetchPostDetail(slug: string): Promise<PostDetail | null> {
-  const post = await fetchPostBySlug(slug);
-  if (!post) return null;
-
-  const content = await fetchPostContent(post.id);
-  return { ...post, content };
-}

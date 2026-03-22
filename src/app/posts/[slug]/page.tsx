@@ -13,7 +13,7 @@ import FormattedDate from "@/components/FormattedDate";
 import ShareButtons from "@/components/ShareButtons";
 import ShareSidebar from "@/components/ShareSidebar";
 
-export const revalidate = 7200;
+export const revalidate = 86400;
 
 // 빌드 시 정적 경로 생성 (SSG)
 export async function generateStaticParams(): Promise<{ slug: string }[]> {

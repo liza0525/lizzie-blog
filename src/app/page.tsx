@@ -8,7 +8,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import PostGrid from "@/components/PostGrid";
 import type { PostListPage } from "@/types";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 interface HomePageProps {
   searchParams: Promise<{ tag?: string; q?: string }>;

@@ -11,13 +11,6 @@ export interface Post {
   coverImage: string | null;
 }
 
-// 목록용 (상세 내용 제외)
-export type PostSummary = Omit<Post, never>;
-
-// 상세 페이지용 (마크다운 본문 포함)
-export interface PostDetail extends Post {
-  content: string;        // notion-to-md로 변환된 마크다운
-}
 
 // 페이지네이션 결과
 export interface PostListPage {

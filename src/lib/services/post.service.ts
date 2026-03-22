@@ -1,15 +1,13 @@
 // 비즈니스 로직 레이어 — Flask의 service 레이어
 // repository를 조합하고, 컴포넌트에서 직접 쓰는 인터페이스 제공
 
-import { unstable_cache } from "next/cache";
 import {
   fetchPostPage,
   fetchAllPosts,
-  fetchPostDetail,
   fetchPostBySlug,
   fetchPostContent,
 } from "@/lib/notion/repository";
-import type { Post, PostDetail, PostListPage } from "@/types";
+import type { Post, PostListPage } from "@/types";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
 export async function getPostPage(options: {
@@ -25,23 +23,12 @@ export async function getPost(slug: string): Promise<Post | null> {
   return fetchPostBySlug(slug);
 }
 
-// 본문만 조회 — unstable_cache로 Notion API 결과를 Next.js 서버 캐시에 저장
-// 태그: post-content-{pageId} → /api/revalidate로 포스트별 수동 무효화 가능
-// TTL 24시간 (블로그 글은 수정이 드물어 긴 TTL 적용)
+// 본문만 조회 — 캐싱은 페이지 레벨 ISR(revalidate=7200)에 위임
+// 수동 갱신은 /api/revalidate 엔드포인트로 revalidatePath 호출
 export function getPostContent(pageId: string): Promise<string> {
-  return unstable_cache(
-    () => fetchPostContent(pageId),
-    [`post-content-${pageId}`],
-    {
-      revalidate: 60 * 60 * 24,
-      tags: [`post-content-${pageId}`],
-    }
-  )();
+  return fetchPostContent(pageId);
 }
 
-export async function getPostDetail(slug: string): Promise<PostDetail | null> {
-  return fetchPostDetail(slug);
-}
 
 // 정적 경로 생성용 (Next.js generateStaticParams에서 사용)
 export async function getAllSlugs(): Promise<string[]> {
