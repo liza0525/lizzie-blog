@@ -1,6 +1,7 @@
 // 비즈니스 로직 레이어 — Flask의 service 레이어
 // repository를 조합하고, 컴포넌트에서 직접 쓰는 인터페이스 제공
 
+import { unstable_cache } from "next/cache";
 import {
   fetchPostPage,
   fetchAllPosts,
@@ -24,9 +25,18 @@ export async function getPost(slug: string): Promise<Post | null> {
   return fetchPostBySlug(slug);
 }
 
-// 본문만 조회 — Suspense 안의 PostContent 컴포넌트에서 사용
-export async function getPostContent(pageId: string): Promise<string> {
-  return fetchPostContent(pageId);
+// 본문만 조회 — unstable_cache로 Notion API 결과를 Next.js 서버 캐시에 저장
+// 태그: post-content-{pageId} → /api/revalidate로 포스트별 수동 무효화 가능
+// TTL 24시간 (블로그 글은 수정이 드물어 긴 TTL 적용)
+export function getPostContent(pageId: string): Promise<string> {
+  return unstable_cache(
+    () => fetchPostContent(pageId),
+    [`post-content-${pageId}`],
+    {
+      revalidate: 60 * 60 * 24,
+      tags: [`post-content-${pageId}`],
+    }
+  )();
 }
 
 export async function getPostDetail(slug: string): Promise<PostDetail | null> {

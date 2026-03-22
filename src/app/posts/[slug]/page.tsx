@@ -1,12 +1,14 @@
 // 글 상세 페이지
 // ISR: 2시간마다 재생성 (CLAUDE.md 참고)
-// 메타데이터(제목/태그/커버)는 즉시 렌더링, 본문은 Suspense로 스트리밍
+// 메타데이터(제목/태그/커버)는 서버에서 즉시 렌더링
+// 본문은 PostContent(client)가 스트리밍 API에서 받아 점진적으로 렌더링
 
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPost, getAllSlugs } from "@/lib/services/post.service";
 import PostContent from "./PostContent";
+import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
 
 export const revalidate = 7200;
@@ -77,34 +79,14 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           />
         </div>
 
-        {/* 본문 + TOC + 이전/다음 — 느린 fetch를 기다리는 동안 스켈레톤 표시 */}
-        <Suspense fallback={<ContentSkeleton />}>
-          <PostContent pageId={post.id} slug={decodedSlug} />
+        {/* 본문 + TOC — 클라이언트에서 스트리밍으로 점진 렌더링 */}
+        <PostContent pageId={post.id} />
+
+        {/* 이전/다음 글 — 본문 스트리밍과 독립적으로 로드 */}
+        <Suspense fallback={null}>
+          <AdjacentPosts slug={decodedSlug} />
         </Suspense>
       </article>
-    </div>
-  );
-}
-
-// 본문 영역 대기 중 스켈레톤
-function ContentSkeleton(): React.JSX.Element {
-  return (
-    <div className="flex gap-12 animate-pulse">
-      <div className="flex-1 min-w-0 space-y-3">
-        {Array.from({ length: 16 }).map((_, i) => (
-          <div
-            key={i}
-            className={`h-4 bg-gray-200 dark:bg-gray-700 rounded ${
-              i % 5 === 0 ? "h-6 w-2/5" : i % 4 === 3 ? "w-3/4" : "w-full"
-            }`}
-          />
-        ))}
-      </div>
-      <div className="w-56 shrink-0 hidden xl:flex xl:flex-col gap-2">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className={`h-3 bg-gray-200 dark:bg-gray-700 rounded ${i % 3 === 0 ? "w-4/5" : "w-3/5"}`} />
-        ))}
-      </div>
     </div>
   );
 }

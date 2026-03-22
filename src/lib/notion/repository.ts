@@ -72,7 +72,7 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
 }
 
 // 단일 블록의 모든 children을 페이지네이션 포함해서 가져옴
-async function fetchAllChildren(blockId: string): Promise<BlockObjectResponse[]> {
+export async function fetchAllChildren(blockId: string): Promise<BlockObjectResponse[]> {
   const results: BlockObjectResponse[] = [];
   let cursor: string | undefined;
 
