@@ -11,24 +11,24 @@ import type { ComponentPropsWithoutRef } from "react";
 
 type CodeProps = ComponentPropsWithoutRef<"code"> & { inline?: boolean };
 
-export default function CodeBlock({ inline, className, children }: CodeProps) {
+export default function CodeBlock({ className, children }: CodeProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const language = /language-(\w+)/.exec(className ?? "")?.[1];
 
-  // 인라인 코드는 그냥 렌더링
-  if (inline) {
-    return (
-      <code className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm">
-        {children}
-      </code>
-    );
-  }
-
   // 언어 미지정 코드블럭 — 하이라이팅 없이 블록 스타일만 적용
+  // inline prop은 react-markdown v9+에서 항상 undefined라 줄바꿈 유무로 블록/인라인 구분
   if (!language) {
+    const isInline = !String(children).includes("\n");
+    if (isInline) {
+      return (
+        <code className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm">
+          {children}
+        </code>
+      );
+    }
     return (
       <div className="my-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
         <pre className="!bg-gray-50 dark:!bg-gray-900 !px-4 !py-4 overflow-x-auto text-sm leading-relaxed text-gray-800 dark:text-gray-200 !m-0">
