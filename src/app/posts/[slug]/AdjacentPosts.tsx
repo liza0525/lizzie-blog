@@ -40,7 +40,7 @@ function AdjacentLink({
   return (
     <Link
       href={`/posts/${encodeURIComponent(post.slug)}`}
-      className="group flex flex-col gap-1"
+      className={`group flex flex-col gap-1${isPrev ? "" : " items-end text-right"}`}
     >
       <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1">
         {isPrev && (
