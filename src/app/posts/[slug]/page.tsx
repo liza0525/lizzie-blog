@@ -14,7 +14,7 @@ import ShareButtons from "@/components/ShareButtons";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
 
-export const revalidate = 86400;
+export const dynamic = "force-dynamic";
 
 // 빌드 시 정적 경로 생성 (SSG)
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
