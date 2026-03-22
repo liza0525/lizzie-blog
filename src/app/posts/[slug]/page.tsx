@@ -12,6 +12,7 @@ import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
 import ShareButtons from "@/components/ShareButtons";
 import ShareSidebar from "@/components/ShareSidebar";
+import GiscusComments from "@/components/GiscusComments";
 
 export const revalidate = 86400;
 
@@ -105,6 +106,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           <Suspense fallback={null}>
             <AdjacentPosts slug={decodedSlug} />
           </Suspense>
+          <GiscusComments />
         </div>
       </article>
     </div>
