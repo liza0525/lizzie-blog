@@ -1,16 +1,36 @@
+import type { Root, Element } from "hast";
+import { visit } from "unist-util-visit";
+import { toString } from "hast-util-to-string";
+
 export interface Heading {
   level: number;   // 1 | 2 | 3
   text: string;
-  id: string;      // rehype-slug 생성 방식과 동일하게 맞춤
+  id: string;
 }
 
-// rehype-slug가 생성하는 ID 규칙 재현
-function toSlug(text: string): string {
+// 헤딩 텍스트 → anchor id 변환
+// 이모지 제거 후 소문자, 공백을 하이픈으로 치환
+export function toSlug(text: string): string {
   return text
+    .replace(/\p{Emoji}/gu, "")
     .toLowerCase()
-    .replace(/[^\w\s가-힣-]/g, "")  // 영문, 숫자, 한글, 하이픈만 유지
+    .replace(/[^\w\s가-힣-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
+}
+
+// rehype-slug 대신 사용하는 커스텀 플러그인
+// 이모지를 제거한 id를 헤딩 엘리먼트에 직접 주입
+export function rehypeSlugNoEmoji() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: Element) => {
+      if (/^h[1-6]$/.test(node.tagName)) {
+        const text = toString(node);
+        node.properties = node.properties ?? {};
+        node.properties.id = toSlug(text);
+      }
+    });
+  };
 }
 
 // 마크다운 문자열에서 h1~h3 헤딩 추출

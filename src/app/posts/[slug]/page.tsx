@@ -10,9 +10,8 @@ import remarkBreaks from "remark-breaks";
 import remarkMath from "remark-math";
 import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
-import rehypeSlug from "rehype-slug";
 import { getPostDetail, getAllSlugs, getAdjacentPosts } from "@/lib/services/post.service";
-import { extractHeadings } from "@/lib/toc";
+import { extractHeadings, rehypeSlugNoEmoji } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
 import FormattedDate from "@/components/FormattedDate";
@@ -92,7 +91,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           <div className="prose prose-gray dark:prose-invert prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-              rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlug]}
+              rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlugNoEmoji]}
               components={{
                 img: ({ src, alt }) => (
                   // eslint-disable-next-line @next/next/no-img-element
