@@ -19,11 +19,22 @@ export default function CodeBlock({ inline, className, children }: CodeProps) {
   const language = /language-(\w+)/.exec(className ?? "")?.[1];
 
   // 인라인 코드는 그냥 렌더링
-  if (inline || !language) {
+  if (inline) {
     return (
       <code className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm">
         {children}
       </code>
+    );
+  }
+
+  // 언어 미지정 코드블럭 — 하이라이팅 없이 블록 스타일만 적용
+  if (!language) {
+    return (
+      <div className="my-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        <pre className="!bg-gray-50 dark:!bg-gray-900 !px-4 !py-4 overflow-x-auto text-sm leading-relaxed text-gray-800 dark:text-gray-200 !m-0">
+          <code>{children}</code>
+        </pre>
+      </div>
     );
   }
 
