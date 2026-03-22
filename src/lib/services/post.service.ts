@@ -23,7 +23,7 @@ export async function getPostPage(options: {
 const getCachedPost = unstable_cache(
   (slug: string) => fetchPostBySlug(slug),
   ["post-by-slug"],
-  { revalidate: 7200 }
+  { revalidate: 7200, tags: ["post"] }
 );
 export async function getPost(slug: string): Promise<Post | null> {
   return getCachedPost(slug);
@@ -33,7 +33,7 @@ export async function getPost(slug: string): Promise<Post | null> {
 const getCachedPostContent = unstable_cache(
   (pageId: string) => fetchPostContent(pageId),
   ["post-content"],
-  { revalidate: 7200 }
+  { revalidate: 7200, tags: ["post"] }
 );
 export function getPostContent(pageId: string): Promise<string> {
   return getCachedPostContent(pageId);

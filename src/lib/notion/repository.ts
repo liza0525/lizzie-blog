@@ -6,6 +6,7 @@ import type {
   PageObjectResponse,
   QueryDatabaseParameters,
   BlockObjectResponse,
+  EmbedBlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { notionClient, DATABASE_ID } from "./client";
 import { mapPageToPost } from "./mapper";
@@ -136,6 +137,14 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   };
 
   const n2m = new NotionToMarkdown({ notionClient: cachedClient as typeof notionClient });
+
+  // embed 블록 → <iframe> HTML로 변환 (rehype-raw가 렌더링)
+  // 다른 블로그 글 등 외부 URL을 Notion에서 embed했을 때 iframe으로 표시
+  n2m.setCustomTransformer("embed", async (block) => {
+    const url = (block as EmbedBlockObjectResponse).embed.url;
+    return `<iframe src="${url}" class="notion-embed" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+  });
+
   const mdBlocks = await n2m.pageToMarkdown(pageId);
   const { parent } = n2m.toMarkdownString(mdBlocks);
   return parent;

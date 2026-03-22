@@ -38,6 +38,10 @@ export default async function PostContent({ pageId }: PostContentProps): Promise
                 </figure>
               ),
               code: (props) => <CodeBlock {...props} />,
+              // notion embed iframe — prose 스타일 override로 비율 유지
+              iframe: ({ ...props }) => (
+                <iframe {...props} className="notion-embed rounded-lg my-4 w-full h-[600px]" />
+              ),
             }}
           >
             {content}
