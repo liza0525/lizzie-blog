@@ -25,6 +25,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 
   // "post" 태그가 붙은 unstable_cache 전체 무효화 — 다음 요청 시 재fetch
-  revalidateTag("post");
+  revalidateTag("post", "default");
   return NextResponse.json({ revalidated: true, slug });
 }
