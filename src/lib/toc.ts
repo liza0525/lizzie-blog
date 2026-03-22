@@ -12,7 +12,7 @@ export interface Heading {
 // 이모지 제거 후 소문자, 공백을 하이픈으로 치환
 export function toSlug(text: string): string {
   return text
-    .replace(/\p{Emoji}/gu, "")
+    .replace(/\p{Emoji_Presentation}/gu, "")
     .toLowerCase()
     .replace(/[^\w\s가-힣-]/g, "")
     .trim()
