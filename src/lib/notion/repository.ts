@@ -58,8 +58,10 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
   const response = await notionClient.databases.query({
     database_id: DATABASE_ID,
     filter: {
-      property: "Slug",
-      formula: { string: { equals: slug } },
+      and: [
+        { property: "Slug", formula: { string: { equals: slug } } },
+        { property: "Status", status: { equals: "Published" } },
+      ],
     },
   });
 
