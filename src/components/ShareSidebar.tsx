@@ -1,4 +1,4 @@
-// 포스트 좌측 sticky 공유 사이드바 — xl 이상에서만 표시
+// 포스트 하단 고정 공유 바 — xl 이상에서만 표시
 // 둥근 직사각형 컨테이너 안에 아이콘 버튼 세로 배치
 // 링크 복사 / LinkedIn / Facebook
 
@@ -40,7 +40,7 @@ export default function ShareSidebar({ title }: ShareSidebarProps): React.JSX.El
   }
 
   return (
-    <div className="inline-flex flex-col gap-1.5 border border-gray-200 dark:border-gray-700 rounded-full p-2">
+    <div className="inline-flex flex-col gap-1.5 border border-gray-200 dark:border-gray-700 rounded-full p-2 bg-white dark:bg-gray-900">
       <IconButton onClick={handleCopy} label={copied ? "복사됨" : "링크 복사"}>
         {copied ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

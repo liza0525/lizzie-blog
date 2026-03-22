@@ -17,8 +17,8 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "lizzie",
-  description: "개인 개발 기술 블로그",
+  title: "Lizzie's Blog",
+  description: "Lizzie의 개인 개발 기술 블로그",
 };
 
 export default function RootLayout({
@@ -34,7 +34,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <footer className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 mt-16">
             <div className="max-w-6xl mx-auto px-6 py-8 text-center text-sm text-gray-400">
-              © {new Date().getFullYear()} lizzie
+              © {new Date().getFullYear()} Lizzie
             </div>
           </footer>
         </ThemeProvider>

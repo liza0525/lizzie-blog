@@ -36,9 +36,6 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
 
   return (
     <nav>
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-        On this page
-      </p>
       <ul className="border-l border-gray-200 dark:border-gray-700 space-y-0.5">
         {headings.map(({ level, text, id }) => {
           const isActive = activeId === id;

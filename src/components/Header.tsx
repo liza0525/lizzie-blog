@@ -13,7 +13,7 @@ export default function Header(): React.JSX.Element {
           href="/"
           className="text-lg font-bold tracking-tight text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
         >
-          lizzie
+          Lizzie
         </Link>
         <div className="flex items-center gap-4">
           <Suspense>
