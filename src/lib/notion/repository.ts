@@ -59,7 +59,7 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
     database_id: DATABASE_ID,
     filter: {
       and: [
-        { property: "Slug", formula: { string: { equals: slug } } },
+        { property: "Slug", rich_text: { equals: slug } },
         { property: "Status", status: { equals: "Published" } },
       ],
     },
