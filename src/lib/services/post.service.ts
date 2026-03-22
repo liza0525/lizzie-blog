@@ -1,6 +1,7 @@
 // 비즈니스 로직 레이어 — Flask의 service 레이어
 // repository를 조합하고, 컴포넌트에서 직접 쓰는 인터페이스 제공
 
+import { unstable_cache } from "next/cache";
 import {
   fetchPostPage,
   fetchAllPosts,
@@ -18,15 +19,24 @@ export async function getPostPage(options: {
   return fetchPostPage({ pageSize: options.pageSize ?? 20, ...options });
 }
 
-// 메타데이터만 조회 (본문 제외) — 스트리밍 렌더링 시 빠른 첫 화면용
+// 메타데이터만 조회 (본문 제외) — 2시간 캐싱
+const getCachedPost = unstable_cache(
+  (slug: string) => fetchPostBySlug(slug),
+  ["post-by-slug"],
+  { revalidate: 7200 }
+);
 export async function getPost(slug: string): Promise<Post | null> {
-  return fetchPostBySlug(slug);
+  return getCachedPost(slug);
 }
 
-// 본문만 조회 — 캐싱은 페이지 레벨 ISR(revalidate=7200)에 위임
-// 수동 갱신은 /api/revalidate 엔드포인트로 revalidatePath 호출
+// 본문 조회 — 2시간 캐싱 (Notion 블록이 많아 API 비용이 크므로 캐싱 필수)
+const getCachedPostContent = unstable_cache(
+  (pageId: string) => fetchPostContent(pageId),
+  ["post-content"],
+  { revalidate: 7200 }
+);
 export function getPostContent(pageId: string): Promise<string> {
-  return fetchPostContent(pageId);
+  return getCachedPostContent(pageId);
 }
 
 

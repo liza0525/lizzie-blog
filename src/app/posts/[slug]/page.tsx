@@ -14,7 +14,8 @@ import ShareButtons from "@/components/ShareButtons";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
 
-export const dynamic = "force-dynamic";
+// revalidate/ISR 미사용 — 한글 slug가 x-next-cache-tags 헤더 오류를 유발
+// 데이터 캐싱은 post.service의 unstable_cache로 처리
 
 // 빌드 시 정적 경로 생성 (SSG)
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
