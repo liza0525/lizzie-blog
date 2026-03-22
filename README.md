@@ -12,6 +12,7 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 - **Syntax Highlighting:** react-syntax-highlighter (Prism)
 - **Math:** remark-math + rehype-katex
 - **Theme:** next-themes (다크/라이트 모드)
+- **Comments:** Giscus (GitHub Discussions 기반)
 
 ## 주요 기능
 
@@ -23,8 +24,9 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 - 포스트 우측 목차(TOC) — 스크롤 기반 현재 섹션 하이라이팅
 - 이전글/다음글 네비게이션
 - 다크/라이트 모드 토글
-- SNS 공유 버튼 (링크 복사, LinkedIn, Facebook) — 모바일 헤더 인라인 + 화면 하단 고정 / 데스크탑 본문 왼쪽 하단 sticky
-- ISR (글 목록/글 상세 24시간)
+- SNS 공유 버튼 (링크 복사, LinkedIn, Facebook) — 모바일 좌측 하단 고정 / 데스크탑 본문 왼쪽 sticky
+- Giscus 댓글 (GitHub 계정으로 로그인, 다크/라이트 모드 연동)
+- ISR (글 목록 1시간 / 글 상세 2시간)
 - 브라우저 로케일 기준 날짜 포맷
 
 ## 로컬 실행

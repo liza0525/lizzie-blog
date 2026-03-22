@@ -19,7 +19,7 @@ export const revalidate = 86400;
 // 빌드 시 정적 경로 생성 (SSG)
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const slugs = await getAllSlugs();
-  return slugs.map((slug) => ({ slug: encodeURIComponent(slug) }));
+  return slugs.map((slug) => ({ slug }));
 }
 
 interface PageProps {
