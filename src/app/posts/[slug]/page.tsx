@@ -10,6 +10,8 @@ import { getPost, getAllSlugs } from "@/lib/services/post.service";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
+import ShareButtons from "@/components/ShareButtons";
+import ShareSidebar from "@/components/ShareSidebar";
 
 export const revalidate = 7200;
 
@@ -66,7 +68,13 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
               {post.description}
             </p>
           )}
-          <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500" />
+          <div className="flex items-center justify-between mt-4">
+            <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500" />
+            {/* xl 이상에서는 좌측 sticky 사이드바로 대체 */}
+            <div className="xl:hidden">
+              <ShareButtons title={post.title} />
+            </div>
+          </div>
         </header>
 
         {/* 커버 이미지 */}
@@ -79,13 +87,20 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           />
         </div>
 
-        {/* 본문 + TOC — 클라이언트에서 스트리밍으로 점진 렌더링 */}
-        <PostContent pageId={post.id} />
+        {/* 본문 영역 — relative로 감싸서 사이드바를 absolute로 바깥에 띄움 */}
+        <div className="relative">
+          {/* 공유 사이드바 — 본문 왼쪽 바깥에 absolute로 위치, 본문 너비에 영향 없음 */}
+          <div className="hidden xl:block absolute right-full top-0 h-full pr-6">
+            <div className="sticky top-24">
+              <ShareSidebar title={post.title} />
+            </div>
+          </div>
 
-        {/* 이전/다음 글 — 본문 스트리밍과 독립적으로 로드 */}
-        <Suspense fallback={null}>
-          <AdjacentPosts slug={decodedSlug} />
-        </Suspense>
+          <PostContent pageId={post.id} />
+          <Suspense fallback={null}>
+            <AdjacentPosts slug={decodedSlug} />
+          </Suspense>
+        </div>
       </article>
     </div>
   );
