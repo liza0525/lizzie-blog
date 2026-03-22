@@ -5,6 +5,8 @@ import {
   fetchPostPage,
   fetchAllPosts,
   fetchPostDetail,
+  fetchPostBySlug,
+  fetchPostContent,
 } from "@/lib/notion/repository";
 import type { Post, PostDetail, PostListPage } from "@/types";
 
@@ -15,6 +17,16 @@ export async function getPostPage(options: {
   tag?: string;
 }): Promise<PostListPage> {
   return fetchPostPage({ pageSize: options.pageSize ?? 20, ...options });
+}
+
+// 메타데이터만 조회 (본문 제외) — 스트리밍 렌더링 시 빠른 첫 화면용
+export async function getPost(slug: string): Promise<Post | null> {
+  return fetchPostBySlug(slug);
+}
+
+// 본문만 조회 — Suspense 안의 PostContent 컴포넌트에서 사용
+export async function getPostContent(pageId: string): Promise<string> {
+  return fetchPostContent(pageId);
 }
 
 export async function getPostDetail(slug: string): Promise<PostDetail | null> {
