@@ -86,6 +86,7 @@ export default function PostGrid({
           <Link
             key={post.id}
             href={`/posts/${encodeURIComponent(post.slug)}`}
+            prefetch={false}
             className="group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-950 transition-shadow duration-200"
           >
             <div className="aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-800">
