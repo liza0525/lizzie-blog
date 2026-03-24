@@ -18,11 +18,11 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
   const { tag, q } = await searchParams;
 
   // 검색 시: 전체 로드 후 필터 (Notion 제목 검색 미지원)
-  // 그 외: 페이지네이션 (20개씩)
+  // 그 외: 페이지네이션 (10개씩)
   const [firstPage, tags] = await Promise.all([
     q
       ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
-      : getPostPage({ pageSize: 20, tag }),
+      : getPostPage({ pageSize: 10, tag }),
     getAllTags(),
   ]);
 

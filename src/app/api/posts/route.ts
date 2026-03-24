@@ -9,6 +9,6 @@ export async function GET(req: NextRequest): Promise<NextResponse<PostListPage>>
   const cursor = req.nextUrl.searchParams.get("cursor") ?? undefined;
   const tag = req.nextUrl.searchParams.get("tag") ?? undefined;
 
-  const result = await getPostPage({ pageSize: 20, cursor, tag });
+  const result = await getPostPage({ pageSize: 10, cursor, tag });
   return NextResponse.json(result);
 }

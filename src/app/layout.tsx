@@ -16,9 +16,29 @@ const notoSerifKR = Noto_Serif_KR({
   variable: "--font-noto-serif-kr",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Lizzie's Blog",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Lizzie's Blog",
+    // 글 상세 페이지에서 "글 제목 | Lizzie's Blog" 형태로 표시
+    template: "%s | Lizzie's Blog",
+  },
   description: "Lizzie의 개인 개발 기술 블로그",
+  openGraph: {
+    siteName: "Lizzie's Blog",
+    locale: "ko_KR",
+    type: "website",
+    url: SITE_URL,
+    title: "Lizzie's Blog",
+    description: "Lizzie의 개인 개발 기술 블로그",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lizzie's Blog",
+    description: "Lizzie의 개인 개발 기술 블로그",
+  },
 };
 
 export default function RootLayout({

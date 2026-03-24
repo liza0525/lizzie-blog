@@ -6,6 +6,7 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getPost, getAllSlugs } from "@/lib/services/post.service";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
@@ -24,6 +25,36 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+// 글별 동적 메타데이터 생성 — title, description, OG, Twitter card
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(decodeURIComponent(slug));
+  if (!post) return {};
+
+  const ogImage = post.coverImage
+    ? { url: post.coverImage, width: 1200, height: 500, alt: post.title }
+    : undefined;
+
+  return {
+    title: post.title,
+    description: post.description || undefined,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.description || undefined,
+      publishedTime: post.publishedAt,
+      tags: post.tags,
+      images: ogImage ? [ogImage] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description || undefined,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+  };
 }
 
 export default async function PostPage({ params }: PageProps): Promise<React.JSX.Element> {
