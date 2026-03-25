@@ -27,6 +27,8 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 - SNS 공유 버튼 (링크 복사, LinkedIn, Facebook) — 모바일 좌측 하단 고정 / 데스크탑 본문 왼쪽 sticky
 - Giscus 댓글 (GitHub 계정으로 로그인, 다크/라이트 모드 연동)
 - `unstable_cache` 기반 캐싱 (글 목록 1시간 / 글 상세 2시간) + `/admin`에서 수동 무효화
+- OG 메타데이터 자동 생성 (포스트별 제목, 설명, 커버 이미지)
+- Notion 업로드 이미지 프록시 — S3 signed URL 만료 우회
 - Notion embed 블록 → iframe 렌더링
 - 브라우저 로케일 기준 날짜 포맷
 
