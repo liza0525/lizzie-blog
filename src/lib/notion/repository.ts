@@ -7,6 +7,7 @@ import type {
   QueryDatabaseParameters,
   BlockObjectResponse,
   EmbedBlockObjectResponse,
+  ImageBlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { notionClient, DATABASE_ID } from "./client";
 import { mapPageToPost } from "./mapper";
@@ -137,6 +138,18 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   };
 
   const n2m = new NotionToMarkdown({ notionClient: cachedClient as typeof notionClient });
+
+  // image 블록 — file 타입은 S3 signed URL이 1시간 만료되므로 프록시 경유
+  // external 타입(Velog 등 외부 URL)은 만료 없으므로 직접 사용
+  n2m.setCustomTransformer("image", async (block) => {
+    const imageBlock = block as ImageBlockObjectResponse;
+    const caption = imageBlock.image.caption.map((t) => t.plain_text).join("");
+    const url =
+      imageBlock.image.type === "file"
+        ? `/api/notion-image?blockId=${block.id}`
+        : imageBlock.image.external.url;
+    return `![${caption}](${url})`;
+  });
 
   // embed 블록 → <iframe> HTML로 변환 (rehype-raw가 렌더링)
   // 다른 블로그 글 등 외부 URL을 Notion에서 embed했을 때 iframe으로 표시

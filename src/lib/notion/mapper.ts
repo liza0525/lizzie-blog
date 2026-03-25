@@ -42,7 +42,8 @@ function extractMultiSelect(
 function extractCoverImage(page: PageObjectResponse): string | null {
   if (!page.cover) return null;
   if (page.cover.type === "external") return page.cover.external.url;
-  if (page.cover.type === "file") return page.cover.file.url;
+  // file 타입은 S3 signed URL → 1시간 만료 → 프록시 경유해서 항상 신선한 URL로 redirect
+  if (page.cover.type === "file") return `/api/notion-image?pageId=${page.id}`;
   return null;
 }
 
