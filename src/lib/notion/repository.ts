@@ -152,6 +152,20 @@ export async function fetchPostContent(pageId: string): Promise<string> {
     return `![${caption}](${url})`;
   });
 
+  // heading_4 블록 — @notionhq/client 타입 미지원(h1~h3만 있음), notion-to-md도 인식 못해 무시됨
+  // Notion API는 h4 데이터를 heading_1~3과 동일한 구조로 반환하므로 직접 변환
+  n2m.setCustomTransformer("heading_4", async (block) => {
+    const raw = block as unknown as { heading_4: { rich_text: { plain_text: string; annotations: object; type: string; text?: { link: { url: string } | null } }[] } };
+    const text = raw.heading_4.rich_text
+      .map((t) => {
+        if (t.type !== "text") return t.plain_text;
+        const annotated = n2m.annotatePlainText(t.plain_text, t.annotations as Parameters<typeof n2m.annotatePlainText>[1]);
+        return t.text?.link ? `[${annotated}](${t.text.link.url})` : annotated;
+      })
+      .join("");
+    return `#### ${text}`;
+  });
+
   // callout 블록 → 구별되는 HTML div로 변환 (rehype-raw가 렌더링)
   // 기본 notion-to-md는 blockquote(>)로 변환해 인용문과 구분 불가
   // color는 "gray_background", "yellow_background" 등의 형태로 옴
