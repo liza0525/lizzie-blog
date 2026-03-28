@@ -48,6 +48,50 @@ body {
 
 .prose h1 { font-size: 2.25rem; }
 
+/* Notion callout 블록 — blockquote와 구별되는 박스 스타일 */
+/* 기본: 아이콘 + 텍스트를 나란히, 배경색 + 좌측 강조선 */
+.notion-callout {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--callout-border, #d1d5db);
+  background-color: var(--callout-bg, #f3f4f6);
+  font-family: var(--font-noto-sans-kr), sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+.dark .notion-callout {
+  background-color: var(--callout-bg-dark, #1f2937);
+  border-left-color: var(--callout-border-dark, #374151);
+}
+.notion-callout-icon {
+  font-size: 1.2em;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+.notion-callout-body {
+  flex: 1;
+  min-width: 0;
+  color: #374151;
+}
+.dark .notion-callout-body {
+  color: #d1d5db;
+}
+
+/* Notion callout 색상 변형 */
+.notion-callout[data-color="gray"]   { --callout-bg: #f3f4f6; --callout-border: #9ca3af; --callout-bg-dark: #1f2937; --callout-border-dark: #4b5563; }
+.notion-callout[data-color="brown"]  { --callout-bg: #fdf8f6; --callout-border: #a16207; --callout-bg-dark: #1c1310; --callout-border-dark: #78350f; }
+.notion-callout[data-color="orange"] { --callout-bg: #fff7ed; --callout-border: #ea580c; --callout-bg-dark: #1c1208; --callout-border-dark: #9a3412; }
+.notion-callout[data-color="yellow"] { --callout-bg: #fefce8; --callout-border: #ca8a04; --callout-bg-dark: #1c1a08; --callout-border-dark: #854d0e; }
+.notion-callout[data-color="green"]  { --callout-bg: #f0fdf4; --callout-border: #16a34a; --callout-bg-dark: #052e16; --callout-border-dark: #166534; }
+.notion-callout[data-color="blue"]   { --callout-bg: #eff6ff; --callout-border: #2563eb; --callout-bg-dark: #0c1a3d; --callout-border-dark: #1e40af; }
+.notion-callout[data-color="purple"] { --callout-bg: #faf5ff; --callout-border: #9333ea; --callout-bg-dark: #1a0d2e; --callout-border-dark: #6b21a8; }
+.notion-callout[data-color="pink"]   { --callout-bg: #fdf2f8; --callout-border: #db2777; --callout-bg-dark: #2d0a1e; --callout-border-dark: #9d174d; }
+.notion-callout[data-color="red"]    { --callout-bg: #fef2f2; --callout-border: #dc2626; --callout-bg-dark: #1c0808; --callout-border-dark: #991b1b; }
+
 /* CodeBlock 컴포넌트가 자체 스타일을 가지므로 prose의 pre 기본 스타일 리셋 */
 .prose pre {
   background: none;

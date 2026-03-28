@@ -1,6 +1,7 @@
 // 마크다운 코드 블록 렌더러 — react-syntax-highlighter(Prism) 기반
 // next-themes의 useTheme으로 다크/라이트 테마 자동 전환
 // 인라인 코드와 블록 코드를 구분해 각각 다른 스타일 적용
+// mermaid 언어 블록은 MermaidBlock으로 위임해 SVG 다이어그램으로 렌더링
 "use client";
 
 import { useTheme } from "next-themes";
@@ -8,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { ComponentPropsWithoutRef } from "react";
+import MermaidBlock from "@/components/MermaidBlock";
 
 type CodeProps = ComponentPropsWithoutRef<"code"> & { inline?: boolean };
 
@@ -17,6 +19,11 @@ export default function CodeBlock({ className, children }: CodeProps) {
   useEffect(() => setMounted(true), []);
 
   const language = /language-(\w+)/.exec(className ?? "")?.[1];
+
+  // mermaid 코드블록은 SVG 다이어그램으로 렌더링
+  if (language === "mermaid") {
+    return <MermaidBlock chart={String(children)} />;
+  }
 
   // 언어 미지정 코드블럭 — 하이라이팅 없이 블록 스타일만 적용
   // inline prop은 react-markdown v9+에서 항상 undefined라 줄바꿈 유무로 블록/인라인 구분

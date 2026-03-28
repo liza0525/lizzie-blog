@@ -6,6 +6,7 @@ import type {
   PageObjectResponse,
   QueryDatabaseParameters,
   BlockObjectResponse,
+  CalloutBlockObjectResponse,
   EmbedBlockObjectResponse,
   ImageBlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
@@ -149,6 +150,28 @@ export async function fetchPostContent(pageId: string): Promise<string> {
         ? `/api/notion-image?blockId=${block.id}`
         : imageBlock.image.external.url;
     return `![${caption}](${url})`;
+  });
+
+  // callout 블록 → 구별되는 HTML div로 변환 (rehype-raw가 렌더링)
+  // 기본 notion-to-md는 blockquote(>)로 변환해 인용문과 구분 불가
+  // color는 "gray_background", "yellow_background" 등의 형태로 옴
+  n2m.setCustomTransformer("callout", async (block) => {
+    const { rich_text, icon, color } = (block as CalloutBlockObjectResponse).callout;
+
+    const emoji = icon?.type === "emoji" ? icon.emoji : "💡";
+    const text = rich_text
+      .map((t) => {
+        if (t.type !== "text") return t.plain_text;
+        const annotated = n2m.annotatePlainText(t.plain_text, t.annotations);
+        return t.text.link ? `[${annotated}](${t.text.link.url})` : annotated;
+      })
+      .join("");
+
+    // "gray_background" → "gray", "default" → ""
+    const colorName = color === "default" ? "" : color.replace("_background", "");
+    const colorAttr = colorName ? ` data-color="${colorName}"` : "";
+
+    return `<div class="notion-callout"${colorAttr}><span class="notion-callout-icon">${emoji}</span><div class="notion-callout-body">${text}</div></div>`;
   });
 
   // embed 블록 → <iframe> HTML로 변환 (rehype-raw가 렌더링)
