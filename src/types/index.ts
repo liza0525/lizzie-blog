@@ -7,6 +7,7 @@ export interface Post {
   title: string;
   description: string;
   publishedAt: string;    // ISO 8601 날짜 문자열
+  updatedAt: string;      // Notion 페이지 마지막 수정 시각 (last_edited_time)
   tags: string[];
   coverImage: string | null;
 }

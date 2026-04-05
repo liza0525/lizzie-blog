@@ -58,6 +58,7 @@ export function mapPageToPost(page: PageObjectResponse): Post {
     title: extractRichText(props["Title"]),
     description: extractRichText(props["Description"]),
     publishedAt: extractDate(props["PublishedAt"]),
+    updatedAt: page.last_edited_time,
     tags: extractMultiSelect(props["Tags"]),
     coverImage: extractCoverImage(page),
   };
