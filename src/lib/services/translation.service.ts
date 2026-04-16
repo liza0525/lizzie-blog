@@ -33,11 +33,23 @@ function extractPreserved(markdown: string): ExtractResult {
   // 2. 인라인 코드 (`...`)
   text = text.replace(/`[^`\n]+`/g, keep);
 
-  // 3. HTML 블록/태그 — callout div, iframe embed 등 (repository.ts custom transformer 산출물)
+  // 3. 콜아웃 — wrapper HTML(아이콘 포함)은 보존하고 body 텍스트만 번역에 노출
+  // 구조: <div class="notion-callout"[attrs]><span ...>emoji</span><div class="notion-callout-body">텍스트</div></div>
+  // openTag와 closeTag를 각각 placeholder로 치환 → body 텍스트는 DeepL이 번역함
+  text = text.replace(
+    /<div class="notion-callout"([^>]*)><span class="notion-callout-icon">([^<]*)<\/span><div class="notion-callout-body">([\s\S]*?)<\/div><\/div>/g,
+    (_, colorAttr: string, icon: string, body: string) => {
+      const openTag = `<div class="notion-callout"${colorAttr}><span class="notion-callout-icon">${icon}</span><div class="notion-callout-body">`;
+      const closeTag = `</div></div>`;
+      return `${keep(openTag)}${body}${keep(closeTag)}`;
+    }
+  );
+
+  // 4. 나머지 HTML 블록/태그 — iframe embed 등
   text = text.replace(/<[a-zA-Z][^>]*>[\s\S]*?<\/[a-zA-Z]+>/g, keep);
   text = text.replace(/<[a-zA-Z][^>]*\/>/g, keep);
 
-  // 4. 마크다운 링크/이미지의 URL 부분만 보존 — 텍스트는 번역, URL은 유지
+  // 5. 마크다운 링크/이미지의 URL 부분만 보존 — 텍스트는 번역, URL은 유지
   // [링크 텍스트](url) → [링크 텍스트][[[n]]]
   // ![alt](url)       → ![alt][[[n]]]
   text = text.replace(/\]\(([^)]+)\)/g, (_, url: string) => `]${keep(`(${url})`)}`);
