@@ -15,6 +15,7 @@ import FormattedDate from "@/components/FormattedDate";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
 import { getLang, dict } from "@/lib/i18n";
+import { translatePostsMeta } from "@/lib/services/translation.service";
 
 // revalidate/ISR 미사용 — 한글 slug가 x-next-cache-tags 헤더 오류를 유발
 // 데이터 캐싱은 post.service의 unstable_cache로 처리
@@ -70,6 +71,11 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
   const lang = getLang(cookieStore.get("lang")?.value);
   const t = dict[lang];
 
+  // 영어면 포스트 제목/설명 번역 (목록 페이지와 동일한 캐시 사용)
+  const displayPost = lang === "en"
+    ? (await translatePostsMeta([post]))[0]
+    : post;
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
@@ -99,11 +105,11 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
             </div>
           )}
           <h1 className="text-3xl font-bold leading-snug text-gray-900 dark:text-white mb-4">
-            {post.title}
+            {displayPost.title}
           </h1>
-          {post.description && (
+          {displayPost.description && (
             <p className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
-              {post.description}
+              {displayPost.description}
             </p>
           )}
           <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500 mt-4 block" />
