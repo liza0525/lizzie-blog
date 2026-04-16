@@ -1,11 +1,19 @@
-// 전역 헤더 — 블로그 제목(홈 링크), 검색창, 홈 아이콘, 다크모드 토글 포함
+// 전역 헤더 — 블로그 제목(홈 링크), 검색창, 홈 아이콘, 다크모드 토글, 언어 토글 포함
 // sticky top-0으로 스크롤해도 항상 상단 고정
+// cookies()로 lang 쿠키를 읽어 LanguageToggle에 초기값으로 전달
+
 import React, { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import ThemeToggle from "./ThemeToggle";
 import SearchInput from "./SearchInput";
+import LanguageToggle from "./LanguageToggle";
+import { getLang } from "@/lib/i18n";
 
-export default function Header(): React.JSX.Element {
+export default async function Header(): Promise<React.JSX.Element> {
+  const cookieStore = await cookies();
+  const lang = getLang(cookieStore.get("lang")?.value);
+
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -34,6 +42,7 @@ export default function Header(): React.JSX.Element {
             </Link>
           </nav>
           <ThemeToggle />
+          <LanguageToggle initialLang={lang} />
         </div>
       </div>
     </header>

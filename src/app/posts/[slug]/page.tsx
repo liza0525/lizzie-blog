@@ -5,6 +5,7 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPost, getAllSlugs } from "@/lib/services/post.service";
@@ -13,6 +14,7 @@ import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
+import { getLang, dict } from "@/lib/i18n";
 
 // revalidate/ISR 미사용 — 한글 slug가 x-next-cache-tags 헤더 오류를 유발
 // 데이터 캐싱은 post.service의 unstable_cache로 처리
@@ -64,6 +66,10 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
 
   if (!post) notFound();
 
+  const cookieStore = await cookies();
+  const lang = getLang(cookieStore.get("lang")?.value);
+  const t = dict[lang];
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
@@ -75,7 +81,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          목록으로
+          {t.backToList}
         </Link>
 
         {/* 헤더 — 메타데이터만 사용하므로 즉시 렌더링 */}
