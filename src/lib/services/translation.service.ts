@@ -1,9 +1,13 @@
 // DeepL API를 이용한 마크다운 번역 서비스
 // 코드블록, 인라인 코드, HTML 태그, URL을 placeholder로 치환 후 번역 → 복원
 // (이 부분들은 번역하면 안 되기 때문)
+//
+// 캐싱 전략: Vercel KV (Redis) — 원문 SHA256 해시를 키로 사용
+// 원문이 바뀌면 해시가 달라지므로 Notion 내용 변경 시 자연 무효화됨
+// → /api/revalidate로 Notion 캐시를 지우면 다음 요청에서 새 원문을 읽고 KV miss → 재번역
 
-import { unstable_cache } from "next/cache";
 import { getPostContent } from "@/lib/services/post.service";
+import { getTranslationCache, setTranslationCache } from "@/lib/cache/kv";
 import type { Post } from "@/types";
 
 // placeholder 토큰 — DeepL이 번역하지 않도록 특수문자 조합 사용
@@ -95,59 +99,57 @@ async function callDeepL(text: string): Promise<string> {
 }
 
 // 마크다운 전체 번역 (보존 처리 포함)
+// KV 캐시: 원문 마크다운 전체를 키로 사용
 export async function translateMarkdown(markdown: string): Promise<string> {
+  const cached = await getTranslationCache(markdown);
+  if (cached) return cached;
+
   const { text, preserved } = extractPreserved(markdown);
   const translated = await callDeepL(text);
-  return restorePreserved(translated, preserved);
+  const result = restorePreserved(translated, preserved);
+
+  await setTranslationCache(markdown, result);
+  return result;
 }
 
-// pageId 기준으로 번역 결과를 캐싱 (2시간)
-// Notion 원본 캐시와 동일한 주기로 설정
-const getCachedTranslation = unstable_cache(
-  async (pageId: string): Promise<string> => {
-    const content = await getPostContent(pageId);
-    return translateMarkdown(content);
-  },
-  ["post-translation"],
-  { revalidate: 7200, tags: ["post"] }
-);
-
+// pageId로 포스트 본문을 가져와 번역 반환
+// 본문은 post.service의 unstable_cache로 캐싱 → 번역은 KV로 캐싱
 export async function getTranslatedPostContent(pageId: string): Promise<string> {
-  return getCachedTranslation(pageId);
+  const content = await getPostContent(pageId);
+  return translateMarkdown(content);
 }
 
 // 포스트 메타데이터(title + description) 번역
 // title과 description을 구분자로 합쳐 DeepL 1회 호출 → API 비용 최소화
-// postId 기준으로 캐싱하므로 동일 포스트는 2시간 내 재번역 없음
-const getCachedPostMeta = unstable_cache(
-  async (
-    _postId: string,
-    title: string,
-    description: string
-  ): Promise<{ title: string; description: string }> => {
-    const SPLIT = "\n\n---SPLIT---\n\n";
-    const combined = description ? `${title}${SPLIT}${description}` : title;
-    const translated = await callDeepL(combined);
-
-    if (!description) return { title: translated.trim(), description: "" };
-
-    const splitIdx = translated.indexOf("---SPLIT---");
-    if (splitIdx === -1) return { title: translated.trim(), description };
-
-    return {
-      title: translated.slice(0, splitIdx).trim(),
-      description: translated.slice(splitIdx + 11).trim(),
-    };
-  },
-  ["post-meta-translation"],
-  { revalidate: 7200, tags: ["post"] }
-);
-
+// KV 캐시: "title\n\n---SPLIT---\n\ndescription" 전체를 원문 키로 사용
 export async function translatePostsMeta(posts: Post[]): Promise<Post[]> {
+  const SPLIT = "\n\n---SPLIT---\n\n";
+
   return Promise.all(
     posts.map(async (post) => {
-      const meta = await getCachedPostMeta(post.id, post.title, post.description);
-      return { ...post, ...meta };
+      const combined = post.description ? `${post.title}${SPLIT}${post.description}` : post.title;
+
+      const cached = await getTranslationCache(combined);
+      if (cached) {
+        return parseMeta(post, cached);
+      }
+
+      const translated = await callDeepL(combined);
+      await setTranslationCache(combined, translated);
+      return parseMeta(post, translated);
     })
   );
+}
+
+function parseMeta(post: Post, translated: string): Post {
+  if (!post.description) return { ...post, title: translated.trim() };
+
+  const splitIdx = translated.indexOf("---SPLIT---");
+  if (splitIdx === -1) return { ...post, title: translated.trim() };
+
+  return {
+    ...post,
+    title: translated.slice(0, splitIdx).trim(),
+    description: translated.slice(splitIdx + 11).trim(),
+  };
 }
