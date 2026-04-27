@@ -16,7 +16,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<PostListPage>>
   const result = await getPostPage({ pageSize: 10, cursor, tag });
 
   const posts = lang === "en"
-    ? await translatePostsMeta(result.posts)
+    ? (await translatePostsMeta(result.posts)).posts
     : result.posts;
 
   return NextResponse.json({ ...result, posts });
