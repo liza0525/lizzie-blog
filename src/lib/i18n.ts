@@ -18,6 +18,7 @@ export const dict = {
     noPosts: "아직 게시된 글이 없습니다.",
     langToggle: "EN",
     langToggleLabel: "영어로 전환",
+    translationError: "번역을 일시적으로 사용할 수 없습니다. 원문(한국어)을 표시합니다.",
   },
   en: {
     backToList: "Back to list",
@@ -29,5 +30,6 @@ export const dict = {
     noPosts: "No posts yet.",
     langToggle: "KO",
     langToggleLabel: "한국어로 전환",
+    translationError: "Translation is temporarily unavailable. Showing original Korean content.",
   },
 } as const;

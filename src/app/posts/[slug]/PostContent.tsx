@@ -24,8 +24,18 @@ export default async function PostContent({ pageId }: PostContentProps): Promise
     lang === "en" ? getTranslatedPostContent(pageId) : Promise.resolve(null),
   ]);
 
-  const content = lang === "en" && enContent ? enContent : koContent;
+  // enContent가 null이면 번역 실패 — 원문으로 fallback
+  const translationFailed = lang === "en" && enContent === null;
+  const content = enContent ?? koContent;
   const headings = extractHeadings(content);
 
-  return <PostContentClient content={content} headings={headings} pageId={pageId} lang={lang} />;
+  return (
+    <PostContentClient
+      content={content}
+      headings={headings}
+      pageId={pageId}
+      lang={lang}
+      translationFailed={translationFailed}
+    />
+  );
 }

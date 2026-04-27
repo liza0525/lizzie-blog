@@ -100,45 +100,64 @@ async function callDeepL(text: string): Promise<string> {
 
 // 마크다운 전체 번역 (보존 처리 포함)
 // KV 캐시: 원문 마크다운 전체를 키로 사용
-export async function translateMarkdown(markdown: string): Promise<string> {
+// DeepL 오류(quota 초과 등) 시 null 반환 — 호출자가 원문으로 fallback 처리
+export async function translateMarkdown(markdown: string): Promise<string | null> {
   const cached = await getTranslationCache(markdown);
   if (cached) return cached;
 
-  const { text, preserved } = extractPreserved(markdown);
-  const translated = await callDeepL(text);
-  const result = restorePreserved(translated, preserved);
-
-  await setTranslationCache(markdown, result);
-  return result;
+  try {
+    const { text, preserved } = extractPreserved(markdown);
+    const translated = await callDeepL(text);
+    const result = restorePreserved(translated, preserved);
+    await setTranslationCache(markdown, result);
+    return result;
+  } catch (err) {
+    console.error("[translation] translateMarkdown failed:", err);
+    return null;
+  }
 }
 
 // pageId로 포스트 본문을 가져와 번역 반환
 // 본문은 post.service의 unstable_cache로 캐싱 → 번역은 KV로 캐싱
-export async function getTranslatedPostContent(pageId: string): Promise<string> {
+// 번역 실패 시 null 반환
+export async function getTranslatedPostContent(pageId: string): Promise<string | null> {
   const content = await getPostContent(pageId);
   return translateMarkdown(content);
+}
+
+export interface TranslatePostsMetaResult {
+  posts: Post[];
+  translationFailed: boolean;
 }
 
 // 포스트 메타데이터(title + description) 번역
 // title과 description을 구분자로 합쳐 DeepL 1회 호출 → API 비용 최소화
 // KV 캐시: "title\n\n---SPLIT---\n\ndescription" 전체를 원문 키로 사용
-export async function translatePostsMeta(posts: Post[]): Promise<Post[]> {
+// 번역 실패한 포스트는 원문 그대로 유지, translationFailed 플래그로 UI에 알림
+export async function translatePostsMeta(posts: Post[]): Promise<TranslatePostsMetaResult> {
   const SPLIT = "\n\n---SPLIT---\n\n";
+  let translationFailed = false;
 
-  return Promise.all(
+  const translatedPosts = await Promise.all(
     posts.map(async (post) => {
       const combined = post.description ? `${post.title}${SPLIT}${post.description}` : post.title;
 
       const cached = await getTranslationCache(combined);
-      if (cached) {
-        return parseMeta(post, cached);
-      }
+      if (cached) return parseMeta(post, cached);
 
-      const translated = await callDeepL(combined);
-      await setTranslationCache(combined, translated);
-      return parseMeta(post, translated);
+      try {
+        const translated = await callDeepL(combined);
+        await setTranslationCache(combined, translated);
+        return parseMeta(post, translated);
+      } catch (err) {
+        console.error("[translation] translatePostsMeta failed for post:", post.id, err);
+        translationFailed = true;
+        return post;
+      }
     })
   );
+
+  return { posts: translatedPosts, translationFailed };
 }
 
 function parseMeta(post: Post, translated: string): Post {

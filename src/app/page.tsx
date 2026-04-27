@@ -7,7 +7,7 @@ import React, { Suspense } from "react";
 import { cookies } from "next/headers";
 import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
 import { translatePostsMeta } from "@/lib/services/translation.service";
-import { getLang } from "@/lib/i18n";
+import { getLang, dict } from "@/lib/i18n";
 import TagSidebar from "@/components/TagSidebar";
 import SidebarLayout from "@/components/SidebarLayout";
 import PostGrid from "@/components/PostGrid";
@@ -32,9 +32,13 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
   ]);
 
   // 영어 요청 시 포스트 제목/설명 번역 (서버 캐시 2시간)
-  const posts = lang === "en"
-    ? await translatePostsMeta(firstPage.posts)
-    : firstPage.posts;
+  let posts = firstPage.posts;
+  let translationFailed = false;
+  if (lang === "en") {
+    const result = await translatePostsMeta(firstPage.posts);
+    posts = result.posts;
+    translationFailed = result.translationFailed;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -54,6 +58,16 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
             </p>
           )}
 
+          {translationFailed && (
+            <div className="mb-6 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              {dict["en"].translationError}
+            </div>
+          )}
           <PostGrid
             initialPosts={posts}
             initialCursor={firstPage.nextCursor}

@@ -72,9 +72,13 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
   const t = dict[lang];
 
   // 영어면 포스트 제목/설명 번역 (목록 페이지와 동일한 캐시 사용)
-  const displayPost = lang === "en"
-    ? (await translatePostsMeta([post]))[0]
-    : post;
+  let displayPost = post;
+  let metaTranslationFailed = false;
+  if (lang === "en") {
+    const result = await translatePostsMeta([post]);
+    displayPost = result.posts[0];
+    metaTranslationFailed = result.translationFailed;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -89,6 +93,17 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           </svg>
           {t.backToList}
         </Link>
+
+        {metaTranslationFailed && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            {t.translationError}
+          </div>
+        )}
 
         {/* 헤더 — 메타데이터만 사용하므로 즉시 렌더링 */}
         <header className="mb-10">
