@@ -14,7 +14,6 @@ import rehypeKatex from "rehype-katex";
 import { rehypeSlugNoEmoji } from "@/lib/toc";
 import type { Heading } from "@/lib/toc";
 import type { Lang } from "@/lib/i18n";
-import { dict } from "@/lib/i18n";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
 
@@ -23,29 +22,17 @@ interface PostContentClientProps {
   headings: Heading[];
   pageId: string;
   lang: Lang;
-  translationFailed?: boolean;
 }
 
 export default function PostContentClient({
   content,
   headings,
   pageId: _pageId,
-  lang,
-  translationFailed,
+  lang: _lang,
 }: PostContentClientProps): React.JSX.Element {
   return (
     <div className="flex gap-12">
       <div className="flex-1 min-w-0">
-        {translationFailed && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            {dict[lang].translationError}
-          </div>
-        )}
         <div className="prose prose-gray dark:prose-invert prose-lg max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}

@@ -28,7 +28,7 @@ export default async function AdjacentPosts({ slug }: AdjacentPostsProps): Promi
   let translatedNext = next;
   if (lang === "en") {
     const postsToTranslate = [prev, next].filter((p): p is Post => p !== null);
-    const translated = await translatePostsMeta(postsToTranslate);
+    const { posts: translated } = await translatePostsMeta(postsToTranslate);
     let idx = 0;
     if (prev) translatedPrev = translated[idx++];
     if (next) translatedNext = translated[idx];
