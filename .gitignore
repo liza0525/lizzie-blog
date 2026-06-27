@@ -44,5 +44,6 @@ next-env.d.ts
 
 # custom
 insights*.md
+next-ideation-*.md
 CLAUDE.md
 .claude/
