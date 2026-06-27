@@ -1,7 +1,6 @@
 // 포스트 카드 그리드 — 무한 스크롤 지원
 // IntersectionObserver로 스크롤 바닥 감지 → /api/posts로 다음 페이지 fetch
 // 태그 필터/검색어 변경 시 자동으로 처음부터 다시 로드
-// lang prop을 받아 API 호출 시 전달하고 빈 상태 메시지를 i18n으로 처리
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -9,8 +8,6 @@ import Link from "next/link";
 import type { Post, PostListPage } from "@/types";
 import HighlightText from "@/components/HighlightText";
 import FormattedDate from "@/components/FormattedDate";
-import type { Lang } from "@/lib/i18n";
-import { dict } from "@/lib/i18n";
 
 interface PostGridProps {
   initialPosts: Post[];
@@ -18,7 +15,6 @@ interface PostGridProps {
   initialHasMore: boolean;
   tag?: string;
   query?: string;
-  lang: Lang;
 }
 
 function getCardImage(post: Post): string {
@@ -32,7 +28,6 @@ export default function PostGrid({
   initialHasMore,
   tag,
   query,
-  lang,
 }: PostGridProps): React.JSX.Element {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
@@ -59,7 +54,6 @@ export default function PostGrid({
         const params = new URLSearchParams({
           ...(cursor ? { cursor } : {}),
           ...(tag ? { tag } : {}),
-          lang,
         });
         const res = await fetch(`/api/posts?${params}`);
         const data: PostListPage = await res.json();
@@ -74,18 +68,16 @@ export default function PostGrid({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [cursor, hasMore, loading, tag, lang]);
-
-  const t = dict[lang];
+  }, [cursor, hasMore, loading, tag]);
 
   if (posts.length === 0) {
     return (
       <p className="text-center text-gray-400 py-24">
         {query
-          ? t.noResults(query)
+          ? `"${query}"에 대한 검색 결과가 없습니다.`
           : tag
-          ? t.noTagResults(tag)
-          : t.noPosts}
+          ? `"${tag}" 태그의 글이 없습니다.`
+          : "아직 게시된 글이 없습니다."}
       </p>
     );
   }
@@ -143,7 +135,7 @@ export default function PostGrid({
 
       {/* 스크롤 감지 sentinel */}
       <div ref={sentinelRef} className="h-10 mt-6 flex items-center justify-center">
-        {loading && <span className="text-sm text-gray-400">{t.loading}</span>}
+        {loading && <span className="text-sm text-gray-400">불러오는 중...</span>}
       </div>
     </>
   );

@@ -5,7 +5,6 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPost, getAllSlugs } from "@/lib/services/post.service";
@@ -14,8 +13,6 @@ import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
 import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
-import { getLang, dict } from "@/lib/i18n";
-import { translatePostsMeta } from "@/lib/services/translation.service";
 
 // revalidate/ISR 미사용 — 한글 slug가 x-next-cache-tags 헤더 오류를 유발
 // 데이터 캐싱은 post.service의 unstable_cache로 처리
@@ -67,19 +64,6 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
 
   if (!post) notFound();
 
-  const cookieStore = await cookies();
-  const lang = getLang(cookieStore.get("lang")?.value);
-  const t = dict[lang];
-
-  // 영어면 포스트 제목/설명 번역 (목록 페이지와 동일한 캐시 사용)
-  let displayPost = post;
-  let metaTranslationFailed = false;
-  if (lang === "en") {
-    const result = await translatePostsMeta([post]);
-    displayPost = result.posts[0];
-    metaTranslationFailed = result.translationFailed;
-  }
-
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
@@ -91,19 +75,8 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          {t.backToList}
+          목록으로
         </Link>
-
-        {lang === "en" && metaTranslationFailed && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            {t.translationError}
-          </div>
-        )}
 
         {/* 헤더 — 메타데이터만 사용하므로 즉시 렌더링 */}
         <header className="mb-10">
@@ -120,11 +93,11 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
             </div>
           )}
           <h1 className="text-3xl font-bold leading-snug text-gray-900 dark:text-white mb-4">
-            {displayPost.title}
+            {post.title}
           </h1>
-          {displayPost.description && (
+          {post.description && (
             <p className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
-              {displayPost.description}
+              {post.description}
             </p>
           )}
           <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500 mt-4 block" />

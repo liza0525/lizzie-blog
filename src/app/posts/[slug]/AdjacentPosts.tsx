@@ -1,13 +1,9 @@
 // 이전/다음 글 네비게이션 서버 컴포넌트
 // page.tsx의 Suspense 안에서 렌더링 — 본문 스트리밍과 독립적으로 로드
-// lang 쿠키를 읽어 영어면 인접 포스트 제목도 번역해서 표시
 
 import React from "react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { getAdjacentPosts } from "@/lib/services/post.service";
-import { translatePostsMeta } from "@/lib/services/translation.service";
-import { getLang, dict } from "@/lib/i18n";
 import type { Post } from "@/types";
 
 interface AdjacentPostsProps {
@@ -15,32 +11,17 @@ interface AdjacentPostsProps {
 }
 
 export default async function AdjacentPosts({ slug }: AdjacentPostsProps): Promise<React.JSX.Element | null> {
-  const cookieStore = await cookies();
-  const lang = getLang(cookieStore.get("lang")?.value);
-  const t = dict[lang];
-
   const { prev, next } = await getAdjacentPosts(slug);
 
   if (!prev && !next) return null;
 
-  // 영어면 인접 포스트 제목도 번역
-  let translatedPrev = prev;
-  let translatedNext = next;
-  if (lang === "en") {
-    const postsToTranslate = [prev, next].filter((p): p is Post => p !== null);
-    const { posts: translated } = await translatePostsMeta(postsToTranslate);
-    let idx = 0;
-    if (prev) translatedPrev = translated[idx++];
-    if (next) translatedNext = translated[idx];
-  }
-
   return (
     <nav className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-4">
       <div>
-        <AdjacentLink post={translatedPrev} slug={prev?.slug} direction="prev" label={t.prevPost} />
+        <AdjacentLink post={prev} slug={prev?.slug} direction="prev" label="이전 글" />
       </div>
       <div className="flex flex-col items-end text-right">
-        <AdjacentLink post={translatedNext} slug={next?.slug} direction="next" label={t.nextPost} />
+        <AdjacentLink post={next} slug={next?.slug} direction="next" label="다음 글" />
       </div>
     </nav>
   );

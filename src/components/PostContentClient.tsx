@@ -1,6 +1,5 @@
 // 포스트 본문 렌더러 (client component)
-// PostContent(server)에서 이미 lang에 맞는 content를 받으므로 단순 렌더링만 담당
-// 번역 토글은 헤더의 전역 LanguageToggle로 대체됨
+// PostContent(server)에서 마크다운 content와 headings를 받아 렌더링
 
 "use client";
 
@@ -13,7 +12,6 @@ import rehypeRaw from "rehype-raw";
 import rehypeKatex from "rehype-katex";
 import { rehypeSlugNoEmoji } from "@/lib/toc";
 import type { Heading } from "@/lib/toc";
-import type { Lang } from "@/lib/i18n";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
 
@@ -21,14 +19,12 @@ interface PostContentClientProps {
   content: string;
   headings: Heading[];
   pageId: string;
-  lang: Lang;
 }
 
 export default function PostContentClient({
   content,
   headings,
   pageId: _pageId,
-  lang: _lang,
 }: PostContentClientProps): React.JSX.Element {
   return (
     <div className="flex gap-12">
