@@ -47,5 +47,6 @@ insights/
 insights_*.md
 ideations/
 ideations-*.md
-CLAUDE.md
+CLAUDE.local.md
+.claude/
 .claude/
