@@ -1,13 +1,17 @@
 // 비즈니스 로직 레이어 — Flask의 service 레이어
 // repository를 조합하고, 컴포넌트에서 직접 쓰는 인터페이스 제공
 
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import {
   fetchPostPage,
-  fetchAllPosts,
+  fetchAllPosts as fetchAllPostsRaw,
   fetchPostBySlug,
   fetchPostContent,
 } from "@/lib/notion/repository";
+
+// 같은 요청 내에서 fetchAllPosts() 중복 호출 방지 (getAllTags/searchPosts/getAdjacentPosts가 각각 호출)
+const fetchAllPosts = cache(fetchAllPostsRaw);
 import type { Post, PostListPage } from "@/types";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
