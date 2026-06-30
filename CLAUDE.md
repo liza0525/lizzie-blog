@@ -138,3 +138,10 @@ npm run build && npm run start   # 배포 전 로컬 확인
 npm run lint                     # 린트 확인
 ```
 
+---
+
+## Design System
+
+이 프로젝트는 `design-system/` 디렉토리에 디자인 시스템을 git submodule로 포함하고 있다.
+UI/스타일 관련 작업을 할 때는 항상 `design-system/design-system.md`를 먼저 읽고 그 안의 폰트, 컬러 팔레트, 톤 가이드를 따를 것.
+
