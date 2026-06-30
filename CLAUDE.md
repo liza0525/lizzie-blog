@@ -43,6 +43,7 @@ src/
 │   ├── robots.ts               # robots.txt 생성
 │   └── sitemap.ts              # sitemap.xml 생성
 ├── lib/
+│   ├── config.ts               # 전역 설정 (CORE_TAGS 등)
 │   ├── toc.ts                  # 마크다운 헤딩 추출 + rehype slug 플러그인
 │   ├── notion/
 │   │   ├── client.ts           # Notion 클라이언트 초기화

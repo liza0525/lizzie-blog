@@ -8,7 +8,7 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 - **Language:** TypeScript (strict)
 - **CMS:** Notion API (`@notionhq/client` + `notion-to-md`)
 - **Styling:** Tailwind CSS v4 + `@tailwindcss/typography`
-- **Font:** Noto Sans KR (UI) / Noto Serif KR (본문)
+- **Font:** Pretendard (UI/레이블, CDN) / Hahmlet (본문, Google Fonts)
 - **Syntax Highlighting:** react-syntax-highlighter (Prism) + Mermaid
 - **Math:** remark-math + rehype-katex
 - **Theme:** next-themes (다크/라이트 모드)
@@ -18,7 +18,7 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 
 - Notion 데이터베이스 기반 포스트 관리
 - 포스트 목록 무한 스크롤 (커서 기반 페이지네이션, 10개씩)
-- 태그 필터 사이드바 (lg 이상에서만 표시)
+- 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기로 전체 태그 펼침)
 - 제목 검색 + 검색어 하이라이팅
 - 마크다운 렌더링 (GFM, 수식, 코드 하이라이팅, 이미지, Mermaid 다이어그램)
 - 포스트 우측 목차(TOC) — 스크롤 기반 현재 섹션 하이라이팅
