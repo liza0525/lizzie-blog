@@ -1,4 +1,4 @@
-// 홈 페이지 — 글 카드 목록 + 태그 사이드바
+// 홈 페이지 — 글 목록 + 태그 사이드바
 
 import React, { Suspense } from "react";
 import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
@@ -24,7 +24,7 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
   ]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-[900px] mx-auto px-6 py-12">
       <SidebarLayout
         sidebar={
           <Suspense>
@@ -34,10 +34,10 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
       >
         <div>
           {(tag || q) && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              {q && <><span className="font-medium text-gray-900 dark:text-white">"{q}"</span>{" "}검색 결과{" "}</>}
-              {tag && <><span className="font-medium text-gray-900 dark:text-white">{tag}</span>{" "}태그{" "}</>}
-              <span className="text-gray-400">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
+            <p className="text-sm text-muted mb-6 font-sans">
+              {q && <><span className="font-semibold text-ink">&ldquo;{q}&rdquo;</span>{" "}검색 결과{" "}</>}
+              {tag && <><span className="font-semibold text-ink">{tag}</span>{" "}태그{" "}</>}
+              <span className="text-muted">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
             </p>
           )}
 
