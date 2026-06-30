@@ -34,6 +34,16 @@ export default function PostContentClient({
             remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
             rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlugNoEmoji]}
             components={{
+              // 이미지를 포함한 단락은 <p> 없이 내보냄 — <p> 안에 block 요소(<figure>) 금지 때문
+              // remarkBreaks로 <br>이 끼어있어도 img가 하나라도 있으면 해당
+              p: ({ children, node }) => {
+                const hasImage = node?.children?.some(
+                  (child) => (child as { type?: string; tagName?: string }).type === "element" &&
+                             (child as { type?: string; tagName?: string }).tagName === "img"
+                );
+                if (hasImage) return <>{children}</>;
+                return <p>{children}</p>;
+              },
               img: ({ src, alt }) => (
                 <figure className="my-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -56,11 +66,13 @@ export default function PostContentClient({
         </div>
       </div>
 
-      <aside className="w-[140px] shrink-0 hidden xl:block">
-        <div className="sticky top-24">
-          <TableOfContents headings={headings} />
-        </div>
-      </aside>
+      {headings.length > 0 && (
+        <aside className="w-[140px] shrink-0 hidden xl:block">
+          <div className="sticky top-24">
+            <TableOfContents headings={headings} />
+          </div>
+        </aside>
+      )}
     </div>
   );
 }
