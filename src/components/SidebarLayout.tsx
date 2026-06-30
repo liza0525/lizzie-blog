@@ -56,7 +56,7 @@ export default function SidebarLayout({ sidebar, children }: SidebarLayoutProps)
         <button
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "사이드바 닫기" : "사이드바 열기"}
-          className="hidden lg:block mb-6 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+          className="hidden lg:block mb-6 text-muted hover:text-ink transition-colors"
         >
           {open ? <CloseIcon /> : <MenuIcon />}
         </button>

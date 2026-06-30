@@ -20,7 +20,6 @@ export default function TagSidebar({ tags }: TagSidebarProps) {
 
   function handleTagClick(tagName: string) {
     if (activeTag === tagName) {
-      // 같은 태그 다시 클릭 시 필터 해제
       router.push("/");
     } else {
       router.push(`/?tag=${encodeURIComponent(tagName)}`);
@@ -30,7 +29,7 @@ export default function TagSidebar({ tags }: TagSidebarProps) {
   return (
     <aside>
       <div>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted mb-4 font-sans">
           Tags
         </h2>
         <ul className="space-y-1">
@@ -40,14 +39,14 @@ export default function TagSidebar({ tags }: TagSidebarProps) {
               <li key={name}>
                 <button
                   onClick={() => handleTagClick(name)}
-                  className={`w-full text-left flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  className={`w-full text-left flex items-center justify-between px-3 py-1.5 text-sm transition-colors font-sans ${
                     isActive
-                      ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                      ? "bg-accent text-bg font-semibold"
+                      : "text-ink hover:bg-surface"
                   }`}
                 >
                   <span>{name}</span>
-                  <span className={`text-xs ${isActive ? "text-gray-300 dark:text-gray-600" : "text-gray-400 dark:text-gray-600"}`}>
+                  <span className={`text-xs ${isActive ? "text-bg opacity-60" : "text-muted"}`}>
                     {count}
                   </span>
                 </button>

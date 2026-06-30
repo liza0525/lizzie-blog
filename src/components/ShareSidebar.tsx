@@ -19,7 +19,7 @@ export default function ShareSidebar({ title }: ShareSidebarProps): React.JSX.El
   }
 
   return (
-    <div className="inline-flex flex-col gap-1.5 border border-gray-200 dark:border-gray-700 rounded-full p-2 bg-white dark:bg-gray-900">
+    <div className="inline-flex flex-col gap-1.5 border border-border p-2 bg-bg">
       <IconButton onClick={handleCopy} label={copied ? "복사됨" : `링크 복사: ${title}`}>
         {copied ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,7 +50,7 @@ function IconButton({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className="p-2.5 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      className="p-2.5 text-muted hover:text-ink hover:bg-surface transition-colors"
     >
       {children}
     </button>
