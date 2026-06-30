@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Hahmlet } from "next/font/google";
 import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
-const notoSansKR = Noto_Sans_KR({
+const hahmlet = Hahmlet({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  variable: "--font-noto-sans-kr",
-});
-
-const notoSerifKR = Noto_Serif_KR({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  variable: "--font-noto-serif-kr",
+  weight: ["400", "600", "900"],
+  variable: "--font-hahmlet",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
@@ -48,14 +42,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ko" className={`${hahmlet.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+      </head>
       <GoogleAnalytics />
-      <body className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 mt-16">
-            <div className="max-w-6xl mx-auto px-6 py-8 text-center text-sm text-gray-400">
+          <footer className="border-t border-border mt-16">
+            <div className="max-w-[900px] mx-auto px-6 py-8 text-center text-xs text-muted">
               © {new Date().getFullYear()} Lizzie
             </div>
           </footer>

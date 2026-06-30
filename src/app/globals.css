@@ -7,37 +7,73 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 라이트 모드 토큰 */
 :root {
-  --background: #f9fafb;
-  --foreground: #ffffff;
+  --bg: #f6f2eb;
+  --surface: #edeae2;
+  --border: #e4ddd0;
+  --muted: #9a9590;
+  --text: #282420;
+  --accent: #3d5a80;
+  --accent2: #b85c38;
 }
 
+/* 다크 모드 토큰 */
+.dark {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #21262d;
+  --muted: #555e6a;
+  --text: #e8e0d0;
+  --accent: #4a7fa5;
+  --accent2: #c9b48a;
+}
+
+/* Tailwind 유틸리티로 사용 가능한 색상/폰트 토큰 */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-noto-sans-kr);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-ink: var(--text);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent2);
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: var(--font-hahmlet), Georgia, serif;
 }
 
-/* gray-900 override — text-gray-900 클래스를 #242424로 */
-@theme {
-  --color-gray-900: #242424;
-}
-
-/* 기본: 산셰리프 (UI 요소, 태그, 날짜, 버튼 등 전부) */
 body {
-  font-family: var(--font-noto-sans-kr), sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
 }
 
-/* 글 본문 영역만 세리프 */
+/* 본문 영역: Hahmlet 세리프, typography 플러그인 색상 토큰 재정의 */
 .prose {
-  font-family: var(--font-noto-serif-kr), serif;
+  font-family: var(--font-serif);
+  --tw-prose-body: var(--text);
+  --tw-prose-headings: var(--text);
+  --tw-prose-lead: var(--muted);
+  --tw-prose-links: var(--accent);
+  --tw-prose-bold: var(--text);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--muted);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--text);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--accent2);
+  --tw-prose-pre-code: var(--text);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
 }
 
-/* prose 안 제목, 코드는 다시 산셰리프 */
+/* 제목·코드는 Pretendard 산세리프 */
 .prose h1, .prose h2, .prose h3,
 .prose h4, .prose h5, .prose h6,
 .prose code, .prose pre {
-  font-family: var(--font-noto-sans-kr), sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* sticky 헤더(64px)에 가리지 않도록 앵커 스크롤 여백 */
@@ -46,26 +82,23 @@ body {
   scroll-margin-top: 5rem;
 }
 
-.prose h1 { font-size: 2.25rem; }
-
-/* Notion callout 블록 — blockquote와 구별되는 박스 스타일 */
-/* 기본: 아이콘 + 텍스트를 나란히, 배경색 + 좌측 강조선 */
+/* Notion callout 블록 */
 .notion-callout {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
   margin: 1.5rem 0;
-  padding: 1rem 1.25rem;
-  border-radius: 0.5rem;
-  border-left: 4px solid var(--callout-border, #d1d5db);
-  background-color: var(--callout-bg, #f3f4f6);
-  font-family: var(--font-noto-sans-kr), sans-serif;
+  padding: 1.1rem 1.25rem;
+  border-radius: 0;
+  border-left: 4px solid var(--callout-border, var(--border));
+  background-color: var(--callout-bg, var(--surface));
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   line-height: 1.7;
 }
 .dark .notion-callout {
-  background-color: var(--callout-bg-dark, #1f2937);
-  border-left-color: var(--callout-border-dark, #374151);
+  background-color: var(--callout-bg-dark, var(--surface));
+  border-left-color: var(--callout-border-dark, var(--border));
 }
 .notion-callout-icon {
   font-size: 1.2em;
@@ -75,22 +108,19 @@ body {
 .notion-callout-body {
   flex: 1;
   min-width: 0;
-  color: #374151;
-}
-.dark .notion-callout-body {
-  color: #d1d5db;
+  color: var(--text);
 }
 
-/* Notion callout 색상 변형 */
-.notion-callout[data-color="gray"]   { --callout-bg: #f3f4f6; --callout-border: #9ca3af; --callout-bg-dark: #1f2937; --callout-border-dark: #4b5563; }
-.notion-callout[data-color="brown"]  { --callout-bg: #fdf8f6; --callout-border: #a16207; --callout-bg-dark: #1c1310; --callout-border-dark: #78350f; }
-.notion-callout[data-color="orange"] { --callout-bg: #fff7ed; --callout-border: #ea580c; --callout-bg-dark: #1c1208; --callout-border-dark: #9a3412; }
-.notion-callout[data-color="yellow"] { --callout-bg: #fefce8; --callout-border: #ca8a04; --callout-bg-dark: #1c1a08; --callout-border-dark: #854d0e; }
-.notion-callout[data-color="green"]  { --callout-bg: #f0fdf4; --callout-border: #16a34a; --callout-bg-dark: #052e16; --callout-border-dark: #166534; }
-.notion-callout[data-color="blue"]   { --callout-bg: #eff6ff; --callout-border: #2563eb; --callout-bg-dark: #0c1a3d; --callout-border-dark: #1e40af; }
-.notion-callout[data-color="purple"] { --callout-bg: #faf5ff; --callout-border: #9333ea; --callout-bg-dark: #1a0d2e; --callout-border-dark: #6b21a8; }
-.notion-callout[data-color="pink"]   { --callout-bg: #fdf2f8; --callout-border: #db2777; --callout-bg-dark: #2d0a1e; --callout-border-dark: #9d174d; }
-.notion-callout[data-color="red"]    { --callout-bg: #fef2f2; --callout-border: #dc2626; --callout-bg-dark: #1c0808; --callout-border-dark: #991b1b; }
+/* 콜아웃 색상 변형 — 크림 배경 기준으로 채도 낮게 조정 */
+.notion-callout[data-color="gray"]   { --callout-bg: #eeebe4; --callout-border: #9a9590; --callout-bg-dark: #1a1e26; --callout-border-dark: #4a5568; }
+.notion-callout[data-color="brown"]  { --callout-bg: #f2ece3; --callout-border: #8c6d4f; --callout-bg-dark: #1e1812; --callout-border-dark: #6b4f30; }
+.notion-callout[data-color="orange"] { --callout-bg: #f5ece2; --callout-border: #c46a2d; --callout-bg-dark: #1e1610; --callout-border-dark: #8a4a1e; }
+.notion-callout[data-color="yellow"] { --callout-bg: #f5eedc; --callout-border: #b89040; --callout-bg-dark: #1c1a0c; --callout-border-dark: #7a6030; }
+.notion-callout[data-color="green"]  { --callout-bg: #e8ede5; --callout-border: #5a8060; --callout-bg-dark: #0e1a14; --callout-border-dark: #3d6050; }
+.notion-callout[data-color="blue"]   { --callout-bg: #e5ecf2; --callout-border: #3d5a80; --callout-bg-dark: #0c1520; --callout-border-dark: #4a7fa5; }
+.notion-callout[data-color="purple"] { --callout-bg: #ede9f2; --callout-border: #7055a0; --callout-bg-dark: #160e20; --callout-border-dark: #5a4080; }
+.notion-callout[data-color="pink"]   { --callout-bg: #f2e8ee; --callout-border: #a06080; --callout-bg-dark: #1e1018; --callout-border-dark: #784060; }
+.notion-callout[data-color="red"]    { --callout-bg: #f2e8e5; --callout-border: #b85c38; --callout-bg-dark: #1e0e0c; --callout-border-dark: #a04030; }
 
 /* CodeBlock 컴포넌트가 자체 스타일을 가지므로 prose의 pre 기본 스타일 리셋 */
 .prose pre {
@@ -98,4 +128,18 @@ body {
   padding: 0;
   border-radius: 0;
   color: inherit;
+}
+
+/* 인라인 코드 — typography 플러그인 기본 배경/백틱 가상요소 제거 */
+.prose :not(pre) > code {
+  color: var(--accent2);
+  background: none;
+  padding: 0;
+  font-size: 0.875em;
+  font-weight: inherit;
+  border-radius: 0;
+}
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
 }
