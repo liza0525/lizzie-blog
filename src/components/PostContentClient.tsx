@@ -29,7 +29,7 @@ export default function PostContentClient({
   return (
     <div className="flex gap-12">
       <div className="flex-1 min-w-0">
-        <div className="prose prose-gray dark:prose-invert prose-lg max-w-none">
+        <div className="prose prose-lg max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
             rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlugNoEmoji]}
@@ -37,9 +37,9 @@ export default function PostContentClient({
               img: ({ src, alt }) => (
                 <figure className="my-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={alt ?? ""} className="rounded-lg w-full" />
+                  <img src={src} alt={alt ?? ""} className="w-full" />
                   {alt && (
-                    <figcaption className="text-center text-sm text-gray-400 dark:text-gray-500 mt-2">
+                    <figcaption className="text-center text-[12px] text-muted mt-2 font-sans">
                       {alt}
                     </figcaption>
                   )}
@@ -47,7 +47,7 @@ export default function PostContentClient({
               ),
               code: (props) => <CodeBlock {...props} />,
               iframe: ({ ...props }) => (
-                <iframe {...props} className="notion-embed rounded-lg my-4 w-full h-[600px]" />
+                <iframe {...props} className="notion-embed my-4 w-full h-[600px]" />
               ),
             }}
           >
@@ -56,7 +56,7 @@ export default function PostContentClient({
         </div>
       </div>
 
-      <aside className="w-56 shrink-0 hidden xl:block">
+      <aside className="w-[140px] shrink-0 hidden xl:block">
         <div className="sticky top-24">
           <TableOfContents headings={headings} />
         </div>

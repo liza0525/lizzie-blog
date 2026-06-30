@@ -8,6 +8,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPost, getAllSlugs } from "@/lib/services/post.service";
+import { CORE_TAGS } from "@/lib/config";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
@@ -70,7 +71,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
         {/* 뒤로가기 */}
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-10"
+          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors mb-10 font-sans"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -78,40 +79,42 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           목록으로
         </Link>
 
-        {/* 헤더 — 메타데이터만 사용하므로 즉시 렌더링 */}
+        {/* 헤더 — 제목 → 날짜 + 태그 → 설명 순서 */}
         <header className="mb-10">
-          {post.tags.length > 0 && (
-            <div className="flex gap-1.5 flex-wrap mb-4">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2.5 py-1 rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          <h1 className="text-3xl font-bold leading-snug text-gray-900 dark:text-white mb-4">
+          <h1 className="text-[26px] font-bold leading-snug text-ink mb-3 font-sans">
             {post.title}
           </h1>
+          <div className="flex items-center gap-3 flex-wrap mb-3">
+            <FormattedDate date={post.publishedAt} className="text-[11px] font-semibold tracking-[0.08em] text-muted uppercase font-sans" />
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className={`text-xs font-semibold text-bg px-[10px] py-[3px] rounded-[2px] font-sans ${
+                  (CORE_TAGS as readonly string[]).includes(tag) ? "bg-accent2" : "bg-accent"
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
           {post.description && (
-            <p className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+            <p className="text-lg text-ink opacity-75 leading-relaxed font-serif">
               {post.description}
             </p>
           )}
-          <FormattedDate date={post.publishedAt} className="text-sm text-gray-400 dark:text-gray-500 mt-4 block" />
         </header>
 
         {/* 커버 이미지 */}
-        <div className="rounded-xl overflow-hidden mb-12 aspect-[12/5] bg-gray-100 dark:bg-gray-800">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.coverImage ?? `https://picsum.photos/seed/${encodeURIComponent(post.id)}/1200/500`}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {post.coverImage && (
+          <div className="overflow-hidden mb-12 aspect-[12/5] bg-surface border border-border">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
 
         {/* 본문 영역 — relative로 감싸서 사이드바를 absolute로 바깥에 띄움 */}
         <div className="relative">

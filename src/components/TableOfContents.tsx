@@ -36,30 +36,19 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
 
   return (
     <nav>
-      <ul className="border-l border-gray-200 dark:border-gray-700 space-y-0.5">
+      <ul className="space-y-0.5">
         {headings.map(({ level, text, id }) => {
           const isActive = activeId === id;
-
-          // 계층별 들여쓰기와 텍스트 스타일 (동적 클래스 대신 명시적으로)
-          const indent =
-            level === 1 ? "pl-3" : level === 2 ? "pl-5" : "pl-7";
-          const fontSize =
-            level === 1 ? "text-sm" : level === 2 ? "text-sm" : "text-xs";
-          const baseColor = isActive
-            ? "text-gray-900 dark:text-white font-medium"
-            : level === 3
-            ? "text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
-            : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200";
+          const indent = level === 1 ? "pl-0" : level === 2 ? "pl-3" : "pl-6";
+          const color = isActive
+            ? "text-accent font-semibold"
+            : "text-muted hover:text-ink";
 
           return (
             <li key={id}>
               <a
                 href={`#${id}`}
-                className={`block py-1 leading-snug -ml-px border-l-2 transition-colors ${indent} ${fontSize} ${baseColor} ${
-                  isActive
-                    ? "border-gray-900 dark:border-white"
-                    : "border-transparent"
-                }`}
+                className={`block py-1 text-[13px] leading-snug transition-colors font-sans ${indent} ${color}`}
               >
                 {text}
               </a>
