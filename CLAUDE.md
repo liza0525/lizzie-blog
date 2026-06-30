@@ -55,9 +55,8 @@ src/
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
-│   ├── TagSidebar.tsx          # 태그 필터 사이드바 (?tag= URL 기반)
-│   ├── SidebarLayout.tsx       # 햄버거 토글 사이드바 레이아웃 (lg 이상)
-│   ├── PostGrid.tsx            # 포스트 카드 그리드 (무한 스크롤)
+│   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침)
+│   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
 │   ├── PostContentClient.tsx   # 포스트 본문 렌더러 (client) — PostContent(server)에서 분리
 │   ├── HighlightText.tsx       # 검색어 하이라이팅
 │   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism) — mermaid는 MermaidBlock으로 위임

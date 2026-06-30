@@ -1,9 +1,8 @@
-// 홈 페이지 — 글 목록 + 태그 사이드바
+// 홈 페이지 — 태그 필터 + 글 목록
 
 import React, { Suspense } from "react";
 import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
-import TagSidebar from "@/components/TagSidebar";
-import SidebarLayout from "@/components/SidebarLayout";
+import TagFilter from "@/components/TagFilter";
 import PostGrid from "@/components/PostGrid";
 import type { PostListPage } from "@/types";
 
@@ -25,31 +24,27 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
 
   return (
     <div className="max-w-[900px] mx-auto px-6 py-12">
-      <SidebarLayout
-        sidebar={
-          <Suspense>
-            <TagSidebar tags={tags} />
-          </Suspense>
-        }
-      >
-        <div>
-          {(tag || q) && (
-            <p className="text-sm text-muted mb-6 font-sans">
-              {q && <><span className="font-semibold text-ink">&ldquo;{q}&rdquo;</span>{" "}검색 결과{" "}</>}
-              {tag && <><span className="font-semibold text-ink">{tag}</span>{" "}태그{" "}</>}
-              <span className="text-muted">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
-            </p>
-          )}
+      {!q && (
+        <Suspense>
+          <TagFilter tags={tags} />
+        </Suspense>
+      )}
 
-          <PostGrid
-            initialPosts={firstPage.posts}
-            initialCursor={firstPage.nextCursor}
-            initialHasMore={firstPage.hasMore}
-            tag={tag}
-            query={q}
-          />
-        </div>
-      </SidebarLayout>
+      {(tag || q) && (
+        <p className="text-sm text-muted mb-6 font-sans">
+          {q && <><span className="font-semibold text-ink">&ldquo;{q}&rdquo;</span>{" "}검색 결과{" "}</>}
+          {tag && <><span className="font-semibold text-ink">{tag}</span>{" "}태그{" "}</>}
+          <span className="text-muted">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
+        </p>
+      )}
+
+      <PostGrid
+        initialPosts={firstPage.posts}
+        initialCursor={firstPage.nextCursor}
+        initialHasMore={firstPage.hasMore}
+        tag={tag}
+        query={q}
+      />
     </div>
   );
 }
