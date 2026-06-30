@@ -12,6 +12,25 @@ import type { ComponentPropsWithoutRef } from "react";
 import MermaidBlock from "@/components/MermaidBlock";
 
 type CodeProps = ComponentPropsWithoutRef<"code"> & { inline?: boolean };
+type PrismStyle = Record<string, React.CSSProperties>;
+
+// oneLight/oneDark의 배경을 --surface CSS 변수로 교체 — 크림 팔레트와 일치하도록
+function withSurfaceBg(theme: PrismStyle): PrismStyle {
+  return {
+    ...theme,
+    'code[class*="language-"]': {
+      ...theme['code[class*="language-"]'],
+      background: "var(--surface)",
+    },
+    'pre[class*="language-"]': {
+      ...theme['pre[class*="language-"]'],
+      background: "var(--surface)",
+    },
+  };
+}
+
+const lightTheme = withSurfaceBg(oneLight as PrismStyle);
+const darkTheme = withSurfaceBg(oneDark as PrismStyle);
 
 export default function CodeBlock({ className, children }: CodeProps) {
   const { resolvedTheme } = useTheme();
@@ -31,27 +50,27 @@ export default function CodeBlock({ className, children }: CodeProps) {
     const isInline = !String(children).includes("\n");
     if (isInline) {
       return (
-        <code className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm">
+        <code className="text-accent2 text-[0.875em]">
           {children}
         </code>
       );
     }
     return (
-      <div className="my-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-        <pre className="!bg-gray-50 dark:!bg-gray-900 !px-4 !py-4 overflow-x-auto text-sm leading-relaxed text-gray-800 dark:text-gray-200 !m-0">
+      <div className="my-6 overflow-hidden border border-border">
+        <pre className="!px-4 !py-4 overflow-x-auto text-sm leading-relaxed text-ink !m-0" style={{ background: "var(--surface)" }}>
           <code>{children}</code>
         </pre>
       </div>
     );
   }
 
-  const theme = mounted && resolvedTheme === "dark" ? oneDark : oneLight;
+  const theme = mounted && resolvedTheme === "dark" ? darkTheme : lightTheme;
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="my-6 overflow-hidden border border-border">
       {/* 언어 라벨 */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <div className="flex items-center justify-between px-4 py-2 bg-surface border-b border-border">
+        <span className="text-xs font-semibold text-muted uppercase tracking-wider font-sans">
           {language}
         </span>
       </div>
