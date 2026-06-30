@@ -63,7 +63,6 @@ src/
 │   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism) — mermaid는 MermaidBlock으로 위임
 │   ├── MermaidBlock.tsx        # Mermaid 다이어그램 SVG 렌더러 (다크/라이트 테마 대응)
 │   ├── TableOfContents.tsx     # 포스트 우측 목차 (IntersectionObserver 활성화)
-│   ├── ShareSidebar.tsx        # SNS 공유 버튼 (링크 복사, LinkedIn, Facebook)
 │   ├── GiscusComments.tsx      # Giscus 댓글 (GitHub Discussions 기반)
 │   ├── GoogleAnalytics.tsx     # GA4 스크립트 삽입 (프로덕션 환경에서만 활성화)
 │   └── FormattedDate.tsx       # 브라우저 로케일 기준 날짜+시간 포맷

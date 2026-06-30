@@ -12,7 +12,6 @@ import { CORE_TAGS } from "@/lib/config";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
 import FormattedDate from "@/components/FormattedDate";
-import ShareSidebar from "@/components/ShareSidebar";
 import GiscusComments from "@/components/GiscusComments";
 
 // revalidate/ISR 미사용 — 한글 slug가 x-next-cache-tags 헤더 오류를 유발
@@ -116,20 +115,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           </div>
         )}
 
-        {/* 본문 영역 — relative로 감싸서 사이드바를 absolute로 바깥에 띄움 */}
-        <div className="relative">
-          {/* 공유 사이드바 — 모바일: 화면 왼쪽 하단 고정 */}
-          <div className="xl:hidden fixed bottom-24 left-6">
-            <ShareSidebar title={post.title} />
-          </div>
-
-          {/* 공유 사이드바 — 데스크톱: 본문 왼쪽 바깥, 항상 화면 하단에 위치 */}
-          <div className="hidden xl:block absolute right-full top-0 h-full pr-20">
-            <div className="sticky top-[calc(100vh-12rem)]">
-              <ShareSidebar title={post.title} />
-            </div>
-          </div>
-
+        <div>
           <PostContent pageId={post.id} />
           <Suspense fallback={null}>
             <AdjacentPosts slug={decodedSlug} />
