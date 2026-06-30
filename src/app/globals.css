@@ -5,6 +5,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable both-edges;
 }
 
 /* 라이트 모드 토큰 */
