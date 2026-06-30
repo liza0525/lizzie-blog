@@ -37,10 +37,10 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
   }
 
   function itemClass(name: string): string {
-    return `text-sm font-sans transition-colors px-3 py-1 ${
+    return `text-sm font-sans transition-colors px-3 py-1 border-b-2 ${
       activeTag === name
-        ? "bg-accent text-bg font-semibold"
-        : "text-muted hover:text-ink hover:bg-surface"
+        ? "text-ink font-semibold border-accent"
+        : "text-muted hover:text-ink border-transparent"
     }`;
   }
 
@@ -48,10 +48,10 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
     <div className="flex flex-wrap items-center gap-1.5 mb-8">
       <button
         onClick={() => router.push("/")}
-        className={`text-sm font-sans transition-colors px-3 py-1 ${
+        className={`text-sm font-sans transition-colors px-3 py-1 border-b-2 ${
           !activeTag
-            ? "bg-accent text-bg font-semibold"
-            : "text-muted hover:text-ink hover:bg-surface"
+            ? "text-ink font-semibold border-accent"
+            : "text-muted hover:text-ink border-transparent"
         }`}
       >
         전체
