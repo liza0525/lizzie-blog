@@ -27,7 +27,7 @@ Next.js 16 (App Router) + Notion API + Vercel 배포.
 ```
 src/
 ├── app/                        # 라우트 레이어
-│   ├── layout.tsx              # 루트 레이아웃 (폰트, 메타데이터, Header/Footer)
+│   ├── layout.tsx              # 루트 레이아웃 (CDN 폰트 링크, 메타데이터, Header/Footer)
 │   ├── page.tsx                # 홈 (글 목록)
 │   ├── admin/
 │   │   └── page.tsx            # 캐시 수동 무효화 UI
@@ -143,4 +143,21 @@ npm run lint                     # 린트 확인
 
 이 프로젝트는 `design-system/` 디렉토리에 디자인 시스템을 git submodule로 포함하고 있다.
 UI/스타일 관련 작업을 할 때는 항상 `design-system/design-system.md`를 먼저 읽고 그 안의 폰트, 컬러 팔레트, 톤 가이드를 따를 것.
+
+### 사용 방식
+- `design-system.md` — AI 컨텍스트 문서로 사용 (CSS 라이브러리로 import하지 않음)
+- 컬러 토큰 등 실제 값은 `src/app/globals.css`에 직접 반영해서 관리
+- `base.css` / `components.css`는 Tailwind와 충돌 가능성으로 사용하지 않음
+
+### submodule 업데이트 방법
+```bash
+git -C design-system pull origin main   # submodule 최신화
+# 이후 부모 repo에서 변경된 포인터 커밋
+```
+
+### 폰트
+- Pretendard (UI/레이블/제목): CDN — `orioncactus/pretendard`
+- Maru Buri (본문 세리프): CDN — `fonts-archive/MaruBuri`
+- 두 폰트 모두 `layout.tsx`의 `<head>`에 `<link rel="stylesheet">`로 로드
+- **next/font 미사용** — font import 추가/제거 시 `.next` 캐시 삭제 필요 없음
 

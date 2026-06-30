@@ -40,7 +40,7 @@ html {
   --color-accent: var(--accent);
   --color-accent2: var(--accent2);
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: var(--font-hahmlet), Georgia, serif;
+  --font-serif: "Maru Buri", Georgia, serif;
 }
 
 body {
@@ -134,8 +134,8 @@ body {
 /* 인라인 코드 — typography 플러그인 기본 배경/백틱 가상요소 제거 */
 .prose :not(pre) > code {
   color: var(--accent2);
-  background: none;
-  padding: 0;
+  background: var(--surface);
+  padding: 0.15em 0.4em;
   font-size: 0.875em;
   font-weight: inherit;
   border-radius: 0;

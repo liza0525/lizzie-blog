@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import { Hahmlet } from "next/font/google";
 import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
-
-const hahmlet = Hahmlet({
-  subsets: ["latin"],
-  weight: ["400", "600", "900"],
-  variable: "--font-hahmlet",
-});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
 
@@ -42,9 +35,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${hahmlet.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css" />
       </head>
       <GoogleAnalytics />
       <body className="min-h-full flex flex-col">

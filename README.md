@@ -8,7 +8,7 @@ Notion을 CMS로 사용하는 개인 개발 기술 블로그.
 - **Language:** TypeScript (strict)
 - **CMS:** Notion API (`@notionhq/client` + `notion-to-md`)
 - **Styling:** Tailwind CSS v4 + `@tailwindcss/typography`
-- **Font:** Pretendard (UI/레이블, CDN) / Hahmlet (본문, Google Fonts)
+- **Font:** Pretendard (UI/레이블, CDN) / Maru Buri (본문, CDN)
 - **Syntax Highlighting:** react-syntax-highlighter (Prism) + Mermaid
 - **Math:** remark-math + rehype-katex
 - **Theme:** next-themes (다크/라이트 모드)
