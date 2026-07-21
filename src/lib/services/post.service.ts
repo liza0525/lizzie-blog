@@ -12,13 +12,14 @@ import {
 
 // 같은 요청 내에서 fetchAllPosts() 중복 호출 방지 (getAllTags/searchPosts/getAdjacentPosts가 각각 호출)
 const fetchAllPosts = cache(fetchAllPostsRaw);
-import type { Post, PostListPage } from "@/types";
+import type { Post, PostListPage, PostType } from "@/types";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
 export async function getPostPage(options: {
   pageSize?: number;
   cursor?: string;
   tag?: string;
+  type?: PostType;
 }): Promise<PostListPage> {
   return fetchPostPage({ pageSize: options.pageSize ?? 20, ...options });
 }

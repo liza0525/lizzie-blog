@@ -14,20 +14,25 @@ import { rehypeSlugNoEmoji } from "@/lib/toc";
 import type { Heading } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
+import type { PostType } from "@/types";
 
 interface PostContentClientProps {
   content: string;
   headings: Heading[];
   pageId: string;
+  type: PostType;
 }
 
 export default function PostContentClient({
   content,
   headings,
   pageId: _pageId,
+  type,
 }: PostContentClientProps): React.JSX.Element {
+  const isNote = type === "note";
+
   return (
-    <div className="flex gap-12">
+    <div className={isNote ? "" : "flex gap-12"}>
       <div className="flex-1 min-w-0">
         <div className="prose prose-lg max-w-none">
           <ReactMarkdown
@@ -66,7 +71,7 @@ export default function PostContentClient({
         </div>
       </div>
 
-      {headings.length > 0 && (
+      {!isNote && headings.length > 0 && (
         <aside className="w-[140px] shrink-0 hidden xl:block">
           <div className="sticky top-24">
             <TableOfContents headings={headings} />

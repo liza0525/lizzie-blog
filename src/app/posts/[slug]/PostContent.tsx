@@ -5,12 +5,14 @@ import React from "react";
 import { getPostContent } from "@/lib/services/post.service";
 import { extractHeadings } from "@/lib/toc";
 import PostContentClient from "@/components/PostContentClient";
+import type { PostType } from "@/types";
 
 interface PostContentProps {
   pageId: string;
+  type: PostType;
 }
 
-export default async function PostContent({ pageId }: PostContentProps): Promise<React.JSX.Element> {
+export default async function PostContent({ pageId, type }: PostContentProps): Promise<React.JSX.Element> {
   const content = await getPostContent(pageId);
   const headings = extractHeadings(content);
 
@@ -19,6 +21,7 @@ export default async function PostContent({ pageId }: PostContentProps): Promise
       content={content}
       headings={headings}
       pageId={pageId}
+      type={type}
     />
   );
 }

@@ -4,7 +4,8 @@ import React, { Suspense } from "react";
 import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
 import TagFilter from "@/components/TagFilter";
 import PostGrid from "@/components/PostGrid";
-import type { PostListPage } from "@/types";
+import NoteHighlights from "@/components/NoteHighlights";
+import type { Post, PostListPage } from "@/types";
 
 export const revalidate = 3600;
 
@@ -15,15 +16,18 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
   const { tag, q } = await searchParams;
 
-  const [firstPage, tags] = await Promise.all([
+  const [firstPage, tags, noteHighlights] = await Promise.all([
     q
       ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
-      : getPostPage({ pageSize: 10, tag }),
+      : getPostPage({ pageSize: 10, tag, type: "essay" }),
     getAllTags(),
+    q ? Promise.resolve<Post[]>([]) : getPostPage({ pageSize: 6, type: "note" }).then((p) => p.posts),
   ]);
 
   return (
     <div className="max-w-[900px] mx-auto px-6 py-12">
+      {!q && <NoteHighlights notes={noteHighlights} />}
+
       {!q && (
         <Suspense>
           <TagFilter tags={tags} />
@@ -43,6 +47,7 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
         initialCursor={firstPage.nextCursor}
         initialHasMore={firstPage.hasMore}
         tag={tag}
+        type="essay"
         query={q}
       />
     </div>

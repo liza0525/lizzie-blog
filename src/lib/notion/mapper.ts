@@ -39,6 +39,15 @@ function extractMultiSelect(
   return [];
 }
 
+function extractSelect(
+  property: PageObjectResponse["properties"][string]
+): string | null {
+  if (property.type === "select") {
+    return property.select?.name ?? null;
+  }
+  return null;
+}
+
 function extractCoverImage(page: PageObjectResponse): string | null {
   if (!page.cover) return null;
   if (page.cover.type === "external") return page.cover.external.url;
@@ -48,7 +57,7 @@ function extractCoverImage(page: PageObjectResponse): string | null {
 }
 
 // Notion 페이지 → Post 타입 변환
-// CLAUDE.md의 Notion DB 컬럼명과 맞춰야 함 (Title, Description, Slug, PublishedAt, Tags)
+// CLAUDE.md의 Notion DB 컬럼명과 맞춰야 함 (Title, Description, Slug, PublishedAt, Tags, Type)
 export function mapPageToPost(page: PageObjectResponse): Post {
   const props = page.properties;
 
@@ -61,5 +70,7 @@ export function mapPageToPost(page: PageObjectResponse): Post {
     updatedAt: page.last_edited_time,
     tags: extractMultiSelect(props["Tags"]),
     coverImage: extractCoverImage(page),
+    // Type 값이 비어있거나 "note"가 아니면 기존 글 호환을 위해 essay로 폴백
+    type: extractSelect(props["Type"]) === "note" ? "note" : "essay",
   };
 }

@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Post, PostListPage } from "@/types";
+import type { Post, PostListPage, PostType } from "@/types";
 import HighlightText from "@/components/HighlightText";
 import FormattedDate from "@/components/FormattedDate";
 import { CORE_TAGS } from "@/lib/config";
@@ -15,6 +15,7 @@ interface PostGridProps {
   initialCursor: string | null;
   initialHasMore: boolean;
   tag?: string;
+  type?: PostType;
   query?: string;
 }
 
@@ -23,6 +24,7 @@ export default function PostGrid({
   initialCursor,
   initialHasMore,
   tag,
+  type,
   query,
 }: PostGridProps): React.JSX.Element {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -50,6 +52,7 @@ export default function PostGrid({
         const params = new URLSearchParams({
           ...(cursor ? { cursor } : {}),
           ...(tag ? { tag } : {}),
+          ...(type ? { type } : {}),
         });
         const res = await fetch(`/api/posts?${params}`);
         const data: PostListPage = await res.json();
@@ -64,7 +67,7 @@ export default function PostGrid({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [cursor, hasMore, loading, tag]);
+  }, [cursor, hasMore, loading, tag, type]);
 
   if (posts.length === 0) {
     return (
@@ -81,54 +84,67 @@ export default function PostGrid({
   return (
     <>
       <div className="divide-y divide-border">
-        {posts.map((post) => (
-          <Link
-            key={post.id}
-            href={`/posts/${encodeURIComponent(post.slug)}`}
-            prefetch={false}
-            className="group flex items-start gap-5 py-5 -mx-4 px-4 hover:bg-surface transition-colors"
-          >
-            {/* 텍스트 영역 */}
-            <div className="flex-1 min-w-0">
-              <time className="block text-[11px] font-semibold tracking-[0.08em] text-muted uppercase mb-1.5 font-sans">
-                <FormattedDate date={post.publishedAt} />
-              </time>
-              <h2 className="text-[18px] font-semibold text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                <HighlightText text={post.title} query={query ?? ""} />
-              </h2>
-              {post.description && (
-                <p className="text-[15px] leading-[1.7] text-ink opacity-75 mb-2.5 line-clamp-2 font-serif">
-                  {post.description}
-                </p>
-              )}
-              {post.tags.length > 0 && (
-                <div className="flex gap-1.5 flex-wrap">
-                  {post.tags.map((tagName) => (
-                    <span
-                      key={tagName}
-                      className={`text-xs font-semibold text-bg px-[10px] py-[3px] rounded-[2px] font-sans ${
-                        (CORE_TAGS as readonly string[]).includes(tagName) ? "bg-accent2" : "bg-accent"
-                      }`}
-                    >
-                      {tagName}
-                    </span>
-                  ))}
+        {posts.map((post) => {
+          const isNote = post.type === "note";
+          return (
+            <Link
+              key={post.id}
+              href={`/posts/${encodeURIComponent(post.slug)}`}
+              prefetch={false}
+              className={`group flex items-start gap-5 -mx-4 px-4 hover:bg-surface transition-colors ${
+                isNote ? "py-3" : "py-5"
+              }`}
+            >
+              {/* 텍스트 영역 */}
+              <div className="flex-1 min-w-0">
+                <time className="block text-[11px] font-semibold tracking-[0.08em] text-muted uppercase mb-1.5 font-sans">
+                  <FormattedDate date={post.publishedAt} />
+                </time>
+                <h2
+                  className={`text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors ${
+                    isNote ? "text-[15px] font-medium" : "text-[18px] font-semibold"
+                  }`}
+                >
+                  <HighlightText text={post.title} query={query ?? ""} />
+                </h2>
+                {post.description && (
+                  <p
+                    className={`leading-[1.7] text-ink opacity-75 mb-2.5 font-serif ${
+                      isNote ? "text-[14px] line-clamp-3" : "text-[15px] line-clamp-2"
+                    }`}
+                  >
+                    {post.description}
+                  </p>
+                )}
+                {post.tags.length > 0 && (
+                  <div className="flex gap-1.5 flex-wrap">
+                    {post.tags.map((tagName) => (
+                      <span
+                        key={tagName}
+                        className={`text-xs font-semibold text-bg px-[10px] py-[3px] rounded-[2px] font-sans ${
+                          (CORE_TAGS as readonly string[]).includes(tagName) ? "bg-accent2" : "bg-accent"
+                        }`}
+                      >
+                        {tagName}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* 썸네일 — cover 이미지가 있을 때만, note는 생략 */}
+              {!isNote && post.coverImage && (
+                <div className="shrink-0 w-24 h-[72px] border border-border overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.coverImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               )}
-            </div>
-            {/* 썸네일 — cover 이미지가 있을 때만 표시 */}
-            {post.coverImage && (
-              <div className="shrink-0 w-24 h-[72px] border border-border overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={post.coverImage}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {/* 스크롤 감지 sentinel */}
