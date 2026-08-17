@@ -64,6 +64,12 @@ export default function PostContentClient({
               iframe: ({ ...props }) => (
                 <iframe {...props} className="notion-embed my-4 w-full h-[600px]" />
               ),
+              // 본문 내 모든 링크는 새 탭에서 열림 — 다른 글로 이동해도 읽던 글 유지
+              a: ({ children, ...props }) => (
+                <a {...props} target="_blank" rel="noopener noreferrer">
+                  {children}
+                </a>
+              ),
             }}
           >
             {content}
