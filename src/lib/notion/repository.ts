@@ -14,6 +14,12 @@ import { notionClient, DATABASE_ID } from "./client";
 import { mapPageToPost } from "./mapper";
 import type { Post, PostListPage } from "@/types";
 
+// QueryDatabaseParameters["filter"]의 "and" 배열 원소 타입 — PropertyFilter가 export되지 않아 인덱스로 추출
+type FilterItem = Extract<
+  NonNullable<QueryDatabaseParameters["filter"]>,
+  { and: unknown[] }
+>["and"][number];
+
 // 페이지네이션 포스트 목록 조회 (20개씩, 태그/타입 필터 선택)
 export async function fetchPostPage(options: {
   pageSize: number;
@@ -21,8 +27,8 @@ export async function fetchPostPage(options: {
   tag?: string;
   type?: "essay" | "note";
 }): Promise<PostListPage> {
-  const baseFilter = { property: "Status", status: { equals: "Published" } };
-  const extraFilters: QueryDatabaseParameters["filter"][] = [];
+  const baseFilter: FilterItem = { property: "Status", status: { equals: "Published" } };
+  const extraFilters: FilterItem[] = [];
   if (options.tag) {
     extraFilters.push({ property: "Tags", multi_select: { contains: options.tag } });
   }
