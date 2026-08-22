@@ -49,10 +49,12 @@ export default function PostContentClient({
                 if (hasImage) return <>{children}</>;
                 return <p>{children}</p>;
               },
+              // Notion API는 에디터에서 조절한 표시 폭을 주지 않으므로 이미지의 원본 픽셀 크기를 기준으로 렌더
+              // max-w-full + h-auto — 본문 폭을 넘을 때만 비율 유지한 채 축소 (모바일 대응)
               img: ({ src, alt }) => (
-                <figure className="my-0">
+                <figure className="my-0 flex flex-col items-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={alt ?? ""} className="w-full" />
+                  <img src={src} alt={alt ?? ""} className="max-w-full h-auto" />
                   {alt && (
                     <figcaption className="text-center text-[12px] text-muted mt-2 font-sans">
                       {alt}
