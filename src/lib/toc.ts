@@ -3,7 +3,7 @@ import { visit } from "unist-util-visit";
 import { toString } from "hast-util-to-string";
 
 export interface Heading {
-  level: number;   // 1 | 2 | 3
+  level: number;   // 1 | 2 | 3 | 4
   text: string;
   id: string;
 }
@@ -33,11 +33,11 @@ export function rehypeSlugNoEmoji() {
   };
 }
 
-// 마크다운 문자열에서 h1~h3 헤딩 추출
+// 마크다운 문자열에서 h1~h4 헤딩 추출
 // 코드블럭(```...```) 안의 # 주석이 헤딩으로 오인식되는 걸 막기 위해 코드블럭을 먼저 제거
 export function extractHeadings(markdown: string): Heading[] {
   const stripped = markdown.replace(/^```[\s\S]*?^```/gm, "");
-  const regex = /^(#{1,3})\s+(.+)$/gm;
+  const regex = /^(#{1,4})\s+(.+)$/gm;
   const headings: Heading[] = [];
   let match;
   while ((match = regex.exec(stripped)) !== null) {

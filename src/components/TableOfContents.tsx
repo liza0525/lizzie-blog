@@ -1,10 +1,18 @@
-// 포스트 우측 목차(TOC) — h1/h2/h3 계층 구조로 렌더링
+// 포스트 우측 목차(TOC) — h1/h2/h3/h4 계층 구조로 렌더링
 // IntersectionObserver로 현재 읽고 있는 섹션을 감지해 활성 항목 하이라이팅
 // rehype-slug가 생성한 헤딩 id를 앵커로 사용
 "use client";
 
 import { useEffect, useState } from "react";
 import type { Heading } from "@/lib/toc";
+
+// 헤딩 레벨 → 들여쓰기 클래스
+const INDENT_BY_LEVEL: Record<number, string> = {
+  1: "pl-0",
+  2: "pl-3",
+  3: "pl-6",
+  4: "pl-9",
+};
 
 interface TableOfContentsProps {
   headings: Heading[];
@@ -39,7 +47,8 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
       <ul className="space-y-0.5">
         {headings.map(({ level, text, id }) => {
           const isActive = activeId === id;
-          const indent = level === 1 ? "pl-0" : level === 2 ? "pl-3" : "pl-6";
+          // 레벨별 들여쓰기 — 정의되지 않은 레벨은 가장 깊은 단계로 처리
+          const indent = INDENT_BY_LEVEL[level] ?? "pl-9";
           const color = isActive
             ? "text-accent font-semibold"
             : "text-muted hover:text-ink";
