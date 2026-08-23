@@ -111,6 +111,14 @@ body {
   min-width: 0;
   color: var(--text);
 }
+/* 콜아웃 본문은 마크다운으로 파싱되므로 p/ul/pre 등 블록 요소가 들어온다 —
+   prose 기본 여백 때문에 콜아웃 위아래가 벌어지는 것만 정리 */
+.notion-callout-body > :first-child {
+  margin-top: 0;
+}
+.notion-callout-body > :last-child {
+  margin-bottom: 0;
+}
 
 /* 콜아웃 색상 변형 — 크림 배경 기준으로 채도 낮게 조정 */
 .notion-callout[data-color="gray"]   { --callout-bg: #eeebe4; --callout-border: #9a9590; --callout-bg-dark: #1a1e26; --callout-border-dark: #4a5568; }

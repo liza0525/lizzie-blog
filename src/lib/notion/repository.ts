@@ -191,7 +191,8 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   // 기본 notion-to-md는 blockquote(>)로 변환해 인용문과 구분 불가
   // color는 "gray_background", "yellow_background" 등의 형태로 옴
   n2m.setCustomTransformer("callout", async (block) => {
-    const { rich_text, icon, color } = (block as CalloutBlockObjectResponse).callout;
+    const calloutBlock = block as CalloutBlockObjectResponse;
+    const { rich_text, icon, color } = calloutBlock.callout;
 
     const emoji = icon?.type === "emoji" ? icon.emoji : "💡";
     const text = rich_text
@@ -202,11 +203,26 @@ export async function fetchPostContent(pageId: string): Promise<string> {
       })
       .join("");
 
+    // 콜아웃 안에서 Enter로 줄을 나누면 자식 블록(paragraph, list 등)이 생기는데,
+    // notion-to-md는 custom transformer가 등록된 블록의 children을 아예 처리하지 않고 버린다.
+    // (notion-to-md.js: blocksToMarkdown에서 customTransformers에 있으면 재귀 호출 skip)
+    // → 여기서 직접 자식 블록을 마크다운으로 변환해 본문에 이어붙인다.
+    let childrenMd = "";
+    if (calloutBlock.has_children) {
+      const childBlocks = await n2m.pageToMarkdown(calloutBlock.id);
+      childrenMd = (n2m.toMarkdownString(childBlocks).parent ?? "").trim();
+    }
+
+    const body = [text.trim(), childrenMd].filter(Boolean).join("\n\n");
+
     // "gray_background" → "gray", "default" → ""
     const colorName = color === "default" ? "" : color.replace("_background", "");
     const colorAttr = colorName ? ` data-color="${colorName}"` : "";
 
-    return `<div class="notion-callout"${colorAttr}><span class="notion-callout-icon">${emoji}</span><div class="notion-callout-body">${text}</div></div>`;
+    // 본문을 빈 줄로 감싸는 이유: CommonMark에서 HTML 블록 내부는 마크다운으로 파싱되지 않는다.
+    // 빈 줄로 HTML 블록을 한 번 닫아주면 가운데 내용이 마크다운으로 파싱되고,
+    // rehype-raw가 앞뒤 raw HTML과 다시 합쳐서 하나의 div로 렌더링한다.
+    return `<div class="notion-callout"${colorAttr}><span class="notion-callout-icon">${emoji}</span><div class="notion-callout-body">\n\n${body}\n\n</div></div>`;
   });
 
   // embed 블록 → <iframe> HTML로 변환 (rehype-raw가 렌더링)
