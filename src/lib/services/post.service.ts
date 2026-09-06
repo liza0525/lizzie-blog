@@ -13,6 +13,7 @@ import {
 // 같은 요청 내에서 fetchAllPosts() 중복 호출 방지 (getAllTags/searchPosts/getAdjacentPosts가 각각 호출)
 const fetchAllPosts = cache(fetchAllPostsRaw);
 import type { Post, PostListPage, PostType } from "@/types";
+import { STATIC_BUILD_POST_LIMIT } from "@/lib/config";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
 export async function getPostPage(options: {
@@ -46,9 +47,10 @@ export function getPostContent(pageId: string): Promise<string> {
 
 
 // 정적 경로 생성용 (Next.js generateStaticParams에서 사용)
+// 최신 STATIC_BUILD_POST_LIMIT개만 빌드 시 미리 생성 — 나머지는 방문 시 dynamicParams로 생성 후 캐싱
 export async function getAllSlugs(): Promise<string[]> {
   const posts = await fetchAllPosts();
-  return posts.map((p) => p.slug);
+  return posts.slice(0, STATIC_BUILD_POST_LIMIT).map((p) => p.slug);
 }
 
 // 이전/다음 포스트 조회 (publishedAt 기준, 목록은 최신순이므로 index+1이 이전글)
