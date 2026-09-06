@@ -1,6 +1,7 @@
 // 포스트 우측 목차(TOC) — h1/h2/h3/h4 계층 구조로 렌더링
 // IntersectionObserver로 현재 읽고 있는 섹션을 감지해 활성 항목 하이라이팅
 // rehype-slug가 생성한 헤딩 id를 앵커로 사용
+// onNavigate: 앵커 클릭 시 호출되는 선택적 콜백 — 바텀시트 등 오버레이에서 목차 클릭과 동시에 닫기 위해 사용
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,9 +17,10 @@ const INDENT_BY_LEVEL: Record<number, string> = {
 
 interface TableOfContentsProps {
   headings: Heading[];
+  onNavigate?: () => void;
 }
 
-export default function TableOfContents({ headings }: TableOfContentsProps) {
+export default function TableOfContents({ headings, onNavigate }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
             <li key={id}>
               <a
                 href={`#${id}`}
+                onClick={onNavigate}
                 className={`block py-1 text-[13px] leading-snug transition-colors font-sans ${indent} ${color}`}
               >
                 {text}

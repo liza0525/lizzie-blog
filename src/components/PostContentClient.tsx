@@ -14,6 +14,7 @@ import { rehypeSlugNoEmoji } from "@/lib/toc";
 import type { Heading } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
+import TocBottomSheet from "@/components/TocBottomSheet";
 import type { PostType } from "@/types";
 
 interface PostContentClientProps {
@@ -30,6 +31,8 @@ export default function PostContentClient({
   type,
 }: PostContentClientProps): React.JSX.Element {
   const isNote = type === "note";
+  // 데스크톱 사이드바와 모바일 바텀시트가 동일 조건을 공유 — 조건 중복 방지
+  const showToc = !isNote && headings.length > 0;
 
   return (
     <div className={isNote ? "" : "flex gap-12"}>
@@ -79,13 +82,15 @@ export default function PostContentClient({
         </div>
       </div>
 
-      {!isNote && headings.length > 0 && (
+      {showToc && (
         <aside className="w-[140px] shrink-0 hidden xl:block">
           <div className="sticky top-24">
             <TableOfContents headings={headings} />
           </div>
         </aside>
       )}
+
+      {showToc && <TocBottomSheet headings={headings} />}
     </div>
   );
 }
