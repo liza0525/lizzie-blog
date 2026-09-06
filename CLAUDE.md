@@ -125,7 +125,8 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 (운영 환경에서만)
 
 ## 캐싱 전략
 - 글 목록 페이지(`page.tsx`): `searchParams` 사용으로 dynamic 렌더링 — 캐싱 없음
-- 글 상세 페이지(`posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 빌드 시 정적 생성
+- 글 상세 페이지(`posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 최신 `STATIC_BUILD_POST_LIMIT`(`lib/config.ts`, 현재 20)개만 빌드 시 정적 생성, 나머지는 `dynamicParams`(기본값)로 첫 방문 시 생성 후 캐싱
+  - 전체를 다 빌드하면 포스트마다 Notion 블록 트리를 병렬로 가져오는 구조라 글이 쌓일수록 빌드 중 Notion rate limit(429)에 걸림 — 이를 피하기 위한 제한
 - 포스트 데이터: `post.service.ts`의 `unstable_cache`로 캐싱 (글 상세 2시간)
 - `fetchAllPosts()`: `React.cache()`로 같은 요청 내 중복 호출 방지
 
