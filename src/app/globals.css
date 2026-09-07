@@ -47,6 +47,12 @@ body {
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
+  /* 모바일에서 폭 넓은 노션 표/임베드/긴 링크가 남아있어도 페이지 전체가
+     가로로 스크롤되지 않게 하는 2차 방어선(fallback).
+     - 표 내부 overflow-x-auto는 별도 스크롤 컨테이너라 영향받지 않고 그대로 동작
+     - TableOfContents(sticky)/TocBottomSheet(fixed)는 뷰포트 기준 위치라
+       body의 overflow 설정과 무관하게 정상 동작 */
+  overflow-x: hidden;
 }
 
 /* 본문 영역: Hahmlet 세리프, typography 플러그인 색상 토큰 재정의 */
@@ -137,6 +143,13 @@ body {
   padding: 0;
   border-radius: 0;
   color: inherit;
+}
+
+/* overflow-x-auto 래퍼가 새 BFC를 만들어 표 자체 마진이 앞뒤 요소와
+   collapse 되지 않고 래퍼 안에 갇히는 문제 방지 — 세로 여백은
+   PostContentClient 래퍼 div(my-8)가 대신 담당 */
+.prose table {
+  margin: 0;
 }
 
 /* 인라인 코드 — typography 플러그인 기본 배경/백틱 가상요소 제거 */

@@ -66,12 +66,22 @@ export default function PostContentClient({
                 </figure>
               ),
               code: (props) => <CodeBlock {...props} />,
+              // GFM 표는 셀 내용에 따라 폭이 넓어질 수 있어 전용 가로 스크롤 컨테이너로 감쌈
+              // 표 자체 마진은 globals.css에서 0으로 리셋하고 이 래퍼(my-8)가 세로 여백을 담당
+              // (overflow-x-auto가 새 BFC를 만들어 표 마진이 밖으로 못 나가 이중 여백 생기는 것 방지)
+              table: ({ children }) => (
+                <div className="my-8 overflow-x-auto">
+                  <table>{children}</table>
+                </div>
+              ),
               iframe: ({ ...props }) => (
                 <iframe {...props} className="notion-embed my-4 w-full h-[600px]" />
               ),
               // 본문 내 모든 링크는 새 탭에서 열림 — 다른 글로 이동해도 읽던 글 유지
+              // break-words: 북마크/파일 등이 [텍스트](url) 링크로 렌더될 때 긴 URL/제목이
+              // 하이픈 없이 이어져도 페이지 폭을 넘기지 않고 줄바꿈되도록 함
               a: ({ children, ...props }) => (
-                <a {...props} target="_blank" rel="noopener noreferrer">
+                <a {...props} target="_blank" rel="noopener noreferrer" className="break-words">
                   {children}
                 </a>
               ),
