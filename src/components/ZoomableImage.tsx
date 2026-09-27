@@ -123,7 +123,7 @@ export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.J
             </button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={alt} className="max-w-full max-h-[85vh] w-auto h-auto object-contain" />
-            {alt && <p className="text-center text-[14px] text-muted font-sans">{alt}</p>}
+            {alt && <p className="text-center text-[18px] text-muted font-sans">{alt}</p>}
           </div>,
           document.body
         )}

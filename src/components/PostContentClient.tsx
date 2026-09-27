@@ -59,7 +59,7 @@ export default function PostContentClient({
                 <figure className="my-0 flex flex-col items-center">
                   <ZoomableImage src={typeof src === "string" ? src : undefined} alt={alt ?? ""} />
                   {alt && (
-                    <figcaption className="text-center text-[14px] text-muted mt-2 font-sans">
+                    <figcaption className="text-center text-[18px] text-muted mt-2 font-sans">
                       {alt}
                     </figcaption>
                   )}
