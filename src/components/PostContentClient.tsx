@@ -15,6 +15,7 @@ import type { Heading } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
 import TableOfContents from "@/components/TableOfContents";
 import TocBottomSheet from "@/components/TocBottomSheet";
+import ZoomableImage from "@/components/ZoomableImage";
 import type { PostType } from "@/types";
 
 interface PostContentClientProps {
@@ -53,11 +54,10 @@ export default function PostContentClient({
                 return <p>{children}</p>;
               },
               // Notion API는 에디터에서 조절한 표시 폭을 주지 않으므로 이미지의 원본 픽셀 크기를 기준으로 렌더
-              // max-w-full + h-auto — 본문 폭을 넘을 때만 비율 유지한 채 축소 (모바일 대응)
+              // 본문 폭/70vh를 넘을 때만 비율 유지한 채 축소, 클릭 시 확대 — ZoomableImage 참고
               img: ({ src, alt }) => (
                 <figure className="my-0 flex flex-col items-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={alt ?? ""} className="max-w-full h-auto" />
+                  <ZoomableImage src={typeof src === "string" ? src : undefined} alt={alt ?? ""} />
                   {alt && (
                     <figcaption className="text-center text-[14px] text-muted mt-2 font-sans">
                       {alt}

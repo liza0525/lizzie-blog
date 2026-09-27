@@ -59,6 +59,7 @@ src/
 │   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침)
 │   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
 │   ├── PostContentClient.tsx   # 포스트 본문 렌더러 (client) — PostContent(server)에서 분리
+│   ├── ZoomableImage.tsx       # 본문 이미지 (높이 70vh 제한) + 클릭 확대 라이트박스
 │   ├── HighlightText.tsx       # 검색어 하이라이팅
 │   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism) — mermaid는 MermaidBlock으로 위임
 │   ├── MermaidBlock.tsx        # Mermaid 다이어그램 SVG 렌더러 (다크/라이트 테마 대응)
