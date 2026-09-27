@@ -59,7 +59,7 @@ export default function PostContentClient({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={alt ?? ""} className="max-w-full h-auto" />
                   {alt && (
-                    <figcaption className="text-center text-[12px] text-muted mt-2 font-sans">
+                    <figcaption className="text-center text-[14px] text-muted mt-2 font-sans">
                       {alt}
                     </figcaption>
                   )}
