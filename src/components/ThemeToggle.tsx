@@ -19,7 +19,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
-      className="w-9 h-9 flex items-center justify-center text-muted hover:text-ink hover:bg-surface transition-colors"
+      className="w-9 h-9 flex items-center justify-center rounded-box text-muted hover:text-ink hover:bg-surface transition-colors"
     >
       {isDark ? (
         // 라이트 모드로 전환 → 해 아이콘

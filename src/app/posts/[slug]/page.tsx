@@ -76,12 +76,14 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
         {post.title}
       </h1>
       <div className="flex items-center gap-3 flex-wrap mb-3">
-        <FormattedDate date={post.publishedAt} className="text-[11px] font-semibold tracking-[0.08em] text-muted uppercase font-sans" />
+        <FormattedDate date={post.publishedAt} className="text-xs text-subtle tabular-nums font-sans" />
         {post.tags.map((tag) => (
           <span
             key={tag}
-            className={`text-xs font-semibold text-bg px-[10px] py-[3px] rounded-[2px] font-sans ${
-              (CORE_TAGS as readonly string[]).includes(tag) ? "bg-accent2" : "bg-accent"
+            className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
+              (CORE_TAGS as readonly string[]).includes(tag)
+                ? "bg-accent-soft border-transparent text-on-accent-soft"
+                : "border-border text-muted"
             }`}
           >
             {tag}
@@ -89,7 +91,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
         ))}
       </div>
       {post.description && (
-        <p className={`text-ink opacity-75 leading-relaxed font-serif ${isNote ? "text-[15px]" : "text-lg"}`}>
+        <p className={`text-muted leading-relaxed ${isNote ? "text-[15px]" : "text-lg"}`}>
           {post.description}
         </p>
       )}

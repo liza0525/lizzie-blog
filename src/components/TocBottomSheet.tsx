@@ -77,7 +77,7 @@ export default function TocBottomSheet({ headings }: TocBottomSheetProps): React
         type="button"
         onClick={openSheet}
         aria-label="목차 열기"
-        className="fixed bottom-6 right-6 z-20 xl:hidden flex items-center gap-2 rounded-full bg-bg border border-border text-ink shadow-lg hover:bg-surface transition-colors pl-4 pr-5 py-3"
+        className="fixed bottom-6 right-6 z-20 xl:hidden flex items-center gap-2 rounded-box bg-bg border border-border text-ink shadow-lg hover:bg-surface transition-colors pl-4 pr-5 py-3"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

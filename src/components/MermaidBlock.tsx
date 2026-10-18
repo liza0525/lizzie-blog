@@ -40,7 +40,7 @@ export default function MermaidBlock({ chart }: MermaidBlockProps): React.JSX.El
 
   if (error) {
     return (
-      <div className="my-6 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4 text-sm text-red-600 dark:text-red-400">
+      <div className="my-6 rounded-box bg-warning-soft p-4 text-sm text-warning">
         <p className="font-medium mb-1">Mermaid 오류</p>
         <pre className="whitespace-pre-wrap">{error}</pre>
       </div>
@@ -49,7 +49,7 @@ export default function MermaidBlock({ chart }: MermaidBlockProps): React.JSX.El
 
   if (!svg) {
     return (
-      <div className="my-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-8 flex justify-center items-center text-sm text-gray-400">
+      <div className="my-6 rounded-box border border-border bg-surface p-8 flex justify-center items-center text-sm text-subtle">
         렌더링 중...
       </div>
     );
@@ -57,7 +57,7 @@ export default function MermaidBlock({ chart }: MermaidBlockProps): React.JSX.El
 
   return (
     <div
-      className="my-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 flex justify-center overflow-x-auto"
+      className="my-6 rounded-box border border-border bg-surface p-4 flex justify-center overflow-x-auto"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

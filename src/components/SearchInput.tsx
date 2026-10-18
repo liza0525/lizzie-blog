@@ -32,7 +32,7 @@ export default function SearchInput() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="제목 검색..."
-        className="w-64 pl-8 pr-3 py-1.5 text-sm bg-surface text-ink placeholder-muted border border-border focus:border-accent focus:outline-none transition-colors"
+        className="w-64 pl-8 pr-3 py-1.5 text-sm bg-surface text-ink placeholder-subtle border border-input rounded-box focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none transition-colors"
       />
       <svg
         className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"

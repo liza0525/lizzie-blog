@@ -16,7 +16,7 @@ export default function HighlightText({ text, query }: HighlightTextProps) {
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === query.toLowerCase() ? (
-          <mark key={i} className="bg-yellow-200 dark:bg-yellow-500/40 text-inherit rounded-sm px-0.5">
+          <mark key={i} className="bg-accent-soft text-inherit rounded-box px-0.5">
             {part}
           </mark>
         ) : (

@@ -97,7 +97,7 @@ export default function PostGrid({
             >
               {/* 텍스트 영역 */}
               <div className="flex-1 min-w-0">
-                <time className="block text-[11px] font-semibold tracking-[0.08em] text-muted uppercase mb-1.5 font-sans">
+                <time className="block text-xs text-subtle tabular-nums mb-1.5 font-sans">
                   <FormattedDate date={post.publishedAt} />
                 </time>
                 <h2
@@ -109,7 +109,7 @@ export default function PostGrid({
                 </h2>
                 {post.description && (
                   <p
-                    className={`leading-[1.7] text-ink opacity-75 mb-2.5 font-serif ${
+                    className={`leading-[1.7] text-muted mb-2.5 ${
                       isNote ? "text-[14px] line-clamp-3" : "text-[15px] line-clamp-2"
                     }`}
                   >
@@ -121,8 +121,10 @@ export default function PostGrid({
                     {post.tags.map((tagName) => (
                       <span
                         key={tagName}
-                        className={`text-xs font-semibold text-bg px-[10px] py-[3px] rounded-[2px] font-sans ${
-                          (CORE_TAGS as readonly string[]).includes(tagName) ? "bg-accent2" : "bg-accent"
+                        className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
+                          (CORE_TAGS as readonly string[]).includes(tagName)
+                            ? "bg-accent-soft border-transparent text-on-accent-soft"
+                            : "border-border text-muted"
                         }`}
                       >
                         {tagName}

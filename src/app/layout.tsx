@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css" />
       </head>
       <GoogleAnalytics />
