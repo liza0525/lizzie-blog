@@ -142,25 +142,49 @@ npm run lint                     # 린트 확인
 
 ---
 
+<!-- BEGIN lizzie-design-system -->
 ## Design System
 
-이 프로젝트는 `design-system/` 디렉토리에 디자인 시스템을 git submodule로 포함하고 있다.
-UI/스타일 관련 작업을 할 때는 항상 `design-system/design-system.md`를 먼저 읽고 그 안의 폰트, 컬러 팔레트, 톤 가이드를 따를 것.
+이 프로젝트는 `design-system/`(git submodule)의 Lizzie Design System을 따른다.
 
-### 사용 방식
-- `design-system.md` — AI 컨텍스트 문서로 사용 (CSS 라이브러리로 import하지 않음)
-- 컬러 토큰 등 실제 값은 `src/app/globals.css`에 직접 반영해서 관리
-- `base.css` / `components.css`는 Tailwind와 충돌 가능성으로 사용하지 않음
+- **고정 버전**: `0.0.2` — 실제 값 확인: `git -C design-system describe --tags`
+- **적용 방식**: import
+  - **import** — 프로젝트 CSS에서 `design-system/tokens.css`(필요하면 `components.css`도)를 `@import`해서 쓴다
 
-### submodule 업데이트 방법
-```bash
-git -C design-system pull origin main   # submodule 최신화
-# 이후 부모 repo에서 변경된 포인터 커밋
-```
+### UI 작업 전에
 
-### 폰트
-- Pretendard (UI/레이블/제목): CDN — `orioncactus/pretendard`
-- Maru Buri (본문 세리프): CDN — `fonts-archive/MaruBuri`
-- 두 폰트 모두 `layout.tsx`의 `<head>`에 `<link rel="stylesheet">`로 로드
-- **next/font 미사용** — font import 추가/제거 시 `.next` 캐시 삭제 필요 없음
+UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/design-system.md`를 읽는다.
+실제 값은 `design-system/tokens.css`가 원본이고, 재사용 클래스는 `design-system/components.css`에 있다.
+시스템에 없는 색·폰트·컴포넌트 패턴은 임의로 만들지 말고 사용자에게 먼저 제안한다.
 
+### 항상 지킬 규칙
+
+- 색은 역할 토큰만 쓴다: `--bg` `--surface` `--border` `--input-border` `--text` `--muted` `--subtle` `--accent` `--accent-soft` `--on-accent` `--on-accent-soft` `--warning` `--warning-soft`. hex 값이나 `--gray-*` 원시값을 직접 쓰지 않는다
+- 포인트 색은 `--accent` 하나. `--warning`은 주의 표시에만
+- 폰트는 Pretendard가 기본. Maru Buri(세리프)는 장문 본문(`.prose`) 안에서만
+- 13px 미만 글씨 금지. 제목은 700 + `--letter-tight`. `uppercase`와 넓은 자간 금지
+- 모서리는 전부 `--corner`(4px). 점·아바타만 `--corner-round`. pill 버튼 금지
+- 카드: `--surface` 면 + 1px `--border` + 4px, 그림자 없음. 카드에 `border-top/left` 포인트 색 금지
+- 선택·탐색 상태는 색 면이 아니라 밑줄 2px(`--accent`) + semibold
+- 다크모드는 토큰이 `light-dark()`로 자동 전환한다. 컴포넌트에 `dark:` 분기를 쓰지 않는다
+
+### 디자인 시스템 버전을 올릴 때
+
+"디자인 시스템 올려줘", "design-system 업데이트" 같은 요청을 받으면 아래 순서를 따른다.
+**`git pull`이나 submodule 포인터만 바꾸고 끝내지 않는다.** 아직 0.0.x 단계라 어느 태그든 깨지는 변경이 있을 수 있다.
+
+1. 현재 버전 확인: `git -C design-system describe --tags`
+2. 태그 목록 확인: `git -C design-system fetch --tags` 후 `git -C design-system tag -l`. 사용자가 버전을 말하지 않았으면 최신 태그를 제안하고 확인받는다
+3. 대상 태그로 이동: `git -C design-system checkout <대상 태그>`
+4. `design-system/CHANGELOG.md`에서 현재 버전 다음부터 대상 버전까지의 항목을 읽고, 특히 **Removed**를 사용자에게 요약한다
+5. `design-system/MIGRATION.md`에서 해당 구간 섹션을 열고, 적용 방식(import/copy)에 맞는 절차를 따른다. 섹션 안의 **검색 명령어를 실행해서 결과가 0건이 될 때까지** 대응표대로 고친다
+6. 이 섹션의 "고정 버전"을 새 태그로 바꾼다
+7. 바뀐 파일을 요약해서 보여준다. 커밋은 사용자가 지시할 때만 한다
+<!-- END lizzie-design-system -->
+
+### 이 프로젝트 메모
+- `src/app/globals.css`가 `design-system/tokens.css`만 import한다. 토큰 값을 globals.css에 복사하지 않는다
+- `components.css`는 import하지 않는다 — 그 안의 `.prose` 정의가 `@tailwindcss/typography`의 `.prose`와 겹친다. 태그·입력창 등은 같은 토큰으로 Tailwind 유틸리티를 써서 맞춘다 (`rounded-box`, `bg-accent-soft`, `border-input` …)
+- `base.css`도 import하지 않는다(Tailwind Preflight와 겹침). 필요한 것(`word-break: keep-all`, 제목 자간, `:focus-visible`, `::selection`)만 globals.css에 옮겨 둠
+- Notion 콜아웃 9색은 globals.css의 `.notion-callout[data-color]`에서 3톤(기본/accent/warning)으로 매핑한다
+- 폰트: Pretendard Variable(jsDelivr npm), Maru Buri(`fonts-archive/MaruBuri`) 모두 `layout.tsx`의 `<head>`에 `<link rel="stylesheet">`로 로드. **next/font 미사용** — font import 추가/제거 시 `.next` 캐시 삭제 필요 없음
