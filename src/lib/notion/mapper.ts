@@ -57,7 +57,7 @@ function extractCoverImage(page: PageObjectResponse): string | null {
 }
 
 // Notion 페이지 → Post 타입 변환
-// CLAUDE.md의 Notion DB 컬럼명과 맞춰야 함 (Title, Description, Slug, PublishedAt, Tags, Type)
+// CLAUDE.md의 Notion DB 컬럼명과 맞춰야 함 (Title, Description, Slug, PublishedAt, Tags, Type, Series)
 export function mapPageToPost(page: PageObjectResponse): Post {
   const props = page.properties;
 
@@ -72,5 +72,7 @@ export function mapPageToPost(page: PageObjectResponse): Post {
     coverImage: extractCoverImage(page),
     // Type 값이 비어있거나 "note"가 아니면 기존 글 호환을 위해 essay로 폴백
     type: extractSelect(props["Type"]) === "note" ? "note" : "essay",
+    // Series 속성이 없는 DB(추가 전)에서도 undefined 접근으로 깨지지 않도록 가드
+    series: props["Series"] ? extractSelect(props["Series"]) : null,
   };
 }
