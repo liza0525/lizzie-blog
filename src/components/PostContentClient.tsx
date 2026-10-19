@@ -1,5 +1,6 @@
 // 포스트 본문 렌더러 (client component)
 // PostContent(server)에서 마크다운 content와 headings를 받아 렌더링
+// 시리즈 글이면 우측 네비게이터(데스크톱)·바텀시트(모바일)에 시리즈 목록을 목차 위에 함께 표시
 
 "use client";
 
@@ -13,16 +14,17 @@ import rehypeKatex from "rehype-katex";
 import { rehypeSlugNoEmoji } from "@/lib/toc";
 import type { Heading } from "@/lib/toc";
 import CodeBlock from "@/components/CodeBlock";
-import TableOfContents from "@/components/TableOfContents";
+import PostNavigator from "@/components/PostNavigator";
 import TocBottomSheet from "@/components/TocBottomSheet";
 import ZoomableImage from "@/components/ZoomableImage";
-import type { PostType } from "@/types";
+import type { PostType, SeriesPosition } from "@/types";
 
 interface PostContentClientProps {
   content: string;
   headings: Heading[];
   pageId: string;
   type: PostType;
+  series: SeriesPosition | null;
 }
 
 export default function PostContentClient({
@@ -30,10 +32,12 @@ export default function PostContentClient({
   headings,
   pageId: _pageId,
   type,
+  series,
 }: PostContentClientProps): React.JSX.Element {
   const isNote = type === "note";
   // 데스크톱 사이드바와 모바일 바텀시트가 동일 조건을 공유 — 조건 중복 방지
-  const showToc = !isNote && headings.length > 0;
+  // 헤딩이 없어도 시리즈 글이면 시리즈 목록을 보여주기 위해 네비게이터를 띄움
+  const showNav = !isNote && (headings.length > 0 || series !== null);
 
   return (
     <div className={isNote ? "" : "flex gap-12"}>
@@ -92,15 +96,16 @@ export default function PostContentClient({
         </div>
       </div>
 
-      {showToc && (
+      {showNav && (
         <aside className="w-[140px] shrink-0 hidden xl:block">
-          <div className="sticky top-24">
-            <TableOfContents headings={headings} />
+          {/* 시리즈 + 목차가 화면보다 길어질 수 있어 sticky 영역 안에서 따로 스크롤 */}
+          <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            <PostNavigator headings={headings} series={series} />
           </div>
         </aside>
       )}
 
-      {showToc && <TocBottomSheet headings={headings} />}
+      {showNav && <TocBottomSheet headings={headings} series={series} />}
     </div>
   );
 }

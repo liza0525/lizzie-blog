@@ -1,19 +1,24 @@
 // 모바일/세로화면(<xl) 전용 목차 진입점 — 우하단 플로팅 버튼 + 바텀시트
-// 데스크톱 사이드바(TableOfContents)와 별개 UI로, xl 미만 화면에서만 노출
+// 데스크톱 사이드바(PostContentClient의 aside)와 별개 UI로, xl 미만 화면에서만 노출
 // 배경 dimming 없이 border/shadow로만 시각적 분리 (기존 note 오버레이 카드와 동일한 하우스 스타일)
+// 시리즈 글이면 시트 안에 시리즈 → 목차 순으로 쌓음 (PostNavigator), 목차 없이 시리즈만 있으면 레이블을 "시리즈"로
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import type { Heading } from "@/lib/toc";
-import TableOfContents from "@/components/TableOfContents";
+import type { SeriesPosition } from "@/types";
+import PostNavigator from "@/components/PostNavigator";
 
 interface TocBottomSheetProps {
   headings: Heading[];
+  series: SeriesPosition | null;
 }
 
 const TRANSITION_MS = 300;
 
-export default function TocBottomSheet({ headings }: TocBottomSheetProps): React.JSX.Element {
+export default function TocBottomSheet({ headings, series }: TocBottomSheetProps): React.JSX.Element {
+  // 목차가 하나라도 있으면 "목차"(시리즈는 그 안에 함께 표시), 시리즈만 있으면 "시리즈"
+  const label = headings.length > 0 ? "목차" : "시리즈";
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -76,7 +81,7 @@ export default function TocBottomSheet({ headings }: TocBottomSheetProps): React
         ref={triggerRef}
         type="button"
         onClick={openSheet}
-        aria-label="목차 열기"
+        aria-label={`${label} 열기`}
         className="fixed bottom-6 right-6 z-20 xl:hidden flex items-center gap-2 rounded-box bg-bg border border-border text-ink shadow-lg hover:bg-surface transition-colors pl-4 pr-5 py-3"
       >
         <svg
@@ -97,7 +102,7 @@ export default function TocBottomSheet({ headings }: TocBottomSheetProps): React
           <line x1="3" y1="12" x2="3.01" y2="12" />
           <line x1="3" y1="18" x2="3.01" y2="18" />
         </svg>
-        <span className="text-sm font-medium font-sans">목차</span>
+        <span className="text-sm font-medium font-sans">{label}</span>
       </button>
 
       {mounted && (
@@ -113,18 +118,18 @@ export default function TocBottomSheet({ headings }: TocBottomSheetProps): React
             ref={sheetRef}
             role="dialog"
             aria-modal="true"
-            aria-label="목차"
+            aria-label={label}
             tabIndex={-1}
             className={`fixed inset-x-0 bottom-0 z-40 xl:hidden bg-bg border-t border-border shadow-lg max-h-[75vh] overflow-y-auto transition-transform duration-300 ease-out motion-reduce:transition-none ${
               visible ? "translate-y-0" : "translate-y-full"
             }`}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <span className="text-sm font-semibold text-ink font-sans">목차</span>
+              <span className="text-sm font-semibold text-ink font-sans">{label}</span>
               <button
                 type="button"
                 onClick={closeSheet}
-                aria-label="목차 닫기"
+                aria-label={`${label} 닫기`}
                 className="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors"
               >
                 <svg
@@ -144,7 +149,7 @@ export default function TocBottomSheet({ headings }: TocBottomSheetProps): React
               </button>
             </div>
             <div className="px-5 py-4">
-              <TableOfContents headings={headings} onNavigate={closeSheet} />
+              <PostNavigator headings={headings} series={series} onNavigate={closeSheet} />
             </div>
           </div>
         </>
