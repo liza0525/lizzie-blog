@@ -1,13 +1,17 @@
-// 홈 페이지 — 태그 필터 + 글 목록
+// 홈 페이지 — 시리즈 카드 + 태그 필터 + 글 목록
 // ListOriginMarker로 "전체 글 목록에서 글을 열었다"는 걸 기록 → 글 상세의 돌아가기 버튼이 이 목록(필터 포함)으로 돌아옴
 
 import React, { Suspense } from "react";
-import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
+import { getPostPage, getAllTags, searchPosts, getAllSeries } from "@/lib/services/post.service";
 import TagFilter from "@/components/TagFilter";
 import PostGrid from "@/components/PostGrid";
 import NoteHighlights from "@/components/NoteHighlights";
+import SeriesShelf from "@/components/SeriesShelf";
 import ListOriginMarker from "@/components/ListOriginMarker";
-import type { Post, PostListPage } from "@/types";
+import type { Post, PostListPage, Series } from "@/types";
+
+// 홈에 노출할 시리즈 카드 수 — 나머지는 "모든 시리즈 보기"(/series)로
+const HOME_SERIES_LIMIT = 5;
 
 export const revalidate = 3600;
 
@@ -18,12 +22,13 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
   const { tag, q } = await searchParams;
 
-  const [firstPage, tags, noteHighlights] = await Promise.all([
+  const [firstPage, tags, noteHighlights, recentSeries] = await Promise.all([
     q
       ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
       : getPostPage({ pageSize: 10, tag, type: "essay" }),
     getAllTags(),
     q ? Promise.resolve<Post[]>([]) : getPostPage({ pageSize: 6, type: "note" }).then((p) => p.posts),
+    q ? Promise.resolve<Series[]>([]) : getAllSeries().then((all) => all.slice(0, HOME_SERIES_LIMIT)),
   ]);
 
   // 돌아가기 버튼이 지금 보고 있는 필터·검색 상태 그대로 돌아오도록 현재 URL을 재구성
@@ -35,6 +40,8 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
       <ListOriginMarker href={listHref} label="글 목록" />
 
       {!q && <NoteHighlights notes={noteHighlights} />}
+
+      {!q && <SeriesShelf series={recentSeries} />}
 
       {!q && (
         <Suspense>

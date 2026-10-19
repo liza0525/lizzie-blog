@@ -97,9 +97,19 @@ export default function PostGrid({
             >
               {/* 텍스트 영역 */}
               <div className="flex-1 min-w-0">
-                <time className="block text-xs text-subtle tabular-nums mb-1.5 font-sans">
-                  <FormattedDate date={post.publishedAt} />
-                </time>
+                {/* 모바일에서 날짜가 길어 한 줄에 다 안 들어가면 시리즈 레이블이 다음 줄로 내려가도록 flex-wrap */}
+                <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle mb-1.5 font-sans">
+                  <FormattedDate date={post.publishedAt} className="tabular-nums" />
+                  {/* 시리즈 레이블 — 카드 전체가 <Link>라 중첩 링크를 피하려고 텍스트로만 표시 */}
+                  {post.series && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span>
+                        시리즈 <span className="font-semibold text-muted">{post.series}</span>
+                      </span>
+                    </>
+                  )}
+                </div>
                 <h2
                   className={`text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors ${
                     isNote ? "text-[15px] font-medium" : "text-[18px] font-semibold"
