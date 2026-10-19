@@ -1,10 +1,12 @@
 // 홈 페이지 — 태그 필터 + 글 목록
+// ListOriginMarker로 "전체 글 목록에서 글을 열었다"는 걸 기록 → 글 상세의 돌아가기 버튼이 이 목록(필터 포함)으로 돌아옴
 
 import React, { Suspense } from "react";
 import { getPostPage, getAllTags, searchPosts } from "@/lib/services/post.service";
 import TagFilter from "@/components/TagFilter";
 import PostGrid from "@/components/PostGrid";
 import NoteHighlights from "@/components/NoteHighlights";
+import ListOriginMarker from "@/components/ListOriginMarker";
 import type { Post, PostListPage } from "@/types";
 
 export const revalidate = 3600;
@@ -24,8 +26,14 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
     q ? Promise.resolve<Post[]>([]) : getPostPage({ pageSize: 6, type: "note" }).then((p) => p.posts),
   ]);
 
+  // 돌아가기 버튼이 지금 보고 있는 필터·검색 상태 그대로 돌아오도록 현재 URL을 재구성
+  const listParams = new URLSearchParams({ ...(tag ? { tag } : {}), ...(q ? { q } : {}) }).toString();
+  const listHref = listParams ? `/?${listParams}` : "/";
+
   return (
     <div className="max-w-[900px] mx-auto px-6 py-12">
+      <ListOriginMarker href={listHref} label="글 목록" />
+
       {!q && <NoteHighlights notes={noteHighlights} />}
 
       {!q && (

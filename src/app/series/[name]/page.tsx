@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllSeries, getSeries } from "@/lib/services/post.service";
 import FormattedDate from "@/components/FormattedDate";
+import ListOriginMarker from "@/components/ListOriginMarker";
 
 // revalidate/ISR 미사용 — 글 상세(posts/[slug])와 같은 이유: 한글 경로가 x-next-cache-tags 헤더 오류를 유발
 // 데이터 캐싱은 post.service의 unstable_cache("post" 태그)로 처리
@@ -36,6 +37,9 @@ export default async function SeriesDetailPage({ params }: PageProps): Promise<R
 
   return (
     <div className="max-w-[900px] mx-auto px-6 py-12">
+      {/* 여기서 연 글은 돌아가기 버튼이 이 시리즈 목록으로 돌아오게 기록 */}
+      <ListOriginMarker href={`/series/${encodeURIComponent(series.name)}`} label={`${series.name} 시리즈`} />
+
       <Link
         href="/series"
         className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors mb-10 font-sans"

@@ -13,6 +13,7 @@ import { CORE_TAGS } from "@/lib/config";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
 import SeriesPager from "@/components/SeriesPager";
+import BackToListLink from "@/components/BackToListLink";
 import FormattedDate from "@/components/FormattedDate";
 import GiscusComments from "@/components/GiscusComments";
 
@@ -156,16 +157,8 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
-        {/* 뒤로가기 */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors mb-10 font-sans"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-          목록으로
-        </Link>
+        {/* 처음 들어온 목록으로 돌아가기 (전체 글 목록 / 시리즈 목록) */}
+        <BackToListLink />
 
         {header}
 
