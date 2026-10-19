@@ -28,7 +28,7 @@ Next.js 16 (App Router) + Notion API + Vercel 배포.
 src/
 ├── app/                        # 라우트 레이어
 │   ├── layout.tsx              # 루트 레이아웃 (CDN 폰트 링크, 메타데이터, Header/Footer)
-│   ├── page.tsx                # 홈 (글 목록)
+│   ├── page.tsx                # 홈 (시리즈 카드 + 글 목록)
 │   ├── admin/
 │   │   └── page.tsx            # 캐시 수동 무효화 UI
 │   ├── api/
@@ -40,10 +40,14 @@ src/
 │   │   ├── PostContent.tsx     # 본문 서버 컴포넌트 (fetch → PostContentClient 전달)
 │   │   ├── AdjacentPosts.tsx   # 이전/다음 글 네비게이션
 │   │   └── loading.tsx         # 글 상세 로딩 UI
+│   ├── series/
+│   │   ├── page.tsx            # 시리즈 목록 (최근 발행 순)
+│   │   └── [name]/page.tsx     # 시리즈 상세 (1편부터 순서대로)
 │   ├── robots.ts               # robots.txt 생성
 │   └── sitemap.ts              # sitemap.xml 생성
 ├── lib/
 │   ├── config.ts               # 전역 설정 (CORE_TAGS 등)
+│   ├── listOrigin.ts           # 글을 연 목록(전체/시리즈) 기억 — sessionStorage, 돌아가기 버튼용
 │   ├── toc.ts                  # 마크다운 헤딩 추출 + rehype slug 플러그인
 │   ├── notion/
 │   │   ├── client.ts           # Notion 클라이언트 초기화
@@ -56,6 +60,8 @@ src/
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
+│   ├── SeriesShelf.tsx         # 홈 태그 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드)
+│   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시
 │   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침)
 │   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
 │   ├── PostContentClient.tsx   # 포스트 본문 렌더러 (client) — PostContent(server)에서 분리
@@ -64,7 +70,12 @@ src/
 │   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism) — mermaid는 MermaidBlock으로 위임
 │   ├── MermaidBlock.tsx        # Mermaid 다이어그램 SVG 렌더러 (다크/라이트 테마 대응)
 │   ├── TableOfContents.tsx     # 포스트 우측 목차 (IntersectionObserver 활성화)
-│   ├── TocBottomSheet.tsx      # 모바일/세로화면(<xl)용 TOC 진입점 — 우하단 FAB + 바텀시트
+│   ├── PostNavigator.tsx       # 글 상세 네비게이터 패널 — 시리즈 + 목차 섹션 (사이드바·바텀시트 공용)
+│   ├── SeriesNav.tsx           # 네비게이터의 시리즈 섹션 (편 목록, 현재 글 하이라이트)
+│   ├── SeriesPager.tsx         # 글 상세 하단 시리즈 카드 (시리즈 내 이전편/다음편)
+│   ├── ListOriginMarker.tsx    # 목록 화면이 열릴 때 "마지막으로 본 목록"을 기록 (렌더링 없음)
+│   ├── BackToListLink.tsx      # 글 상세 돌아가기 링크 — 처음 들어온 목록으로 (‹ 글 목록 / ‹ CS 시리즈)
+│   ├── TocBottomSheet.tsx      # 모바일/세로화면(<xl)용 네비게이터 진입점 — 우하단 FAB + 바텀시트
 │   ├── GiscusComments.tsx      # Giscus 댓글 (GitHub Discussions 기반)
 │   ├── GoogleAnalytics.tsx     # GA4 스크립트 삽입 (프로덕션 환경에서만 활성화)
 │   └── FormattedDate.tsx       # 브라우저 로케일 기준 날짜+시간 포맷
@@ -129,6 +140,8 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 (운영 환경에서만)
 - 글 상세 페이지(`posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 최신 `STATIC_BUILD_POST_LIMIT`(`lib/config.ts`, 현재 20)개만 빌드 시 정적 생성, 나머지는 `dynamicParams`(기본값)로 첫 방문 시 생성 후 캐싱
   - 전체를 다 빌드하면 포스트마다 Notion 블록 트리를 병렬로 가져오는 구조라 글이 쌓일수록 빌드 중 Notion rate limit(429)에 걸림 — 이를 피하기 위한 제한
 - 포스트 데이터: `post.service.ts`의 `unstable_cache`로 캐싱 (글 상세 2시간)
+- 시리즈: Notion `Series`(select) 속성 기반. 전체 글 목록을 `unstable_cache`(2시간, `post` 태그)로 캐싱한 뒤 메모리에서 묶음 — Notion 추가 호출 없음
+  - `/series/[name]`은 글 상세와 같은 이유(한글 경로)로 `revalidate` export 없음, 전체 시리즈를 `generateStaticParams`로 빌드
 - `fetchAllPosts()`: `React.cache()`로 같은 요청 내 중복 호출 방지
 
 ---
