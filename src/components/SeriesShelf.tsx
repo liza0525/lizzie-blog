@@ -31,7 +31,7 @@ export default function SeriesShelf({ series }: SeriesShelfProps): React.JSX.Ele
         </Link>
       </div>
 
-      {/* 모바일에서는 좌우 여백까지 스크롤 영역으로 써서 카드가 화면 끝에서 잘려 보이게 (NoteHighlights와 동일) */}
+      {/* 모바일에서는 좌우 여백까지 스크롤 영역으로 써서 카드가 화면 끝에서 잘려 보이게 */}
       <div className="-mx-6 sm:mx-0">
         <ScrollFadeRow className="gap-3 px-6 sm:px-0 pb-1">
           {series.map((s) => {

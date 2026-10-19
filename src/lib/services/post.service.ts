@@ -12,7 +12,7 @@ import {
 
 // 같은 요청 내에서 fetchAllPosts() 중복 호출 방지 (getAllTags/searchPosts/getAdjacentPosts가 각각 호출)
 const fetchAllPosts = cache(fetchAllPostsRaw);
-import type { Post, PostListPage, PostType, Series, SeriesPosition } from "@/types";
+import type { Post, PostListPage, Series, SeriesPosition } from "@/types";
 import { STATIC_BUILD_POST_LIMIT } from "@/lib/config";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
@@ -20,7 +20,6 @@ export async function getPostPage(options: {
   pageSize?: number;
   cursor?: string;
   tag?: string;
-  type?: PostType;
 }): Promise<PostListPage> {
   return fetchPostPage({ pageSize: options.pageSize ?? 20, ...options });
 }
@@ -98,11 +97,11 @@ const getCachedAllPosts = unstable_cache(
   { revalidate: 7200, tags: ["post"] }
 );
 
-// 전체 글 → 시리즈 목록으로 묶기 (essay만 대상)
+// 전체 글 → 시리즈 목록으로 묶기
 function groupBySeries(posts: Post[]): Series[] {
   const map = new Map<string, Post[]>();
   for (const post of posts) {
-    if (post.type !== "essay" || !post.series) continue;
+    if (!post.series) continue;
     const list = map.get(post.series) ?? [];
     list.push(post);
     map.set(post.series, list);
@@ -134,7 +133,7 @@ export async function getSeries(name: string): Promise<Series | null> {
 }
 
 // 글 slug로 소속 시리즈와 위치 조회 — 글 상세의 헤더·사이드바·하단 카드에서 사용
-// 시리즈에 속하지 않은 글(또는 note)이면 null
+// 시리즈에 속하지 않은 글이면 null
 export async function getSeriesPosition(slug: string): Promise<SeriesPosition | null> {
   const all = await getAllSeries();
   for (const series of all) {

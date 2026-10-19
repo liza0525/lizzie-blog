@@ -17,13 +17,12 @@ import CodeBlock from "@/components/CodeBlock";
 import PostNavigator from "@/components/PostNavigator";
 import TocBottomSheet from "@/components/TocBottomSheet";
 import ZoomableImage from "@/components/ZoomableImage";
-import type { PostType, SeriesPosition } from "@/types";
+import type { SeriesPosition } from "@/types";
 
 interface PostContentClientProps {
   content: string;
   headings: Heading[];
   pageId: string;
-  type: PostType;
   series: SeriesPosition | null;
 }
 
@@ -31,16 +30,14 @@ export default function PostContentClient({
   content,
   headings,
   pageId: _pageId,
-  type,
   series,
 }: PostContentClientProps): React.JSX.Element {
-  const isNote = type === "note";
   // 데스크톱 사이드바와 모바일 바텀시트가 동일 조건을 공유 — 조건 중복 방지
   // 헤딩이 없어도 시리즈 글이면 시리즈 목록을 보여주기 위해 네비게이터를 띄움
-  const showNav = !isNote && (headings.length > 0 || series !== null);
+  const showNav = headings.length > 0 || series !== null;
 
   return (
-    <div className={isNote ? "" : "flex gap-12"}>
+    <div className="flex gap-12">
       <div className="flex-1 min-w-0">
         <div className="prose prose-lg max-w-none">
           <ReactMarkdown

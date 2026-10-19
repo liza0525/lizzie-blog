@@ -20,28 +20,16 @@ type FilterItem = Extract<
   { and: unknown[] }
 >["and"][number];
 
-// 페이지네이션 포스트 목록 조회 (20개씩, 태그/타입 필터 선택)
+// 페이지네이션 포스트 목록 조회 (20개씩, 태그 필터 선택)
 export async function fetchPostPage(options: {
   pageSize: number;
   cursor?: string;
   tag?: string;
-  type?: "essay" | "note";
 }): Promise<PostListPage> {
   const baseFilter: FilterItem = { property: "Status", status: { equals: "Published" } };
   const extraFilters: FilterItem[] = [];
   if (options.tag) {
     extraFilters.push({ property: "Tags", multi_select: { contains: options.tag } });
-  }
-  if (options.type === "essay") {
-    // mapper.ts와 동일한 폴백 규칙: Type이 비어있는 기존 글도 essay로 취급
-    extraFilters.push({
-      or: [
-        { property: "Type", select: { equals: "essay" } },
-        { property: "Type", select: { is_empty: true } },
-      ],
-    });
-  } else if (options.type === "note") {
-    extraFilters.push({ property: "Type", select: { equals: "note" } });
   }
   const filter: QueryDatabaseParameters["filter"] =
     extraFilters.length > 0 ? { and: [baseFilter, ...extraFilters] } : baseFilter;

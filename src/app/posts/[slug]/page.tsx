@@ -71,96 +71,52 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
 
   if (!post) notFound();
 
-  const isNote = post.type === "note";
-
-  const header = (
-    <header className={isNote ? "mb-6" : "mb-10"}>
-      {/* 시리즈 표시 — 사이드바는 xl 이상에서만 보이므로 작은 화면에서도 시리즈 글임을 알 수 있게 제목 위에 한 줄로 */}
-      {series && (
-        <p className="flex items-baseline gap-2 text-sm mb-2 font-sans">
-          <span className="text-xs font-semibold text-muted shrink-0">시리즈</span>
-          <Link
-            href={`/series/${encodeURIComponent(series.series.name)}`}
-            className="font-semibold text-ink hover:text-accent transition-colors truncate"
-          >
-            {series.series.name}
-          </Link>
-          <span className="text-xs text-subtle tabular-nums shrink-0">
-            {series.index + 1}/{series.series.posts.length}
-          </span>
-        </p>
-      )}
-      <h1
-        className={`leading-snug text-ink font-sans ${
-          isNote ? "text-[16px] font-medium mb-2" : "text-[26px] font-bold mb-3"
-        }`}
-      >
-        {post.title}
-      </h1>
-      <div className="flex items-center gap-3 flex-wrap mb-3">
-        <FormattedDate date={post.publishedAt} className="text-xs text-subtle tabular-nums font-sans" />
-        {post.tags.map((tag) => (
-          <span
-            key={tag}
-            className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
-              (CORE_TAGS as readonly string[]).includes(tag)
-                ? "bg-accent-soft border-transparent text-on-accent-soft"
-                : "border-border text-muted"
-            }`}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      {post.description && (
-        <p className={`text-muted leading-relaxed ${isNote ? "text-[15px]" : "text-lg"}`}>
-          {post.description}
-        </p>
-      )}
-    </header>
-  );
-
-  const body = (
-    <div>
-      <PostContent pageId={post.id} type={post.type} series={series} />
-      {series && <SeriesPager position={series} />}
-      <Suspense fallback={null}>
-        <AdjacentPosts slug={decodedSlug} />
-      </Suspense>
-      <GiscusComments />
-    </div>
-  );
-
-  // note는 어떻게 진입하든(직접 링크·새로고침·리스트 클릭) 항상 같은 모양으로 렌더링
-  // 클라이언트 라우팅 상태에 기대지 않아서 직접 링크 접속 시에도 동일하게 보임
-  // backdrop/dimming 없이, 페이지 배경 위에 좁은 카드만 떠 있는 형태
-  if (isNote) {
-    return (
-      <div className="min-h-full flex items-start justify-center px-4 py-10 sm:py-16">
-        <article className="relative w-full max-w-2xl bg-bg border border-border shadow-sm px-6 py-8 sm:px-8">
-          <Link
-            href="/"
-            aria-label="닫기"
-            className="absolute top-4 right-4 text-muted hover:text-ink transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-            </svg>
-          </Link>
-          {header}
-          {body}
-        </article>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
         {/* 처음 들어온 목록으로 돌아가기 (전체 글 목록 / 시리즈 목록) */}
         <BackToListLink />
 
-        {header}
+        <header className="mb-10">
+          {/* 시리즈 표시 — 사이드바는 xl 이상에서만 보이므로 작은 화면에서도 시리즈 글임을 알 수 있게 제목 위에 한 줄로 */}
+          {series && (
+            <p className="flex items-baseline gap-2 text-sm mb-2 font-sans">
+              <span className="text-xs font-semibold text-muted shrink-0">시리즈</span>
+              <Link
+                href={`/series/${encodeURIComponent(series.series.name)}`}
+                className="font-semibold text-ink hover:text-accent transition-colors truncate"
+              >
+                {series.series.name}
+              </Link>
+              <span className="text-xs text-subtle tabular-nums shrink-0">
+                {series.index + 1}/{series.series.posts.length}
+              </span>
+            </p>
+          )}
+          <h1 className="text-[26px] font-bold leading-snug text-ink mb-3 font-sans">
+            {post.title}
+          </h1>
+          <div className="flex items-center gap-3 flex-wrap mb-3">
+            <FormattedDate date={post.publishedAt} className="text-xs text-subtle tabular-nums font-sans" />
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
+                  (CORE_TAGS as readonly string[]).includes(tag)
+                    ? "bg-accent-soft border-transparent text-on-accent-soft"
+                    : "border-border text-muted"
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          {post.description && (
+            <p className="text-lg text-muted leading-relaxed">
+              {post.description}
+            </p>
+          )}
+        </header>
 
         {/* 커버 이미지 */}
         {post.coverImage && (
@@ -174,7 +130,14 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
           </div>
         )}
 
-        {body}
+        <div>
+          <PostContent pageId={post.id} series={series} />
+          {series && <SeriesPager position={series} />}
+          <Suspense fallback={null}>
+            <AdjacentPosts slug={decodedSlug} />
+          </Suspense>
+          <GiscusComments />
+        </div>
       </article>
     </div>
   );

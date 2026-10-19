@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Post, PostListPage, PostType } from "@/types";
+import type { Post, PostListPage } from "@/types";
 import HighlightText from "@/components/HighlightText";
 import FormattedDate from "@/components/FormattedDate";
 import { CORE_TAGS } from "@/lib/config";
@@ -15,7 +15,6 @@ interface PostGridProps {
   initialCursor: string | null;
   initialHasMore: boolean;
   tag?: string;
-  type?: PostType;
   query?: string;
 }
 
@@ -24,7 +23,6 @@ export default function PostGrid({
   initialCursor,
   initialHasMore,
   tag,
-  type,
   query,
 }: PostGridProps): React.JSX.Element {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -52,7 +50,6 @@ export default function PostGrid({
         const params = new URLSearchParams({
           ...(cursor ? { cursor } : {}),
           ...(tag ? { tag } : {}),
-          ...(type ? { type } : {}),
         });
         const res = await fetch(`/api/posts?${params}`);
         const data: PostListPage = await res.json();
@@ -67,7 +64,7 @@ export default function PostGrid({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [cursor, hasMore, loading, tag, type]);
+  }, [cursor, hasMore, loading, tag]);
 
   if (posts.length === 0) {
     return (
@@ -84,16 +81,12 @@ export default function PostGrid({
   return (
     <>
       <div className="divide-y divide-border">
-        {posts.map((post) => {
-          const isNote = post.type === "note";
-          return (
+        {posts.map((post) => (
             <Link
               key={post.id}
               href={`/posts/${encodeURIComponent(post.slug)}`}
               prefetch={false}
-              className={`group flex items-start gap-5 -mx-4 px-4 hover:bg-surface transition-colors ${
-                isNote ? "py-3" : "py-5"
-              }`}
+              className="group flex items-start gap-5 -mx-4 px-4 py-5 hover:bg-surface transition-colors"
             >
               {/* 텍스트 영역 */}
               <div className="flex-1 min-w-0">
@@ -111,17 +104,13 @@ export default function PostGrid({
                   )}
                 </div>
                 <h2
-                  className={`text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors ${
-                    isNote ? "text-[15px] font-medium" : "text-[18px] font-semibold"
-                  }`}
+                  className="text-[18px] font-semibold text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors"
                 >
                   <HighlightText text={post.title} query={query ?? ""} />
                 </h2>
                 {post.description && (
                   <p
-                    className={`leading-[1.7] text-muted mb-2.5 ${
-                      isNote ? "text-[14px] line-clamp-3" : "text-[15px] line-clamp-2"
-                    }`}
+                    className="text-[15px] leading-[1.7] text-muted mb-2.5 line-clamp-2"
                   >
                     {post.description}
                   </p>
@@ -143,8 +132,8 @@ export default function PostGrid({
                   </div>
                 )}
               </div>
-              {/* 썸네일 — cover 이미지가 있을 때만, note는 생략 */}
-              {!isNote && post.coverImage && (
+              {/* 썸네일 — cover 이미지가 있을 때만 */}
+              {post.coverImage && (
                 <div className="shrink-0 w-24 h-[72px] border border-border overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -155,8 +144,7 @@ export default function PostGrid({
                 </div>
               )}
             </Link>
-          );
-        })}
+        ))}
       </div>
 
       {/* 스크롤 감지 sentinel */}

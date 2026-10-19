@@ -5,10 +5,9 @@ import React, { Suspense } from "react";
 import { getPostPage, getAllTags, searchPosts, getAllSeries } from "@/lib/services/post.service";
 import TagFilter from "@/components/TagFilter";
 import PostGrid from "@/components/PostGrid";
-import NoteHighlights from "@/components/NoteHighlights";
 import SeriesShelf from "@/components/SeriesShelf";
 import ListOriginMarker from "@/components/ListOriginMarker";
-import type { Post, PostListPage, Series } from "@/types";
+import type { PostListPage, Series } from "@/types";
 
 // 홈에 노출할 시리즈 카드 수 — 나머지는 "모든 시리즈 보기"(/series)로
 const HOME_SERIES_LIMIT = 5;
@@ -22,12 +21,11 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
   const { tag, q } = await searchParams;
 
-  const [firstPage, tags, noteHighlights, recentSeries] = await Promise.all([
+  const [firstPage, tags, recentSeries] = await Promise.all([
     q
       ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
-      : getPostPage({ pageSize: 10, tag, type: "essay" }),
+      : getPostPage({ pageSize: 10, tag }),
     getAllTags(),
-    q ? Promise.resolve<Post[]>([]) : getPostPage({ pageSize: 6, type: "note" }).then((p) => p.posts),
     q ? Promise.resolve<Series[]>([]) : getAllSeries().then((all) => all.slice(0, HOME_SERIES_LIMIT)),
   ]);
 
@@ -38,8 +36,6 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
   return (
     <div className="max-w-[900px] mx-auto px-6 py-12">
       <ListOriginMarker href={listHref} label="글 목록" />
-
-      {!q && <NoteHighlights notes={noteHighlights} />}
 
       {!q && <SeriesShelf series={recentSeries} />}
 
@@ -62,7 +58,6 @@ export default async function HomePage({ searchParams }: HomePageProps): Promise
         initialCursor={firstPage.nextCursor}
         initialHasMore={firstPage.hasMore}
         tag={tag}
-        type="essay"
         query={q}
       />
     </div>
