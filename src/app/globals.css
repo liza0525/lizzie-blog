@@ -89,7 +89,8 @@ body {
   border-radius: var(--corner);
   background-color: var(--surface);
   font-family: var(--family-sans);
-  font-size: 0.95rem;
+  /* 콜아웃 안도 본문 문장이 이어지므로 본문(prose-lg)과 같은 크기 */
+  font-size: 1em;
   line-height: var(--line-normal);
 }
 .notion-callout-icon {
@@ -123,6 +124,49 @@ body {
 .notion-callout[data-color="yellow"],
 .notion-callout[data-color="red"] {
   background-color: var(--warning-soft);
+}
+
+/* Notion toggle 블록 — notion-to-md가 <details><summary>제목</summary>본문</details>으로 내보냄
+   - 본문을 ▶ 뒤 제목 글자 위치에 맞춰 들여쓰기 (Notion과 같은 모양)
+   - 기본 마커는 폰트마다 폭이 달라 들여쓰기와 어긋나므로 숨기고, 폭이 고정된 CSS 삼각형으로 대체 */
+.prose details {
+  margin: 1.25em 0;
+  padding-left: 1.5em;
+}
+.prose details > summary {
+  position: relative;
+  margin-left: -1.5em;
+  padding-left: 1.5em;
+  list-style: none;
+  cursor: pointer;
+}
+.prose details > summary::-webkit-details-marker {
+  display: none;
+}
+.prose details > summary::before {
+  content: "";
+  position: absolute;
+  left: 0.35em;
+  /* 제목 첫 줄 가운데에 오도록 — lh는 현재 줄 높이 */
+  top: calc(0.5lh - 0.3em);
+  border-left: 0.5em solid currentColor;
+  border-top: 0.3em solid transparent;
+  border-bottom: 0.3em solid transparent;
+  transition: transform 0.15s;
+}
+.prose details[open] > summary::before {
+  transform: rotate(90deg);
+}
+/* 제목 바로 아래 본문이 prose 기본 여백(p 1.33em, 코드블록은 그 이상)만큼 떨어지는 것 정리 */
+.prose details > summary + * {
+  margin-top: 0.5em;
+}
+.prose details > :last-child {
+  margin-bottom: 0;
+}
+/* 코드블록은 pre 마진 + CodeBlock 래퍼(my-6)가 겹쳐 이중 여백 — 토글 안에서는 래퍼 마진을 뺌 */
+.prose details pre > div {
+  margin-block: 0;
 }
 
 /* CodeBlock 컴포넌트가 자체 스타일을 가지므로 prose의 pre 기본 스타일 리셋 */
