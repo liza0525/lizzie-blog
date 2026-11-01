@@ -121,7 +121,7 @@ export default function PostGrid({
                       <span
                         key={tagName}
                         className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
-                          (CORE_TAGS as readonly string[]).includes(tagName)
+                          CORE_TAGS.includes(tagName)
                             ? "bg-accent-soft border-transparent text-on-accent-soft"
                             : "border-border text-muted"
                         }`}

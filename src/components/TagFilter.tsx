@@ -25,11 +25,11 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
 
   const tagNameSet = new Set(tags.map((t) => t.name));
 
-  const coreTags = (CORE_TAGS as readonly string[]).filter((t) => tagNameSet.has(t));
-  const otherTags = tags.filter((t) => !(CORE_TAGS as readonly string[]).includes(t.name));
+  const coreTags = CORE_TAGS.filter((t) => tagNameSet.has(t));
+  const otherTags = tags.filter((t) => !CORE_TAGS.includes(t.name));
 
   // activeTag가 비코어 태그면 자동 펼침
-  const isActiveNonCore = !!activeTag && !(CORE_TAGS as readonly string[]).includes(activeTag);
+  const isActiveNonCore = !!activeTag && !CORE_TAGS.includes(activeTag);
   const showOtherTags = expanded || isActiveNonCore;
 
   function handleClick(name: string): void {

@@ -102,7 +102,7 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
               <span
                 key={tag}
                 className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
-                  (CORE_TAGS as readonly string[]).includes(tag)
+                  CORE_TAGS.includes(tag)
                     ? "bg-accent-soft border-transparent text-on-accent-soft"
                     : "border-border text-muted"
                 }`}
