@@ -42,7 +42,9 @@ export function extractHeadings(markdown: string): Heading[] {
   let match;
   while ((match = regex.exec(stripped)) !== null) {
     const level = match[1].length;
-    const text = match[2].trim();
+    // 제목 안 강조는 <strong> 등 HTML 태그로 들어오므로(repository.ts annotateWithHtml) 태그를 벗겨 목차 텍스트로 사용
+    // 렌더된 헤딩의 id(rehypeSlugNoEmoji)도 태그 없는 텍스트 기준이라 slug가 일치한다
+    const text = match[2].replace(/<\/?[a-z]+>/g, "").trim();
     headings.push({ level, text, id: toSlug(text) });
   }
   return headings;

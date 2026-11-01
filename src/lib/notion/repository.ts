@@ -149,6 +149,13 @@ export async function fetchPostContent(pageId: string): Promise<string> {
 
   const n2m = new NotionToMarkdown({ notionClient: cachedClient as typeof notionClient });
 
+  // 볼드·기울임·취소선을 마크다운 기호(** _ ~~) 대신 HTML 태그로 출력 (rehype-raw가 렌더링)
+  // CommonMark는 "기호 안쪽이 문장부호 + 바깥이 글자"면 강조로 인정하지 않아
+  // **'DB 쿼리'**를, _기울임_을 처럼 한국어 조사가 바로 붙으면 기호가 그대로 노출된다.
+  // notion-to-md는 모든 rich text(문단·목록·표 셀 등)를 this.annotatePlainText로 처리하므로
+  // 인스턴스 메서드를 덮어쓰면 아래 custom transformer까지 한 번에 적용된다.
+  n2m.annotatePlainText = annotateWithHtml;
+
   // image 블록 — file 타입은 S3 signed URL이 1시간 만료되므로 프록시 경유
   // external 타입(Velog 등 외부 URL)은 만료 없으므로 직접 사용
   n2m.setCustomTransformer("image", async (block) => {
@@ -223,5 +230,27 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   const mdBlocks = await n2m.pageToMarkdown(pageId);
   const { parent } = n2m.toMarkdownString(mdBlocks);
   return parent;
+}
+
+type Annotations = Parameters<NotionToMarkdown["annotatePlainText"]>[1];
+
+// notion-to-md의 annotatePlainText와 같은 순서·공백 처리를 유지하고, 강조 기호만 HTML 태그로 바꾼 버전
+// 인라인 코드는 백틱 그대로 둔다 — 코드 스팬은 앞뒤 글자와 상관없이 항상 인식된다
+function annotateWithHtml(text: string, annotations: Annotations): string {
+  // 공백만 있는 조각은 감싸지 않음 (빈 태그 방지)
+  if (/^\s*$/.test(text)) return text;
+
+  // 앞뒤 공백은 태그 밖으로 빼서 원래 띄어쓰기를 보존
+  const leading = text.match(/^\s*/)?.[0] ?? "";
+  const trailing = text.match(/\s*$/)?.[0] ?? "";
+  let result = text.trim();
+
+  if (annotations.code) result = `\`${result}\``;
+  if (annotations.bold) result = `<strong>${result}</strong>`;
+  if (annotations.italic) result = `<em>${result}</em>`;
+  if (annotations.strikethrough) result = `<del>${result}</del>`;
+  if (annotations.underline) result = `<u>${result}</u>`;
+
+  return leading + result + trailing;
 }
 
