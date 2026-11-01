@@ -8,7 +8,8 @@
 /* design-system base.css 중 필요한 것만 가져옴
    (base.css 전체는 Tailwind Preflight와 역할이 겹쳐서 import하지 않음) */
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth는 쓰지 않음 — 뒤로 가기 시 브라우저의 스크롤 복원까지 부드럽게 만들어
+     새 페이지가 이전 위치에서 미끄러져 올라감. 목차 이동만 TableOfContents에서 JS로 부드럽게 처리 */
   scrollbar-gutter: stable both-edges;
   /* 한글이 어절 중간에서 끊기지 않게, 대신 긴 URL·영단어는 넘치지 않게 */
   word-break: keep-all;
