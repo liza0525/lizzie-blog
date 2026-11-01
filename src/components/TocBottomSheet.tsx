@@ -2,6 +2,7 @@
 // 데스크톱 사이드바(PostContentClient의 aside)와 별개 UI로, xl 미만 화면에서만 노출
 // 배경 dimming 없이 border/shadow로만 시각적 분리 (기존 note 오버레이 카드와 동일한 하우스 스타일)
 // 시리즈 글이면 시트 안에 시리즈 → 목차 순으로 쌓음 (PostNavigator), 목차 없이 시리즈만 있으면 레이블을 "시리즈"로
+// 플로팅 버튼은 아이콘만 있는 원형 — 디자인 시스템(버튼 4px 모서리)의 의도적 예외. 레이블은 aria-label과 시트 제목에만 쓰임
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -82,7 +83,7 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
         type="button"
         onClick={openSheet}
         aria-label={`${label} 열기`}
-        className="fixed bottom-6 right-6 z-20 xl:hidden flex items-center gap-2 rounded-box bg-bg border border-border text-ink shadow-lg hover:bg-surface transition-colors pl-4 pr-5 py-3"
+        className="fixed bottom-6 right-6 z-20 xl:hidden flex items-center justify-center w-12 h-12 rounded-full bg-bg border border-border text-ink shadow-lg hover:bg-surface transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +103,6 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
           <line x1="3" y1="12" x2="3.01" y2="12" />
           <line x1="3" y1="18" x2="3.01" y2="18" />
         </svg>
-        <span className="text-sm font-medium font-sans">{label}</span>
       </button>
 
       {mounted && (
