@@ -35,7 +35,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
+    // data-scroll-behavior="smooth": globals.css의 scroll-behavior: smooth(목차 앵커 이동용)를
+    // 페이지 이동 때만 Next.js가 잠깐 꺼서, 새 페이지가 이전 스크롤 위치에서 위로 미끄러져 올라가지 않게 함
+    // (Next.js 16부터는 이 속성이 있어야만 꺼줌)
+    <html lang="ko" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css" />
