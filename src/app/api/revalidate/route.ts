@@ -24,7 +24,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // "post" 태그가 붙은 unstable_cache 전체 무효화 — 다음 요청 시 재fetch
-  revalidateTag("post", "default");
+  // "post" 태그가 붙은 unstable_cache 전체 즉시 만료 — 다음 요청이 새로 fetch한 결과를 바로 받음
+  // "default"/"max" 프로필은 stale-while-revalidate라 무효화 직후 첫 방문에 옛 내용이 한 번 더 보임
+  revalidateTag("post", { expire: 0 });
   return NextResponse.json({ revalidated: true, slug });
 }
