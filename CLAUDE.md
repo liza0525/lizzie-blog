@@ -130,6 +130,7 @@ NOTION_API_KEY
 NOTION_DATABASE_ID
 REVALIDATE_SECRET           # /api/revalidate 보호용 시크릿
 NEXT_PUBLIC_SITE_URL        # OG 메타데이터 base URL
+NEXT_PUBLIC_CORE_TAGS       # 코어 태그 (쉼표 구분, 순서 = 홈 태그 바 순서) — 바꾸면 재배포 필요
 NEXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 (운영 환경에서만)
 ```
 
