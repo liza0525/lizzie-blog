@@ -222,9 +222,9 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - 나타남·펼침은 `duration-(--motion-base) ease-motion`, 사라짐·접힘은 `duration-(--motion-fast) ease-motion-exit`. 상태별로 클래스를 나눠 "도착하는 상태"에 둔다(TagFilter·TocBottomSheet·ZoomableImage·IntroStage)
   - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-fast")`로 토큰을 읽는다
   - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. 끝 상태는 forwards가 아니라 기본 스타일로 둔다(타이핑 커서가 남던 버그)
-  - 형광펜 긋기는 globals.css의 `.highlight-swipe`(배경 크기 0→100% + 글자색 → `--on-sunrise`). 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
+  - "질문" 강조는 globals.css의 `.highlight-mark`(모서리 없는 직사각형 띠, 글자 높이의 75%, 세로 가운데 — 디자인 시스템 `.mark-sunrise` 대신 쓰는 블로그 전용 모양, 사용자 결정). 인트로는 `.highlight-swipe`를 더해 500ms 동안 왼쪽→오른쪽으로 그어짐. 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
   - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표·커서 깜빡임), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
-  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기와 인트로 → `/posts` fade(150ms + ease-motion-exit)는 0.1.0 원칙("움직임은 상태 변화에만", "페이지 이동은 fade 없이")과 다르지만 유지한다. 원칙에 맞춘다고 임의로 지우지 않는다
+  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"들어가기" 샤이닝(3초마다 반복, `.shine-text`)과 인트로 → `/posts` fade(150ms + ease-motion-exit)는 0.1.0 원칙("움직임은 상태 변화에만", "페이지 이동은 fade 없이")과 다르지만 유지한다. 원칙에 맞춘다고 임의로 지우지 않는다
   - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)
   - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장 fade는 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 끈다
 - 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐

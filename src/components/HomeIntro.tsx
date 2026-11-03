@@ -16,11 +16,11 @@ interface HomeIntroProps {
 }
 
 export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
-  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+1, TypingText 안, --motion-base 동안 칠해짐) → 소개(N+4) → 들어가기·화살표(N+5)
-  //   형광펜이 거의 다 칠해진 뒤(250ms ≈ 순번 3칸) 소개가 나오도록 띄움
+  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+2, TypingText 안, 500ms ≈ 순번 7칸 동안 칠해짐) → 소개(N+7) → 들어가기·화살표(N+8)
+  //   형광펜이 거의 다 그어질 즈음 소개가 나오도록 띄움 (끝까지 기다리면 첫 화면이 늦게 채워짐)
   const typedStep = typingEndStep(copy.catchphrase);
-  const introStep = typedStep + 4;
-  const actionStep = typedStep + 5;
+  const introStep = typedStep + 7;
+  const actionStep = typedStep + 8;
 
   return (
     // 높이 = 화면 높이 전체 (이 페이지엔 헤더가 없음)
@@ -30,12 +30,14 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
         <h1 className="text-display font-bold tracking-tight text-ink">
           <TypingText text={copy.catchphrase} highlight={copy.highlight} />
         </h1>
-        <p className="mt-5 max-w-reading text-lg text-muted animate-fade-in" style={staggerStyle(introStep)}>
+        <p className="mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(introStep)}>
           {copy.intro}
         </p>
-        <div className="mt-10 animate-fade-in" style={staggerStyle(actionStep)}>
-          <IntroEnterLink />
-        </div>
+      </div>
+
+      {/* 들어가기 — 화면 우측 하단. 본문과 같은 900px 기준선이 아니라 화면 모서리 기준으로 놓아 "다음 장으로 넘기는" 자리처럼 보이게 */}
+      <div className="absolute bottom-10 right-6 sm:bottom-14 sm:right-12 animate-fade-in" style={staggerStyle(actionStep)}>
+        <IntroEnterLink />
       </div>
 
       {/* "아래로 넘기면 된다"는 힌트 — 장식이라 스크린리더에서 숨김 (같은 기능은 위 버튼이 맡음)

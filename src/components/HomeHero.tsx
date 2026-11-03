@@ -1,6 +1,6 @@
 // 글 목록(/posts) 위 히어로 — 브랜드 헤드라인 + 짧은 소개
 // 문구는 lib/config.ts의 HOME_HERO에서 관리 (홈 인트로와 같은 문구)
-// highlight 부분은 새벽빛(sunrise) 면 — 디자인 시스템 0.1.0의 .mark-sunrise와 같은 모양
+// highlight 부분은 새벽빛 형광펜 띠(globals.css .highlight-mark — 모서리 없는 직사각형, 글자 높이의 75%). 인트로와 달리 긋는 애니메이션 없이 처음부터 칠해져 있음
 // 등장은 투명도만 바뀌는 fade (제목 → 소개). 디자인 시스템 0.1.0에서 위치 이동·순차로 떠오르는 효과는 쓰지 않음
 
 import React from "react";
@@ -28,15 +28,14 @@ export default function HomeHero({ copy }: HomeHeroProps): React.JSX.Element {
         {parts ? (
           <>
             {parts[0]}
-            {/* box-decoration-break: clone → 줄이 바뀌어도 줄마다 면 모서리가 온전히 그려짐 */}
-            <mark className="rounded-box bg-sunrise text-on-sunrise px-[0.15em] [box-decoration-break:clone]">{parts[1]}</mark>
+            <mark className="highlight-mark">{parts[1]}</mark>
             {parts[2]}
           </>
         ) : (
           copy.catchphrase
         )}
       </h1>
-      <p className="mt-5 max-w-reading text-lg text-muted animate-fade-in" style={staggerStyle(2)}>
+      <p className="mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(2)}>
         {copy.intro}
       </p>
     </section>
