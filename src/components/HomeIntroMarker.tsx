@@ -10,7 +10,8 @@ interface HomeIntroMarkerProps {
   listHref: string;  // 현재 태그·검색 상태가 담긴 홈 URL — 바뀌면 사용자가 홈 안에서 이동한 것
 }
 
-function disableHomeIntro(): void {
+// 인트로 → 목록 View Transition(IntroStage)도 이동 직전에 호출 — 등장은 전환 애니메이션이 맡으므로 목록 자체의 순차 등장은 끔
+export function disableHomeIntro(): void {
   document.documentElement.dataset.introSeen = "";
 }
 

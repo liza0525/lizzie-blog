@@ -14,6 +14,16 @@ import styles from "./FirstLightBackground.module.css";
 
 export type FirstLightVariant = "intro" | "hero";
 
+// 장면 좌표계 크기 — viewBox와 배율 계산(firstLightScale)이 같은 값을 보도록 한 곳에 둠
+const VIEWBOX_WIDTH = 1600;
+const VIEWBOX_HEIGHT = 900;
+
+// 상자(width×height px)에 그려질 때 장면의 배율 — xMidYMid slice는 상자를 꽉 채우는 쪽(큰 배율)을 고름
+// 인트로 → 히어로 전환(IntroStage)이 두 상자의 배율 비율을 구해, 전환 중 두 그림을 같은 배율로 겹치는 데 씀
+export function firstLightScale(width: number, height: number): number {
+  return Math.max(width / VIEWBOX_WIDTH, height / VIEWBOX_HEIGHT);
+}
+
 interface FirstLightBackgroundProps {
   variant: FirstLightVariant;
 }
@@ -39,7 +49,7 @@ export default function FirstLightBackground({ variant }: FirstLightBackgroundPr
     // 그리는 순서(아래 → 위): 하늘 → 빛 번짐 → 해 → 산 → 뒤 안개 → 바다 → 수평선 → 물빛 반사 → 앞 안개
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 1600 900"
+      viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
       preserveAspectRatio="xMidYMid slice"
       className={`${styles["first-light"]} ${styles[variant]}`}
       aria-hidden="true"
