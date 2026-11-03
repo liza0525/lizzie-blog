@@ -1,7 +1,8 @@
 // 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "들어가기" 버튼
 // 버튼(또는 휠·스와이프·키보드)으로 넘기면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (전환은 감싸는 IntroStage가 담당)
-// 문구는 lib/config.ts의 HOME_HERO에서 관리. highlight 부분에 accent 밑줄 2px (디자인 시스템의 "강조 = 밑줄" 언어)
-// 등장 순서: 캐치프레이즈가 한 글자씩 타이핑 → 밑줄이 왼쪽→오른쪽으로 그어짐 → 소개 → 버튼·아래 화살표
+// 문구는 lib/config.ts의 HOME_HERO에서 관리. 헤드라인은 디자인 시스템 0.1.0 브랜드 "질문으로 접점을 찾는,"
+// highlight 부분은 새벽빛(sunrise) — 이 화면에서 가장 먼저 읽혀야 할 한 가지
+// 등장 순서: 헤드라인 전체가 한 글자씩 타이핑 → "질문"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 소개 → 들어가기·아래 화살표
 //   전부 CSS 애니메이션 + 같은 순번 단위(--i × --stagger-step)라 JS 없이도 재생되고, 하이드레이션 전 깜빡임이 없음
 
 import React from "react";
@@ -15,11 +16,11 @@ interface HomeIntroProps {
 }
 
 export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
-  // 순번: 글자 N개(0 ~ N-1) → 밑줄(N+1, TypingText 안) → 소개(N+3) → 버튼·화살표(N+4)
-  //   밑줄이 다 그어질 즈음 소개가 나오도록 한 칸씩 띄움
+  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+1, TypingText 안, --motion-base 동안 칠해짐) → 소개(N+4) → 들어가기·화살표(N+5)
+  //   형광펜이 거의 다 칠해진 뒤(250ms ≈ 순번 3칸) 소개가 나오도록 띄움
   const typedStep = typingEndStep(copy.catchphrase);
-  const introStep = typedStep + 3;
-  const actionStep = typedStep + 4;
+  const introStep = typedStep + 4;
+  const actionStep = typedStep + 5;
 
   return (
     // 높이 = 화면 높이 전체 (이 페이지엔 헤더가 없음)
@@ -29,19 +30,19 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
         <h1 className="text-display font-bold tracking-tight text-ink">
           <TypingText text={copy.catchphrase} highlight={copy.highlight} />
         </h1>
-        <p className="mt-5 max-w-reading text-lg text-muted animate-fade-up" style={staggerStyle(introStep)}>
+        <p className="mt-5 max-w-reading text-lg text-muted animate-fade-in" style={staggerStyle(introStep)}>
           {copy.intro}
         </p>
-        <div className="mt-10 animate-fade-up" style={staggerStyle(actionStep)}>
+        <div className="mt-10 animate-fade-in" style={staggerStyle(actionStep)}>
           <IntroEnterLink />
         </div>
       </div>
 
       {/* "아래로 넘기면 된다"는 힌트 — 장식이라 스크린리더에서 숨김 (같은 기능은 위 버튼이 맡음)
-          바깥은 등장(fade-up), 안쪽은 반복해서 살짝 내려갔다 오는 움직임 — 한 요소에 두 animation을 겹치지 않으려고 나눔 */}
+          반복해서 움직이지 않음 — 로딩 외 무한 반복 애니메이션 금지(디자인 시스템 0.1.0) */}
       <div
         aria-hidden="true"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-fade-up"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-fade-in"
         style={staggerStyle(actionStep)}
       >
         <svg
@@ -54,7 +55,7 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-subtle animate-nudge-down"
+          className="text-subtle"
         >
           <path d="m6 9 6 6 6-6" />
         </svg>

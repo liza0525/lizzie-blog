@@ -15,8 +15,8 @@ export interface Post {
 
 // 홈 히어로(랜딩) 문구 — lib/config.ts의 HOME_HERO에서 관리
 export interface HomeHeroCopy {
-  catchphrase: string;  // 큰 제목 한 줄
-  highlight: string;    // catchphrase 안에서 accent 밑줄을 그을 부분 (catchphrase에 그대로 들어 있어야 함)
+  catchphrase: string;  // 큰 제목 한 줄 — 브랜드 헤드라인(쉼표로 열어 둔 문장)
+  highlight: string;    // catchphrase 안에서 새벽빛(sunrise)으로 강조할 부분 (catchphrase에 그대로 들어 있어야 함)
   intro: string;        // 제목 아래 짧은 소개 1~2문장
 }
 

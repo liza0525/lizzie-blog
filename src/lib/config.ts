@@ -2,11 +2,11 @@
 
 import type { HomeHeroCopy } from "@/types";
 
-// 홈 히어로(랜딩) 문구 — 임시 문구, 확정되면 이 값만 바꾸면 됨
-// highlight는 catchphrase 안에 그대로 들어 있는 부분이어야 밑줄이 그어짐 (없으면 밑줄 없이 표시)
+// 홈 히어로(랜딩) 문구 — 헤드라인은 디자인 시스템 0.1.0 브랜드 철학, 소개 문구는 아직 임시
+// highlight는 catchphrase 안에 그대로 들어 있는 부분이어야 새벽빛 강조가 붙음 (없으면 강조 없이 표시)
 export const HOME_HERO: HomeHeroCopy = {
-  catchphrase: "만든 이유까지 남기는 개발 기록",
-  highlight: "이유",
+  catchphrase: "질문으로 접점을 찾는,",
+  highlight: "질문",
   intro: "백엔드를 중심으로 기획·데이터·콘텐츠를 엮으며 배운 것들을 정리합니다.",
 };
 
