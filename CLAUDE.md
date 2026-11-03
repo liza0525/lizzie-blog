@@ -66,17 +66,16 @@ src/
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
-│   ├── HomeHero.tsx            # 글 목록 위 히어로 — 캐치프레이즈 어절 순차 등장 + 키워드 밑줄, 검색 결과 화면에서만 숨김
-│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 캐치프레이즈 타이핑 + 키워드 밑줄 + 글 목록 버튼 + 아래 화살표 힌트
+│   ├── HomeHero.tsx            # 글 목록 위 히어로 — 브랜드 헤드라인(새벽빛 강조) + 소개, 검색 결과 화면에서만 숨김
+│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 들어가기 링크 + 아래 화살표 힌트
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 밑줄
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → fade out이 끝나면(transitionend) /posts로 이동, Context로 시작 함수 제공
 │   ├── IntroEnterLink.tsx      # 인트로의 "들어가기" 링크(accent 밑줄 텍스트) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
-│   ├── Reveal.tsx              # 스크롤 등장 래퍼 — 화면 아래 요소만 숨겼다가 들어오면 나타남 (IntersectionObserver 공유)
 │   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
-│   ├── SeriesShelf.tsx         # 홈 태그 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover 시 화살표·제목이 옆으로 살짝 이동)
+│   ├── SeriesShelf.tsx         # 글 목록 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover는 색 변화만)
 │   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
 │   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침 — 펼치기/접기 애니메이션)
-│   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤, 행마다 Reveal)
+│   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
 │   ├── PostContentClient.tsx   # 포스트 본문 렌더러 (client) — PostContent(server)에서 분리
 │   ├── ZoomableImage.tsx       # 본문 이미지 (높이 70vh 제한) + 클릭 확대 라이트박스
 │   ├── HighlightText.tsx       # 검색어 하이라이팅
@@ -175,7 +174,7 @@ npm run lint                     # 린트 확인
 
 이 프로젝트는 `design-system/`(git submodule)의 Lizzie Design System을 따른다.
 
-- **고정 버전**: `0.0.2` — 실제 값 확인: `git -C design-system describe --tags`
+- **고정 버전**: `0.1.0` — 실제 값 확인: `git -C design-system describe --tags`
 - **적용 방식**: import
   - **import** — 프로젝트 CSS에서 `design-system/tokens.css`(필요하면 `components.css`도)를 `@import`해서 쓴다
 
@@ -187,14 +186,18 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
 
 ### 항상 지킬 규칙
 
-- 색은 역할 토큰만 쓴다: `--bg` `--surface` `--border` `--input-border` `--text` `--muted` `--subtle` `--accent` `--accent-soft` `--on-accent` `--on-accent-soft` `--warning` `--warning-soft`. hex 값이나 `--gray-*` 원시값을 직접 쓰지 않는다
-- 포인트 색은 `--accent` 하나. `--warning`은 주의 표시에만
+- 색은 역할 토큰만 쓴다: `--bg` `--surface` `--border` `--input-border` `--text` `--muted` `--subtle` `--accent` `--accent-soft` `--on-accent` `--on-accent-soft` `--sunrise` `--on-sunrise` `--warning` `--warning-soft` `--danger` `--danger-soft` `--success` `--success-soft`. hex 값이나 `--gray-*` 원시값을 직접 쓰지 않는다
+- `--accent`는 링크·주요 버튼·활성 표시에. `--sunrise`는 그 화면에서 가장 먼저 읽혀야 할 한 가지에만, 누르지 않는 자리에(대부분 한 화면에 하나)(라이트에서는 글자색 금지). 상태색은 그 의미일 때만, 레이블과 함께
 - 폰트는 Pretendard가 기본. Maru Buri(세리프)는 장문 본문(`.prose`) 안에서만
 - 13px 미만 글씨 금지. 제목은 700 + `--letter-tight`. `uppercase`와 넓은 자간 금지
 - 모서리는 전부 `--corner`(4px). 점·아바타만 `--corner-round`. pill 버튼 금지
 - 카드: `--surface` 면 + 1px `--border` + 4px, 그림자 없음. 카드에 `border-top/left` 포인트 색 금지
+- 그림자는 떠 있는 층(툴팁·팝오버·메뉴·모달·토스트)에만 `--elevation-float` 한 단계. z-index는 `--layer-float` `--layer-overlay` `--layer-toast`만 쓰고 숫자를 직접 쓰지 않는다. 툴팁·팝오버는 `.tooltip` `.popover`를 쓴다
 - 선택·탐색 상태는 색 면이 아니라 밑줄 2px(`--accent`) + semibold
 - 다크모드는 토큰이 `light-dark()`로 자동 전환한다. 컴포넌트에 `dark:` 분기를 쓰지 않는다
+- 브레이크포인트는 40rem(`sm`)과 56rem(`wide`) 두 개만. 다른 값을 새로 만들지 않는다
+- 모션은 hover·focus의 색 변화(`--motion-fast`), 나타남·사라짐 fade, 펼침·접힘 높이(`.collapse`)에만 쓴다. 나타날 때는 `--motion-base` + `--motion-ease`, 사라질 때는 `--motion-fast` + `--motion-ease-exit`(사라질 때도 fade 없이 바로 없애지 않는다. 예외: 버튼 안 스피너는 글자와 함께, 탭·페이지 이동은 바로 바꾼다). 스크롤 진입 애니메이션, hover 시 떠오르는 카드, 확대, 바운스 금지
+- 로딩은 내용을 기다리면 `.skeleton`(`animate-skeleton`), 누른 일의 결과를 기다리면 글자와 함께 `.spinner`(`animate-spinner`). Tailwind 기본 `animate-pulse`·`animate-spin` 금지
 
 ### 디자인 시스템 버전을 올릴 때
 
@@ -215,14 +218,15 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
 - `components.css`는 import하지 않는다 — 그 안의 `.prose` 정의가 `@tailwindcss/typography`의 `.prose`와 겹친다. 태그·입력창 등은 같은 토큰으로 Tailwind 유틸리티를 써서 맞춘다 (`rounded-box`, `bg-accent-soft`, `border-input` …)
 - `base.css`도 import하지 않는다(Tailwind Preflight와 겹침). 필요한 것(`word-break: keep-all`, 제목 자간, `:focus-visible`, `::selection`, `prefers-reduced-motion`)만 globals.css에 옮겨 둠
   - reduced-motion 규칙에는 `animation-delay`/`transition-delay` 리셋을 더했다 (stagger 등장이 delay 동안 투명하게 남지 않도록)
-- motion 토큰은 tokens.css의 `@theme`에 매핑이 없어서 globals.css에서 연결한다: `ease-motion`, `animate-fade-up`, `animate-underline-draw`. duration은 `duration-(--motion-base)` 문법으로 참조
-  - duration·ease를 안 쓴 `transition-*`(transition-colors 등)의 기본값도 토큰(`--motion-fast`, `--motion-ease`)으로 바꿔 뒀다. `duration-200`처럼 숫자를 직접 쓰지 않는다
-  - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-base")`로 토큰을 읽는다
-  - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. delay는 animation 단축 속성 안에 들어 있다
-  - 스크롤 등장은 `Reveal` + globals.css의 `[data-reveal]`
-  - 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 순번 단위가 같아서 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
-  - 반복 애니메이션은 `animate-nudge-down`(인트로 아래 화살표). reduced-motion 규칙에 `animation-iteration-count: 1`을 더해 반복도 멈춤
-  - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장·스크롤 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 인트로에서 넘어올 때도 재생돼 fade in 역할을 한다. 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 전부 끈다
+- motion: `ease-motion`·`ease-motion-exit`는 tokens.css(0.1.0) `@theme`이 매핑한다. globals.css는 기본 transition 값(`--motion-fast`, `--motion-ease`)과 `animate-fade-in`(투명도만), 타이핑(`.typing-char`)만 정의한다. duration은 `duration-(--motion-base)` 문법으로 토큰을 참조하고 숫자를 직접 쓰지 않는다
+  - 나타남·펼침은 `duration-(--motion-base) ease-motion`, 사라짐·접힘은 `duration-(--motion-fast) ease-motion-exit`. 상태별로 클래스를 나눠 "도착하는 상태"에 둔다(TagFilter·TocBottomSheet·ZoomableImage·IntroStage)
+  - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-fast")`로 토큰을 읽는다
+  - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. 끝 상태는 forwards가 아니라 기본 스타일로 둔다(타이핑 커서가 남던 버그)
+  - 형광펜 긋기는 globals.css의 `.highlight-swipe`(배경 크기 0→100% + 글자색 → `--on-sunrise`). 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
+  - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표·커서 깜빡임), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
+  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기와 인트로 → `/posts` fade(150ms + ease-motion-exit)는 0.1.0 원칙("움직임은 상태 변화에만", "페이지 이동은 fade 없이")과 다르지만 유지한다. 원칙에 맞춘다고 임의로 지우지 않는다
+  - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)
+  - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장 fade는 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 끈다
 - 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐
   - 헤더·푸터가 필요한 새 페이지는 `app/(site)/` 아래에 만든다 (그룹 밖이면 헤더가 안 붙음)
 - Notion 콜아웃 9색은 globals.css의 `.notion-callout[data-color]`에서 3톤(기본/accent/warning)으로 매핑한다

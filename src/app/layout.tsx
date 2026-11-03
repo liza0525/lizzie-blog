@@ -42,7 +42,8 @@ export default function RootLayout({
       <GoogleAnalytics />
       <body className="min-h-full flex flex-col">
         {/* 헤더·푸터는 (site)/layout.tsx에 있음 — 홈 인트로(app/page.tsx)만 헤더 없이 화면 전체를 쓰게 하려고 분리 */}
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {/* disableTransitionOnChange: 테마를 바꾸는 순간엔 모든 전환을 끔 — 배경만 먼저 바뀌고 버튼·링크가 늦게 따라오는 어긋남 방지 (디자인 시스템 0.1.0) */}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
       </body>

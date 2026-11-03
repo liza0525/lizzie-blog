@@ -40,7 +40,7 @@ export default function MermaidBlock({ chart }: MermaidBlockProps): React.JSX.El
 
   if (error) {
     return (
-      <div className="my-6 rounded-box bg-warning-soft p-4 text-sm text-warning">
+      <div className="my-6 rounded-box bg-danger-soft p-4 text-sm text-danger">
         <p className="font-medium mb-1">Mermaid 오류</p>
         <pre className="whitespace-pre-wrap">{error}</pre>
       </div>
