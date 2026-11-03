@@ -17,12 +17,13 @@
   background: var(--bg);
 }
 
-/* 전체 화면 배경 양옆의 띠 없애기
-   globals.css의 html { scrollbar-gutter: stable both-edges }가 스크롤바가 없어도 양쪽에 자리를 비워 두는데,
+/* 전체 화면 배경 오른쪽의 띠 없애기
+   globals.css의 html { scrollbar-gutter: stable }이 스크롤바가 없어도 오른쪽에 자리를 비워 두는데,
    그 자리는 배경이 못 덮어서(position: fixed여도 마찬가지 — 디자인 시스템 "떠 있는 층") 페이지 배경색 띠로 보임
    → 홈 인트로(variant="intro")가 있는 페이지에서만 그 자리를 없앰. 인트로는 스크롤 없는 한 장이라 비워 둘 이유가 없음
    :global(html) — CSS Module은 모든 선택자를 이 파일 클래스로 묶으려 해서, 바깥 요소인 html은 :global로 빼냄
-   글 목록 히어로(variant="hero")에는 걸지 않음 — 스크롤되는 페이지라 자리를 없애면 스크롤바가 생기고 없어질 때마다 레이아웃이 흔들림 */
+   글 목록 히어로(variant="hero")에는 걸지 않음 — 스크롤되는 페이지라 자리를 없애면 스크롤바가 생기고 없어질 때마다 레이아웃이 흔들림
+     (히어로 오른쪽 자리는 스크롤바가 덮어서 띠로 보이지 않음) */
 :global(html):has(.intro) {
   scrollbar-gutter: auto;
 }

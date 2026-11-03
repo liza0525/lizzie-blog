@@ -10,7 +10,10 @@
 html {
   /* scroll-behavior: smooth는 쓰지 않음 — 뒤로 가기 시 브라우저의 스크롤 복원까지 부드럽게 만들어
      새 페이지가 이전 위치에서 미끄러져 올라감. 목차 이동만 TableOfContents에서 JS로 부드럽게 처리 */
-  scrollbar-gutter: stable both-edges;
+  /* 스크롤바 자리를 늘 비워 둠 → 스크롤바가 생기고 없어질 때 레이아웃이 흔들리지 않음
+     both-edges(양쪽)는 쓰지 않음 — 왼쪽에도 빈자리가 생기는데, 그 자리는 페이지 안 요소가 덮지 못해서
+     화면 폭으로 깐 히어로 배경 왼쪽에 페이지 배경색 띠가 남았음. 대신 글 상자가 정가운데보다 스크롤바 폭의 절반만큼 왼쪽에 옴 */
+  scrollbar-gutter: stable;
   /* 한글이 어절 중간에서 끊기지 않게, 대신 긴 URL·영단어는 넘치지 않게 */
   word-break: keep-all;
   overflow-wrap: break-word;
