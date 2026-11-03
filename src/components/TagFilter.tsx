@@ -114,8 +114,9 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
         <div
           id={OTHER_TAGS_ID}
           inert={!expanded}
-          className={`grid transition-[grid-template-rows,opacity] duration-(--motion-base) ease-motion ${
-            expanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          className={`grid transition-[grid-template-rows,opacity] ${
+            // 펼칠 때 --motion-base + ease-motion, 접을 때 --motion-fast + ease-motion-exit (디자인 시스템 0.1.0 펼침·접힘)
+            expanded ? "grid-rows-[1fr] opacity-100 duration-(--motion-base) ease-motion" : "grid-rows-[0fr] opacity-0 duration-(--motion-fast) ease-motion-exit"
           }`}
         >
           {/* 여백·구분선까지 안쪽에 둬야 접혔을 때 높이 0으로 완전히 사라짐 (min-h-0: grid 자식이 내용 높이 밑으로 줄어들 수 있게) */}

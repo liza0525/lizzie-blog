@@ -1,8 +1,7 @@
 // 홈 상단 시리즈 진입점 — 섹션 제목 줄 오른쪽 "모든 시리즈 보기"(/series) + 최근 시리즈 카드 가로 줄
 // 카드는 폭 고정으로 왼쪽부터 채워서 시리즈가 1개여도 늘어나지 않음
 // 카드가 넘치면 ScrollFadeRow가 오른쪽 끝에 페이드를 깔아 가로 스크롤 가능함을 알림 (데스크톱·모바일 동일 구조)
-// hover 시 "모든 시리즈 보기" 화살표와 카드 제목이 오른쪽으로 살짝 밀림 — "이쪽으로 이동"이라는 방향 힌트
-//   (크기 변화·그림자는 디자인 시스템상 쓰지 않음. 카드를 위로 띄우면 가로 스크롤 영역 위쪽에서 잘려서 옆으로만 움직임)
+// hover는 색 변화만 (카드 테두리·제목이 accent로) — 디자인 시스템 0.1.0: hover 시 위치 이동·확대·그림자 금지
 
 import React from "react";
 import Link from "next/link";
@@ -27,7 +26,7 @@ export default function SeriesShelf({ series }: SeriesShelfProps): React.JSX.Ele
           className="group inline-flex items-center gap-0.5 text-xs text-muted hover:text-accent transition-colors"
         >
           모든 시리즈 보기
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </Link>
@@ -44,7 +43,7 @@ export default function SeriesShelf({ series }: SeriesShelfProps): React.JSX.Ele
                 href={`/series/${encodeURIComponent(s.name)}`}
                 className="group shrink-0 w-56 bg-surface border border-border rounded-box px-4 py-3 hover:border-accent transition-colors font-sans"
               >
-                <p className="text-[15px] font-semibold text-ink leading-snug truncate transition-[color,translate] group-hover:text-accent group-hover:translate-x-0.5">
+                <p className="text-[15px] font-semibold text-ink leading-snug truncate transition-colors group-hover:text-accent">
                   {s.name}
                 </p>
                 <p className="text-xs text-subtle mt-1 truncate">

@@ -41,7 +41,7 @@ export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.J
   // 페이드아웃 트랜지션이 끝난 뒤 언마운트
   useEffect(() => {
     if (open || !mounted) return;
-    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-base"));
+    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-fast"));
     return () => clearTimeout(timer);
   }, [open, mounted]);
 
@@ -95,8 +95,9 @@ export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.J
             aria-label={alt || "이미지 크게 보기"}
             tabIndex={-1}
             onClick={closeLightbox}
-            className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 p-4 bg-bg cursor-zoom-out outline-none transition-opacity duration-(--motion-base) ease-motion motion-reduce:transition-none ${
-              visible ? "opacity-100" : "opacity-0"
+            className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 p-4 bg-bg cursor-zoom-out outline-none transition-opacity motion-reduce:transition-none ${
+              // 열릴 때 --motion-base + ease-motion, 닫힐 때 --motion-fast + ease-motion-exit (디자인 시스템 0.1.0 나타남·사라짐)
+              visible ? "opacity-100 duration-(--motion-base) ease-motion" : "opacity-0 duration-(--motion-fast) ease-motion-exit"
             }`}
           >
             <button

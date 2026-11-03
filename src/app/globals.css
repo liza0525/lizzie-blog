@@ -45,48 +45,62 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ─── Motion ──────────────────────────────────────────────
-   design-system tokens.css의 @theme에 motion 매핑이 아직 없어서 여기서 연결 (값은 var()로만 참조)
-   - ease-motion        → transition-timing-function: --motion-ease
-   - duration·ease를 따로 안 쓴 transition-* 유틸리티(transition-colors 등)의 기본값도 토큰(--motion-fast, --motion-ease)으로
-   - duration은 매핑 없이 duration-(--motion-fast) / duration-(--motion-base) 문법으로 참조
-   - animate-fade-up    → 아래 8px에서 떠오르며 나타남 (등장 효과 공통)
-   - animate-underline-draw → 밑줄이 왼쪽에서 오른쪽으로 그어짐 (scaleX, 요소에 origin-left 필요)
-   - animate-nudge-down → 살짝 내려갔다 돌아오기를 반복 ("아래에 더 있음" 힌트, 길이는 --motion-base에서 파생)
+   디자인 시스템 0.1.0 기준: 움직임은 hover·focus 색 변화, 나타남·사라짐 fade, 펼침·접힘 높이에만 쓴다
+   - 나타날 때 --motion-base + ease-motion, 사라질 때 --motion-fast + ease-motion-exit (매핑은 tokens.css @theme이 제공)
+   - 위치 이동(translate)·확대·바운스·스크롤 진입·로딩 외 무한 반복·250ms 초과 전환은 쓰지 않는다
+   여기서 하는 것:
+   - duration·ease를 따로 안 쓴 transition-* 유틸리티(transition-colors 등)의 기본값을 토큰(--motion-fast, --motion-ease)으로
+   - duration은 duration-(--motion-fast) / duration-(--motion-base) 문법으로 참조
+   - animate-fade-in → 투명도만 0 → 1 (등장 효과 공통, 위치는 움직이지 않음)
    순차 등장: 요소에 --i(순번, lib/motion.ts의 staggerStyle)를 주면 순번 × --stagger-step만큼 늦게 시작
    (delay를 별도 유틸리티로 두면 animation 단축 속성이 delay를 0으로 덮어써서 순서에 따라 깨지므로 단축 속성 안에 넣음)
-   animation-fill-mode both: delay 동안엔 시작 상태로 숨어 있다가, 끝나면 최종 상태 유지 */
+   fill backwards: delay 동안엔 투명하게 기다리고, 끝난 뒤엔 기본 스타일(보임)로 — 끝 상태를 forwards에 맡기지 않음(타이핑 커서 버그 참고) */
 :root {
   /* 순차 등장 간격 — 새 값을 만들지 않고 --motion-fast의 절반(75ms)에서 파생 */
   --stagger-step: calc(var(--motion-fast) / 2);
 }
 
 @theme inline {
-  --ease-motion: var(--motion-ease);
   --default-transition-duration: var(--motion-fast);
   --default-transition-timing-function: var(--motion-ease);
 
-  --animate-fade-up: fade-up var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
-  --animate-underline-draw: underline-draw var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
-  --animate-nudge-down: nudge-down calc(var(--motion-base) * 8) var(--motion-ease) infinite;
+  --animate-fade-in: fade-in var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) backwards;
 
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: none; }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
-  @keyframes underline-draw {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
-  }
-  @keyframes nudge-down {
-    0%, 60%, 100% { transform: none; }
-    30%           { transform: translateY(4px); }
+}
+
+/* 형광펜 긋기 — components/TypingText.tsx의 강조 부분. 다 쳐진 뒤 새벽빛 면이 왼쪽→오른쪽으로 칠해짐
+   면은 배경 이미지(단색 그라데이션) 한 장의 가로 크기를 0% → 100%로 늘려서 그림 → 글자는 그대로, 칠만 지나감
+   글자색도 같이 면 위 색(--on-sunrise)으로 바뀜 (다크모드에서 밝은 글자가 밝은 면 위에 남지 않게)
+   기본 스타일이 "칠해진 뒤" 모습이고, 애니메이션은 backwards로 시작 전(칠 없음)·재생 중만 덮어씀 → 끝 상태가 반올림에 흔들리지 않음
+   box-decoration-break: clone → 줄이 바뀌어도 줄마다 면 모서리가 온전히 그려짐 (디자인 시스템 .mark-sunrise와 같은 모양) */
+.highlight-swipe {
+  background-image: linear-gradient(var(--sunrise), var(--sunrise));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  color: var(--on-sunrise);
+  border-radius: var(--corner);
+  padding-inline: 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation: highlight-swipe var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) backwards;
+}
+@keyframes highlight-swipe {
+  from {
+    background-size: 0% 100%;
+    color: var(--text);
+    /* 면 좌우 여백도 칠할 때 생김 — 처음부터 있으면 타이핑 중에 "질문 으로"처럼 띄어 쓴 것처럼 보임 */
+    padding-inline: 0;
   }
 }
 
 /* 타이핑 등장 — components/TypingText.tsx. 글자 하나 = 순번(--i) 하나, 간격은 순차 등장과 같은 --stagger-step
    - 글자: 자기 차례가 되면 바로 나타남 ("탁" 쳐지는 느낌)
    - 커서(::after): 자기 차례 동안만 보였다가 다음 글자로 넘어감 → 커서가 글자를 따라가는 것처럼 보임
-   - 마지막 글자의 커서는 사라지지 않고 계속 깜빡임
+   - 마지막 글자의 커서도 자기 차례가 끝나면 사라짐 (로딩 외 무한 반복 애니메이션 금지 — 디자인 시스템 0.1.0)
    주의: "끝난 뒤 상태"를 animation의 forwards(마지막 값 유지)에 맡기지 않음
      → 끝나는 순간 시간 계산이 반올림되면 브라우저가 처음 값으로 보기도 해서, 커서가 일부 글자에 남는 버그가 있었음
      → 대신 기본 스타일을 "끝난 뒤 모습"으로 두고, 애니메이션은 시작 전(backwards)·재생 중에만 값을 덮어씀
@@ -108,45 +122,21 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
   animation: cursor-pass var(--stagger-step) linear calc(var(--i, 0) * var(--stagger-step));
 }
-.typing-char[data-last]::after {
-  animation: cursor-blink calc(var(--motion-base) * 4) steps(1) calc(var(--i, 0) * var(--stagger-step)) infinite;
-}
 @keyframes type-wait {
   from, to { opacity: 0; }
 }
 @keyframes cursor-pass {
   from, to { opacity: 1; }
 }
-@keyframes cursor-blink {
-  from { opacity: 1; }
-  50%  { opacity: 0; }
-}
-
-/* 스크롤 등장 — components/Reveal.tsx가 data-reveal 값을 바꾸면 전환은 여기서 처리
-   pending은 JS가 "화면 아래에 있는 요소"에만 붙이므로, JS가 없거나 첫 화면 안의 요소는 숨겨지지 않음 */
-[data-reveal] {
-  transition:
-    opacity var(--motion-base) var(--motion-ease),
-    transform var(--motion-base) var(--motion-ease);
-  transition-delay: calc(var(--i, 0) * var(--stagger-step));
-}
-[data-reveal="pending"] {
-  opacity: 0;
-  transform: translateY(8px);
-}
 
 /* 홈 등장 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 — 홈 안에서 이동하거나 홈을 떠나면 HomeIntroMarker가
    <html data-intro-seen>을 붙여 이후엔 전부 최종 상태로 바로 보임. 새로고침하면 <html>이 새로 만들어져 다시 재생
-   [data-intro]는 홈 컨테이너. 스크롤 등장(Reveal)도 같은 스위치로 끔 */
+   [data-intro]는 글 목록(/posts) 컨테이너 */
 html[data-intro-seen] [data-intro] *,
 html[data-intro-seen] [data-intro] *::after {
   animation: none !important;
 }
-html[data-intro-seen] [data-intro] [data-reveal] {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
+
 
 body {
   background-color: var(--bg);

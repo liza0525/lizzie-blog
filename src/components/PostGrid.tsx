@@ -1,7 +1,6 @@
 // 포스트 리스트 — 무한 스크롤 지원
 // IntersectionObserver로 스크롤 바닥 감지 → /api/posts로 다음 페이지 fetch
 // 태그 필터/검색어 변경 시 자동으로 처음부터 다시 로드
-// 각 행은 Reveal로 감싸서 화면 아래에서 스크롤로 들어올 때 등장 (무한 스크롤로 추가된 글 포함)
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +9,6 @@ import type { Post, PostListPage } from "@/types";
 import HighlightText from "@/components/HighlightText";
 import FormattedDate from "@/components/FormattedDate";
 import { CORE_TAGS } from "@/lib/config";
-import Reveal from "@/components/Reveal";
 
 interface PostGridProps {
   initialPosts: Post[];
@@ -84,69 +82,68 @@ export default function PostGrid({
     <>
       <div className="divide-y divide-border">
         {posts.map((post) => (
-          <Reveal key={post.id}>
-            <Link
-              href={`/posts/${encodeURIComponent(post.slug)}`}
-              prefetch={false}
-              className="group flex items-start gap-5 -mx-4 px-4 py-5 hover:bg-surface transition-colors"
-            >
-              {/* 텍스트 영역 */}
-              <div className="flex-1 min-w-0">
-                {/* 모바일에서 날짜가 길어 한 줄에 다 안 들어가면 시리즈 레이블이 다음 줄로 내려가도록 flex-wrap */}
-                <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle mb-1.5 font-sans">
-                  <FormattedDate date={post.publishedAt} className="tabular-nums" />
-                  {/* 시리즈 레이블 — 카드 전체가 <Link>라 중첩 링크를 피하려고 텍스트로만 표시 */}
-                  {post.series && (
-                    <>
-                      <span aria-hidden="true">·</span>
-                      <span>
-                        시리즈 <span className="font-semibold text-muted">{post.series}</span>
-                      </span>
-                    </>
-                  )}
-                </div>
-                <h2
-                  className="text-[18px] font-semibold text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors"
-                >
-                  <HighlightText text={post.title} query={query ?? ""} />
-                </h2>
-                {post.description && (
-                  <p
-                    className="text-[15px] leading-[1.7] text-muted mb-2.5 line-clamp-2"
-                  >
-                    {post.description}
-                  </p>
-                )}
-                {post.tags.length > 0 && (
-                  <div className="flex gap-1.5 flex-wrap">
-                    {post.tags.map((tagName) => (
-                      <span
-                        key={tagName}
-                        className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
-                          CORE_TAGS.includes(tagName)
-                            ? "bg-accent-soft border-transparent text-on-accent-soft"
-                            : "border-border text-muted"
-                        }`}
-                      >
-                        {tagName}
-                      </span>
-                    ))}
-                  </div>
+          <Link
+            key={post.id}
+            href={`/posts/${encodeURIComponent(post.slug)}`}
+            prefetch={false}
+            className="group flex items-start gap-5 -mx-4 px-4 py-5 hover:bg-surface transition-colors"
+          >
+            {/* 텍스트 영역 */}
+            <div className="flex-1 min-w-0">
+              {/* 모바일에서 날짜가 길어 한 줄에 다 안 들어가면 시리즈 레이블이 다음 줄로 내려가도록 flex-wrap */}
+              <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle mb-1.5 font-sans">
+                <FormattedDate date={post.publishedAt} className="tabular-nums" />
+                {/* 시리즈 레이블 — 카드 전체가 <Link>라 중첩 링크를 피하려고 텍스트로만 표시 */}
+                {post.series && (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                      시리즈 <span className="font-semibold text-muted">{post.series}</span>
+                    </span>
+                  </>
                 )}
               </div>
-              {/* 썸네일 — cover 이미지가 있을 때만 */}
-              {post.coverImage && (
-                <div className="shrink-0 w-24 h-[72px] border border-border overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
+              <h2
+                className="text-[18px] font-semibold text-ink leading-snug mb-2 line-clamp-2 group-hover:text-accent transition-colors"
+              >
+                <HighlightText text={post.title} query={query ?? ""} />
+              </h2>
+              {post.description && (
+                <p
+                  className="text-[15px] leading-[1.7] text-muted mb-2.5 line-clamp-2"
+                >
+                  {post.description}
+                </p>
+              )}
+              {post.tags.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap">
+                  {post.tags.map((tagName) => (
+                    <span
+                      key={tagName}
+                      className={`text-xs font-semibold px-2 py-px border rounded-box font-sans ${
+                        CORE_TAGS.includes(tagName)
+                          ? "bg-accent-soft border-transparent text-on-accent-soft"
+                          : "border-border text-muted"
+                      }`}
+                    >
+                      {tagName}
+                    </span>
+                  ))}
                 </div>
               )}
-            </Link>
-          </Reveal>
+            </div>
+            {/* 썸네일 — cover 이미지가 있을 때만 */}
+            {post.coverImage && (
+              <div className="shrink-0 w-24 h-[72px] border border-border overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.coverImage}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </Link>
         ))}
       </div>
 

@@ -46,7 +46,7 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
   // 슬라이드다운 트랜지션이 끝난 뒤 언마운트
   useEffect(() => {
     if (open || !mounted) return;
-    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-base"));
+    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-fast"));
     return () => clearTimeout(timer);
   }, [open, mounted]);
 
@@ -119,8 +119,9 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
             aria-modal="true"
             aria-label={label}
             tabIndex={-1}
-            className={`fixed inset-x-0 bottom-0 z-40 xl:hidden bg-bg border-t border-border shadow-lg max-h-[75vh] overflow-y-auto transition-transform duration-(--motion-base) ease-motion motion-reduce:transition-none ${
-              visible ? "translate-y-0" : "translate-y-full"
+            className={`fixed inset-x-0 bottom-0 z-40 xl:hidden bg-bg border-t border-border shadow-float max-h-[75vh] overflow-y-auto transition-transform motion-reduce:transition-none ${
+              // 열릴 때 --motion-base + ease-motion, 닫힐 때 --motion-fast + ease-motion-exit (디자인 시스템 0.1.0 나타남·사라짐)
+              visible ? "translate-y-0 duration-(--motion-base) ease-motion" : "translate-y-full duration-(--motion-fast) ease-motion-exit"
             }`}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">

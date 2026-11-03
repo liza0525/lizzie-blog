@@ -49,7 +49,7 @@ export default async function PostsPage({ searchParams }: PostListPageProps): Pr
 
   // 등장 순서: 히어로(어절 → 밑줄 → 소개)와 동시에, 아래쪽은 시리즈 줄 → 태그 바 → 글 목록(첫 화면 부분)이 따로 순서대로
   //   목록이 히어로가 끝날 때까지 기다리면 첫 화면이 너무 늦게 채워져서 두 줄기를 같이 시작함
-  // 첫 화면 아래 글은 PostGrid 안의 Reveal(스크롤 등장). 뒤로 가기·태그 클릭으로 다시 그려질 땐 data-intro-seen이 붙어 있어 재생되지 않음
+  // 뒤로 가기·태그 클릭으로 다시 그려질 땐 data-intro-seen이 붙어 있어 재생되지 않음
   const showHero = !q;
 
   return (
@@ -60,13 +60,13 @@ export default async function PostsPage({ searchParams }: PostListPageProps): Pr
       {showHero && <HomeHero copy={HOME_HERO} />}
 
       {!q && (
-        <div className="animate-fade-up" style={staggerStyle(0)}>
+        <div className="animate-fade-in" style={staggerStyle(0)}>
           <SeriesShelf series={recentSeries} />
         </div>
       )}
 
       {!q && (
-        <div className="animate-fade-up" style={staggerStyle(1)}>
+        <div className="animate-fade-in" style={staggerStyle(1)}>
           <Suspense>
             <TagFilter tags={tags} />
           </Suspense>
@@ -81,7 +81,7 @@ export default async function PostsPage({ searchParams }: PostListPageProps): Pr
         </p>
       )}
 
-      <div className="animate-fade-up" style={staggerStyle(2)}>
+      <div className="animate-fade-in" style={staggerStyle(2)}>
         <PostGrid
           initialPosts={firstPage.posts}
           initialCursor={firstPage.nextCursor}

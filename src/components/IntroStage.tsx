@@ -121,10 +121,10 @@ export default function IntroStage({ children }: IntroStageProps): React.JSX.Ele
 
   return (
     <IntroLeaveContext.Provider value={leave}>
-      {/* 흐려지는 길이는 --motion-base의 2배(500ms) — 기본 길이로는 "깜빡"처럼 보여서 천천히 */}
+      {/* 사라짐 규칙(디자인 시스템 0.1.0): --motion-fast(150ms) + ease-motion-exit — 천천히 떠나기 시작해서 빠르게 끝남 */}
       <div
         ref={stageRef}
-        className={`transition-opacity duration-[calc(var(--motion-base)*2)] ease-motion ${leaving ? "opacity-0" : "opacity-100"}`}
+        className={`transition-opacity duration-(--motion-fast) ease-motion-exit ${leaving ? "opacity-0" : "opacity-100"}`}
       >
         {children}
       </div>
