@@ -27,27 +27,32 @@ Next.js 16 (App Router) + Notion API + Vercel 배포.
 ```
 src/
 ├── app/                        # 라우트 레이어
-│   ├── layout.tsx              # 루트 레이아웃 (CDN 폰트 링크, 메타데이터, Header/Footer, 홈 애니메이션 1회 재생 인라인 스크립트)
-│   ├── page.tsx                # 홈 (히어로 + 시리즈 카드 + 글 목록)
-│   ├── admin/
-│   │   └── page.tsx            # 캐시 수동 무효화 UI
+│   ├── layout.tsx              # 루트 레이아웃 (html·body, CDN 폰트 링크, 메타데이터, ThemeProvider, GA) — 헤더·푸터 없음
+│   ├── page.tsx                # 홈(/) — 헤더 없는 전체 화면 인트로 전용 (정적). 버튼 → fade out → /posts
+│   ├── (site)/                 # route group(URL에 안 나타남) — 헤더·푸터가 붙는 일반 페이지들
+│   │   ├── layout.tsx          # 사이트 공통 레이아웃 (Header + main + footer)
+│   │   ├── admin/
+│   │   │   └── page.tsx        # 캐시 수동 무효화 UI
+│   │   ├── posts/
+│   │   │   ├── page.tsx        # 글 목록(/posts) — 히어로 + 시리즈 카드 + 태그 필터 + 글 목록
+│   │   │   └── [slug]/
+│   │   │       ├── page.tsx        # 글 상세
+│   │   │       ├── PostContent.tsx # 본문 서버 컴포넌트 (fetch → PostContentClient 전달)
+│   │   │       ├── AdjacentPosts.tsx # 이전/다음 글 네비게이션
+│   │   │       └── loading.tsx     # 글 상세 로딩 UI
+│   │   └── series/
+│   │       ├── page.tsx        # 시리즈 목록 (최근 발행 순)
+│   │       └── [name]/page.tsx # 시리즈 상세 (1편부터 순서대로)
 │   ├── api/
 │   │   ├── notion-image/       # Notion S3 이미지 프록시 (signed URL 만료 우회)
 │   │   ├── posts/              # 무한 스크롤용 포스트 목록 API
 │   │   └── revalidate/         # ISR 캐시 수동 무효화 API
-│   ├── posts/[slug]/
-│   │   ├── page.tsx            # 글 상세
-│   │   ├── PostContent.tsx     # 본문 서버 컴포넌트 (fetch → PostContentClient 전달)
-│   │   ├── AdjacentPosts.tsx   # 이전/다음 글 네비게이션
-│   │   └── loading.tsx         # 글 상세 로딩 UI
-│   ├── series/
-│   │   ├── page.tsx            # 시리즈 목록 (최근 발행 순)
-│   │   └── [name]/page.tsx     # 시리즈 상세 (1편부터 순서대로)
 │   ├── robots.ts               # robots.txt 생성
 │   └── sitemap.ts              # sitemap.xml 생성
 ├── lib/
 │   ├── config.ts               # 전역 설정 (CORE_TAGS, HOME_HERO 문구 등)
 │   ├── listOrigin.ts           # 글을 연 목록(전체/시리즈) 기억 — sessionStorage, 돌아가기 버튼용
+│   ├── postList.ts             # 글 목록 주소(postListHref → /posts?tag=…) — 태그·검색·돌아가기·헤더 홈 아이콘이 사용
 │   ├── motion.ts               # 애니메이션 헬퍼 — 등장 순번(staggerStyle), motion 토큰 길이 읽기(readMotionMs)
 │   ├── toc.ts                  # 마크다운 헤딩 추출 + rehype slug 플러그인
 │   ├── notion/
@@ -57,13 +62,17 @@ src/
 │   └── services/
 │       └── post.service.ts     # 비즈니스 로직 (repository 조합, React.cache로 중복 방지)
 ├── components/                 # UI 컴포넌트 (각 파일 상단 주석 필수)
-│   ├── Header.tsx              # 전역 헤더 (블로그 제목, 검색, 홈 아이콘, 다크모드 토글)
+│   ├── Header.tsx              # 전역 헤더 (블로그 제목 → 인트로, 검색, 홈 아이콘 → 글 목록 위치, 다크모드 토글)
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
-│   ├── HomeHero.tsx            # 홈 히어로(랜딩) — 캐치프레이즈 어절 순차 등장 + 키워드 밑줄 그리기, 검색 결과 화면에서만 숨김
+│   ├── HomeHero.tsx            # 글 목록 위 히어로 — 캐치프레이즈 어절 순차 등장 + 키워드 밑줄, 검색 결과 화면에서만 숨김
+│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 캐치프레이즈 타이핑 + 키워드 밑줄 + 글 목록 버튼 + 아래 화살표 힌트
+│   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 밑줄
+│   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → fade out이 끝나면(transitionend) /posts로 이동, Context로 시작 함수 제공
+│   ├── IntroEnterLink.tsx      # 인트로의 "들어가기" 링크(accent 밑줄 텍스트) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
 │   ├── Reveal.tsx              # 스크롤 등장 래퍼 — 화면 아래 요소만 숨겼다가 들어오면 나타남 (IntersectionObserver 공유)
-│   ├── HomeIntroMarker.tsx     # 홈을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
+│   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
 │   ├── SeriesShelf.tsx         # 홈 태그 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover 시 화살표·제목이 옆으로 살짝 이동)
 │   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
 │   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침 — 펼치기/접기 애니메이션)
@@ -141,8 +150,9 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 (운영 환경에서만)
 ---
 
 ## 캐싱 전략
-- 글 목록 페이지(`page.tsx`): `searchParams` 사용으로 dynamic 렌더링 — 캐싱 없음
-- 글 상세 페이지(`posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 최신 `STATIC_BUILD_POST_LIMIT`(`lib/config.ts`, 현재 20)개만 빌드 시 정적 생성, 나머지는 `dynamicParams`(기본값)로 첫 방문 시 생성 후 캐싱
+- 홈 인트로(`app/page.tsx`): 데이터를 읽지 않아 정적(Static). 예전 주소 `/?tag=`·`/?q=`는 `next.config.ts` redirects가 `/posts`로 보냄 (페이지에서 searchParams를 읽으면 dynamic이 되므로)
+- 글 목록 페이지(`(site)/posts/page.tsx`): `searchParams` 사용으로 dynamic 렌더링 — 캐싱 없음
+- 글 상세 페이지(`(site)/posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 최신 `STATIC_BUILD_POST_LIMIT`(`lib/config.ts`, 현재 20)개만 빌드 시 정적 생성, 나머지는 `dynamicParams`(기본값)로 첫 방문 시 생성 후 캐싱
   - 전체를 다 빌드하면 포스트마다 Notion 블록 트리를 병렬로 가져오는 구조라 글이 쌓일수록 빌드 중 Notion rate limit(429)에 걸림 — 이를 피하기 위한 제한
 - 포스트 데이터: `post.service.ts`의 `unstable_cache`로 캐싱 (글 상세 2시간)
 - 시리즈: Notion `Series`(select) 속성 기반. 전체 글 목록을 `unstable_cache`(2시간, `post` 태그)로 캐싱한 뒤 메모리에서 묶음 — Notion 추가 호출 없음
@@ -210,6 +220,10 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-base")`로 토큰을 읽는다
   - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. delay는 animation 단축 속성 안에 들어 있다
   - 스크롤 등장은 `Reveal` + globals.css의 `[data-reveal]`
-  - 홈(`[data-intro]` 컨테이너)의 등장·스크롤 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 홈 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 전부 끈다
+  - 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 순번 단위가 같아서 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
+  - 반복 애니메이션은 `animate-nudge-down`(인트로 아래 화살표). reduced-motion 규칙에 `animation-iteration-count: 1`을 더해 반복도 멈춤
+  - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장·스크롤 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 인트로에서 넘어올 때도 재생돼 fade in 역할을 한다. 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 전부 끈다
+- 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐
+  - 헤더·푸터가 필요한 새 페이지는 `app/(site)/` 아래에 만든다 (그룹 밖이면 헤더가 안 붙음)
 - Notion 콜아웃 9색은 globals.css의 `.notion-callout[data-color]`에서 3톤(기본/accent/warning)으로 매핑한다
 - 폰트: Pretendard Variable(jsDelivr npm), Maru Buri(`fonts-archive/MaruBuri`) 모두 `layout.tsx`의 `<head>`에 `<link rel="stylesheet">`로 로드. **next/font 미사용** — font import 추가/제거 시 `.next` 캐시 삭제 필요 없음

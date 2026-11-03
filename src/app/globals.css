@@ -38,6 +38,8 @@ h1, h2, h3, h4, h5, h6 {
     transition-delay: 0ms !important;
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;
+    /* 반복 애니메이션(인트로 아래 화살표 등)이 0.01ms 간격으로 끝없이 돌며 깜빡이지 않게 한 번만 */
+    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
 }
@@ -49,6 +51,7 @@ h1, h2, h3, h4, h5, h6 {
    - duration은 매핑 없이 duration-(--motion-fast) / duration-(--motion-base) 문법으로 참조
    - animate-fade-up    → 아래 8px에서 떠오르며 나타남 (등장 효과 공통)
    - animate-underline-draw → 밑줄이 왼쪽에서 오른쪽으로 그어짐 (scaleX, 요소에 origin-left 필요)
+   - animate-nudge-down → 살짝 내려갔다 돌아오기를 반복 ("아래에 더 있음" 힌트, 길이는 --motion-base에서 파생)
    순차 등장: 요소에 --i(순번, lib/motion.ts의 staggerStyle)를 주면 순번 × --stagger-step만큼 늦게 시작
    (delay를 별도 유틸리티로 두면 animation 단축 속성이 delay를 0으로 덮어써서 순서에 따라 깨지므로 단축 속성 안에 넣음)
    animation-fill-mode both: delay 동안엔 시작 상태로 숨어 있다가, 끝나면 최종 상태 유지 */
@@ -64,6 +67,7 @@ h1, h2, h3, h4, h5, h6 {
 
   --animate-fade-up: fade-up var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
   --animate-underline-draw: underline-draw var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
+  --animate-nudge-down: nudge-down calc(var(--motion-base) * 8) var(--motion-ease) infinite;
 
   @keyframes fade-up {
     from { opacity: 0; transform: translateY(8px); }
@@ -73,6 +77,49 @@ h1, h2, h3, h4, h5, h6 {
     from { transform: scaleX(0); }
     to   { transform: scaleX(1); }
   }
+  @keyframes nudge-down {
+    0%, 60%, 100% { transform: none; }
+    30%           { transform: translateY(4px); }
+  }
+}
+
+/* 타이핑 등장 — components/TypingText.tsx. 글자 하나 = 순번(--i) 하나, 간격은 순차 등장과 같은 --stagger-step
+   - 글자: 자기 차례가 되면 바로 나타남 ("탁" 쳐지는 느낌)
+   - 커서(::after): 자기 차례 동안만 보였다가 다음 글자로 넘어감 → 커서가 글자를 따라가는 것처럼 보임
+   - 마지막 글자의 커서는 사라지지 않고 계속 깜빡임
+   주의: "끝난 뒤 상태"를 animation의 forwards(마지막 값 유지)에 맡기지 않음
+     → 끝나는 순간 시간 계산이 반올림되면 브라우저가 처음 값으로 보기도 해서, 커서가 일부 글자에 남는 버그가 있었음
+     → 대신 기본 스타일을 "끝난 뒤 모습"으로 두고, 애니메이션은 시작 전(backwards)·재생 중에만 값을 덮어씀
+   reduced-motion이면 전역 규칙이 길이·지연을 0으로 만들어 전부 바로 보이고, 커서는 남지 않음 */
+.typing-char {
+  position: relative;
+  /* 기본은 보이는 상태, 자기 차례 전(delay 동안)만 backwards로 숨김 */
+  animation: type-wait 1ms linear calc(var(--i, 0) * var(--stagger-step)) backwards;
+}
+.typing-char::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 0.1em;
+  bottom: 0.1em;
+  width: 2px;
+  background: var(--accent);
+  /* 기본은 안 보이는 상태, 재생 중(자기 차례 한 칸 동안)에만 보임 — fill 없음 */
+  opacity: 0;
+  animation: cursor-pass var(--stagger-step) linear calc(var(--i, 0) * var(--stagger-step));
+}
+.typing-char[data-last]::after {
+  animation: cursor-blink calc(var(--motion-base) * 4) steps(1) calc(var(--i, 0) * var(--stagger-step)) infinite;
+}
+@keyframes type-wait {
+  from, to { opacity: 0; }
+}
+@keyframes cursor-pass {
+  from, to { opacity: 1; }
+}
+@keyframes cursor-blink {
+  from { opacity: 1; }
+  50%  { opacity: 0; }
 }
 
 /* 스크롤 등장 — components/Reveal.tsx가 data-reveal 값을 바꾸면 전환은 여기서 처리

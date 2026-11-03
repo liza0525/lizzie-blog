@@ -1,87 +1,20 @@
-// 홈 페이지 — 히어로(랜딩) + 시리즈 카드 + 태그 필터 + 글 목록
-// 히어로는 태그를 골라도 계속 보여 주고(태그를 누를 때마다 사라졌다 다시 뜨지 않게), 검색 결과 화면에서만 숨김
-// 등장 애니메이션은 페이지를 새로 불러온 뒤 홈을 처음 볼 때만 (새로고침하면 다시 재생) — HomeIntroMarker + data-intro
-// ListOriginMarker로 "전체 글 목록에서 글을 열었다"는 걸 기록 → 글 상세의 돌아가기 버튼이 이 목록(필터 포함)으로 돌아옴
+// 홈(/) — 헤더·푸터 없는 전체 화면 인트로 전용 페이지
+// (site) route group 밖에 있어서 사이트 공통 레이아웃(헤더·푸터)이 붙지 않음
+// "들어가기" 버튼을 누르면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (IntroStage)
+// 데이터를 읽지 않아서 빌드 때 정적 HTML로 만들어짐 → 첫 화면이 빠름
+// 예전 주소(/?tag=…, /?q=…)는 next.config.ts의 redirects가 /posts로 보냄
 
-import React, { Suspense } from "react";
-import { getPostPage, getAllTags, searchPosts, getAllSeries } from "@/lib/services/post.service";
-import TagFilter from "@/components/TagFilter";
-import PostGrid from "@/components/PostGrid";
-import SeriesShelf from "@/components/SeriesShelf";
-import ListOriginMarker from "@/components/ListOriginMarker";
-import HomeHero from "@/components/HomeHero";
-import HomeIntroMarker from "@/components/HomeIntroMarker";
+import React from "react";
+import IntroStage from "@/components/IntroStage";
+import HomeIntro from "@/components/HomeIntro";
 import { HOME_HERO } from "@/lib/config";
-import { staggerStyle } from "@/lib/motion";
-import type { PostListPage, Series } from "@/types";
 
-// 홈에 노출할 시리즈 카드 수 — 나머지는 "모든 시리즈 보기"(/series)로
-const HOME_SERIES_LIMIT = 5;
-
-export const revalidate = 3600;
-
-interface HomePageProps {
-  searchParams: Promise<{ tag?: string; q?: string }>;
-}
-
-export default async function HomePage({ searchParams }: HomePageProps): Promise<React.JSX.Element> {
-  const { tag, q } = await searchParams;
-
-  const [firstPage, tags, recentSeries] = await Promise.all([
-    q
-      ? searchPosts(q).then((posts): PostListPage => ({ posts, nextCursor: null, hasMore: false }))
-      : getPostPage({ pageSize: 10, tag }),
-    getAllTags(),
-    q ? Promise.resolve<Series[]>([]) : getAllSeries().then((all) => all.slice(0, HOME_SERIES_LIMIT)),
-  ]);
-
-  // 돌아가기 버튼이 지금 보고 있는 필터·검색 상태 그대로 돌아오도록 현재 URL을 재구성
-  const listParams = new URLSearchParams({ ...(tag ? { tag } : {}), ...(q ? { q } : {}) }).toString();
-  const listHref = listParams ? `/?${listParams}` : "/";
-
-  // 등장 순서: 히어로(어절 → 밑줄 → 소개)와 동시에, 아래쪽은 시리즈 줄 → 태그 바 → 글 목록(첫 화면 부분)이 따로 순서대로
-  //   목록이 히어로가 끝날 때까지 기다리면 첫 화면이 너무 늦게 채워져서 두 줄기를 같이 시작함
-  // 첫 화면 아래 글은 PostGrid 안의 Reveal(스크롤 등장). 뒤로 가기·태그 클릭으로 다시 그려질 땐 data-intro-seen이 붙어 있어 재생되지 않음
-  const showHero = !q;
-
+export default function HomePage(): React.JSX.Element {
   return (
-    <div className="max-w-[900px] mx-auto px-6 py-12" data-intro>
-      <ListOriginMarker href={listHref} label="글 목록" />
-      <HomeIntroMarker listHref={listHref} />
-
-      {showHero && <HomeHero copy={HOME_HERO} />}
-
-      {!q && (
-        <div className="animate-fade-up" style={staggerStyle(0)}>
-          <SeriesShelf series={recentSeries} />
-        </div>
-      )}
-
-      {!q && (
-        <div className="animate-fade-up" style={staggerStyle(1)}>
-          <Suspense>
-            <TagFilter tags={tags} />
-          </Suspense>
-        </div>
-      )}
-
-      {(tag || q) && (
-        <p className="text-sm text-muted mb-6 font-sans">
-          {q && <><span className="font-semibold text-ink">&ldquo;{q}&rdquo;</span>{" "}검색 결과{" "}</>}
-          {tag && <><span className="font-semibold text-ink">{tag}</span>{" "}태그{" "}</>}
-          <span className="text-muted">({firstPage.posts.length}{firstPage.hasMore ? "+" : ""})</span>
-        </p>
-      )}
-
-      <div className="animate-fade-up" style={staggerStyle(2)}>
-        <PostGrid
-          initialPosts={firstPage.posts}
-          initialCursor={firstPage.nextCursor}
-          initialHasMore={firstPage.hasMore}
-          tag={tag}
-          query={q}
-        />
-      </div>
-    </div>
+    <main className="flex-1">
+      <IntroStage>
+        <HomeIntro copy={HOME_HERO} />
+      </IntroStage>
+    </main>
   );
 }
