@@ -1,6 +1,7 @@
 // 포스트 리스트 — 무한 스크롤 지원
 // IntersectionObserver로 스크롤 바닥 감지 → /api/posts로 다음 페이지 fetch
 // 태그 필터/검색어 변경 시 자동으로 처음부터 다시 로드
+// 각 행은 Reveal로 감싸서 화면 아래에서 스크롤로 들어올 때 등장 (무한 스크롤로 추가된 글 포함)
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +10,7 @@ import type { Post, PostListPage } from "@/types";
 import HighlightText from "@/components/HighlightText";
 import FormattedDate from "@/components/FormattedDate";
 import { CORE_TAGS } from "@/lib/config";
+import Reveal from "@/components/Reveal";
 
 interface PostGridProps {
   initialPosts: Post[];
@@ -82,8 +84,8 @@ export default function PostGrid({
     <>
       <div className="divide-y divide-border">
         {posts.map((post) => (
+          <Reveal key={post.id}>
             <Link
-              key={post.id}
               href={`/posts/${encodeURIComponent(post.slug)}`}
               prefetch={false}
               className="group flex items-start gap-5 -mx-4 px-4 py-5 hover:bg-surface transition-colors"
@@ -144,6 +146,7 @@ export default function PostGrid({
                 </div>
               )}
             </Link>
+          </Reveal>
         ))}
       </div>
 

@@ -13,6 +13,13 @@ export interface Post {
   series: string | null;  // 소속 시리즈 이름 (Notion Series select) — 없으면 null
 }
 
+// 홈 히어로(랜딩) 문구 — lib/config.ts의 HOME_HERO에서 관리
+export interface HomeHeroCopy {
+  catchphrase: string;  // 큰 제목 한 줄
+  highlight: string;    // catchphrase 안에서 accent 밑줄을 그을 부분 (catchphrase에 그대로 들어 있어야 함)
+  intro: string;        // 제목 아래 짧은 소개 1~2문장
+}
+
 // 시리즈 — 같은 Series 값을 가진 글 묶음
 // 지금은 Notion select 속성 기반이라 이름이 곧 식별자 (추후 별도 Series DB로 옮겨도 이 타입은 유지)
 export interface Series {

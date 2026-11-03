@@ -1,5 +1,15 @@
 // 블로그 전역 설정
 
+import type { HomeHeroCopy } from "@/types";
+
+// 홈 히어로(랜딩) 문구 — 임시 문구, 확정되면 이 값만 바꾸면 됨
+// highlight는 catchphrase 안에 그대로 들어 있는 부분이어야 밑줄이 그어짐 (없으면 밑줄 없이 표시)
+export const HOME_HERO: HomeHeroCopy = {
+  catchphrase: "만든 이유까지 남기는 개발 기록",
+  highlight: "이유",
+  intro: "백엔드를 중심으로 기획·데이터·콘텐츠를 엮으며 배운 것들을 정리합니다.",
+};
+
 // 최상위 카테고리 태그 — accent-soft 면 태그로 표시 (그 외 태그는 선만 있는 태그)
 // 자주 바꾸는 값이라 코드 대신 env(쉼표 구분)로 관리. 적힌 순서가 홈 태그 바 순서가 된다
 // 클라이언트 컴포넌트(TagFilter, PostGrid)에서도 쓰므로 NEXT_PUBLIC_ — 빌드 시 값이 박히니 바꾸면 재배포 필요

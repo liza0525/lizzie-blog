@@ -27,8 +27,8 @@ Next.js 16 (App Router) + Notion API + Vercel 배포.
 ```
 src/
 ├── app/                        # 라우트 레이어
-│   ├── layout.tsx              # 루트 레이아웃 (CDN 폰트 링크, 메타데이터, Header/Footer)
-│   ├── page.tsx                # 홈 (시리즈 카드 + 글 목록)
+│   ├── layout.tsx              # 루트 레이아웃 (CDN 폰트 링크, 메타데이터, Header/Footer, 홈 애니메이션 1회 재생 인라인 스크립트)
+│   ├── page.tsx                # 홈 (히어로 + 시리즈 카드 + 글 목록)
 │   ├── admin/
 │   │   └── page.tsx            # 캐시 수동 무효화 UI
 │   ├── api/
@@ -46,8 +46,9 @@ src/
 │   ├── robots.ts               # robots.txt 생성
 │   └── sitemap.ts              # sitemap.xml 생성
 ├── lib/
-│   ├── config.ts               # 전역 설정 (CORE_TAGS 등)
+│   ├── config.ts               # 전역 설정 (CORE_TAGS, HOME_HERO 문구 등)
 │   ├── listOrigin.ts           # 글을 연 목록(전체/시리즈) 기억 — sessionStorage, 돌아가기 버튼용
+│   ├── motion.ts               # 애니메이션 헬퍼 — 등장 순번(staggerStyle), motion 토큰 길이 읽기(readMotionMs)
 │   ├── toc.ts                  # 마크다운 헤딩 추출 + rehype slug 플러그인
 │   ├── notion/
 │   │   ├── client.ts           # Notion 클라이언트 초기화
@@ -60,10 +61,13 @@ src/
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
-│   ├── SeriesShelf.tsx         # 홈 태그 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드)
-│   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시
-│   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침)
-│   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
+│   ├── HomeHero.tsx            # 홈 히어로(랜딩) — 캐치프레이즈 어절 순차 등장 + 키워드 밑줄 그리기, 검색 결과 화면에서만 숨김
+│   ├── Reveal.tsx              # 스크롤 등장 래퍼 — 화면 아래 요소만 숨겼다가 들어오면 나타남 (IntersectionObserver 공유)
+│   ├── HomeIntroMarker.tsx     # 홈을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
+│   ├── SeriesShelf.tsx         # 홈 태그 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover 시 화살표·제목이 옆으로 살짝 이동)
+│   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
+│   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침 — 펼치기/접기 애니메이션)
+│   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤, 행마다 Reveal)
 │   ├── PostContentClient.tsx   # 포스트 본문 렌더러 (client) — PostContent(server)에서 분리
 │   ├── ZoomableImage.tsx       # 본문 이미지 (높이 70vh 제한) + 클릭 확대 라이트박스
 │   ├── HighlightText.tsx       # 검색어 하이라이팅
@@ -199,6 +203,13 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
 ### 이 프로젝트 메모
 - `src/app/globals.css`가 `design-system/tokens.css`만 import한다. 토큰 값을 globals.css에 복사하지 않는다
 - `components.css`는 import하지 않는다 — 그 안의 `.prose` 정의가 `@tailwindcss/typography`의 `.prose`와 겹친다. 태그·입력창 등은 같은 토큰으로 Tailwind 유틸리티를 써서 맞춘다 (`rounded-box`, `bg-accent-soft`, `border-input` …)
-- `base.css`도 import하지 않는다(Tailwind Preflight와 겹침). 필요한 것(`word-break: keep-all`, 제목 자간, `:focus-visible`, `::selection`)만 globals.css에 옮겨 둠
+- `base.css`도 import하지 않는다(Tailwind Preflight와 겹침). 필요한 것(`word-break: keep-all`, 제목 자간, `:focus-visible`, `::selection`, `prefers-reduced-motion`)만 globals.css에 옮겨 둠
+  - reduced-motion 규칙에는 `animation-delay`/`transition-delay` 리셋을 더했다 (stagger 등장이 delay 동안 투명하게 남지 않도록)
+- motion 토큰은 tokens.css의 `@theme`에 매핑이 없어서 globals.css에서 연결한다: `ease-motion`, `animate-fade-up`, `animate-underline-draw`. duration은 `duration-(--motion-base)` 문법으로 참조
+  - duration·ease를 안 쓴 `transition-*`(transition-colors 등)의 기본값도 토큰(`--motion-fast`, `--motion-ease`)으로 바꿔 뒀다. `duration-200`처럼 숫자를 직접 쓰지 않는다
+  - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-base")`로 토큰을 읽는다
+  - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. delay는 animation 단축 속성 안에 들어 있다
+  - 스크롤 등장은 `Reveal` + globals.css의 `[data-reveal]`
+  - 홈(`[data-intro]` 컨테이너)의 등장·스크롤 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 홈 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 전부 끈다
 - Notion 콜아웃 9색은 globals.css의 `.notion-callout[data-color]`에서 3톤(기본/accent/warning)으로 매핑한다
 - 폰트: Pretendard Variable(jsDelivr npm), Maru Buri(`fonts-archive/MaruBuri`) 모두 `layout.tsx`의 `<head>`에 `<link rel="stylesheet">`로 로드. **next/font 미사용** — font import 추가/제거 시 `.next` 캐시 삭제 필요 없음

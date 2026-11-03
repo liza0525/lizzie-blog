@@ -30,6 +30,77 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
 }
 
+/* OS의 "동작 줄이기" 설정 존중 — base.css 규칙에 delay 리셋을 더함
+   (stagger 등장은 animation-delay 동안 시작 상태(투명)로 머무르므로, delay를 남겨 두면 그만큼 안 보임) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Motion ──────────────────────────────────────────────
+   design-system tokens.css의 @theme에 motion 매핑이 아직 없어서 여기서 연결 (값은 var()로만 참조)
+   - ease-motion        → transition-timing-function: --motion-ease
+   - duration·ease를 따로 안 쓴 transition-* 유틸리티(transition-colors 등)의 기본값도 토큰(--motion-fast, --motion-ease)으로
+   - duration은 매핑 없이 duration-(--motion-fast) / duration-(--motion-base) 문법으로 참조
+   - animate-fade-up    → 아래 8px에서 떠오르며 나타남 (등장 효과 공통)
+   - animate-underline-draw → 밑줄이 왼쪽에서 오른쪽으로 그어짐 (scaleX, 요소에 origin-left 필요)
+   순차 등장: 요소에 --i(순번, lib/motion.ts의 staggerStyle)를 주면 순번 × --stagger-step만큼 늦게 시작
+   (delay를 별도 유틸리티로 두면 animation 단축 속성이 delay를 0으로 덮어써서 순서에 따라 깨지므로 단축 속성 안에 넣음)
+   animation-fill-mode both: delay 동안엔 시작 상태로 숨어 있다가, 끝나면 최종 상태 유지 */
+:root {
+  /* 순차 등장 간격 — 새 값을 만들지 않고 --motion-fast의 절반(75ms)에서 파생 */
+  --stagger-step: calc(var(--motion-fast) / 2);
+}
+
+@theme inline {
+  --ease-motion: var(--motion-ease);
+  --default-transition-duration: var(--motion-fast);
+  --default-transition-timing-function: var(--motion-ease);
+
+  --animate-fade-up: fade-up var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
+  --animate-underline-draw: underline-draw var(--motion-base) var(--motion-ease) calc(var(--i, 0) * var(--stagger-step)) both;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes underline-draw {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+}
+
+/* 스크롤 등장 — components/Reveal.tsx가 data-reveal 값을 바꾸면 전환은 여기서 처리
+   pending은 JS가 "화면 아래에 있는 요소"에만 붙이므로, JS가 없거나 첫 화면 안의 요소는 숨겨지지 않음 */
+[data-reveal] {
+  transition:
+    opacity var(--motion-base) var(--motion-ease),
+    transform var(--motion-base) var(--motion-ease);
+  transition-delay: calc(var(--i, 0) * var(--stagger-step));
+}
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* 홈 등장 애니메이션은 페이지를 새로 불러온 뒤 처음 볼 때만 — 홈 안에서 이동하거나 홈을 떠나면 HomeIntroMarker가
+   <html data-intro-seen>을 붙여 이후엔 전부 최종 상태로 바로 보임. 새로고침하면 <html>이 새로 만들어져 다시 재생
+   [data-intro]는 홈 컨테이너. 스크롤 등장(Reveal)도 같은 스위치로 끔 */
+html[data-intro-seen] [data-intro] *,
+html[data-intro-seen] [data-intro] *::after {
+  animation: none !important;
+}
+html[data-intro-seen] [data-intro] [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -153,7 +224,7 @@ body {
   border-left: 0.5em solid currentColor;
   border-top: 0.3em solid transparent;
   border-bottom: 0.3em solid transparent;
-  transition: transform 0.15s;
+  transition: transform var(--motion-fast) var(--motion-ease);
 }
 .prose details[open] > summary::before {
   transform: rotate(90deg);
