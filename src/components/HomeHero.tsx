@@ -2,10 +2,13 @@
 // 문구는 lib/config.ts의 HOME_HERO에서 관리 (홈 인트로와 같은 문구)
 // highlight 부분은 새벽빛 형광펜 띠(globals.css .highlight-mark — 모서리 없는 직사각형, 글자 높이의 75%). 인트로와 달리 긋는 애니메이션 없이 처음부터 칠해져 있음
 // 등장은 투명도만 바뀌는 fade (제목 → 소개). 디자인 시스템 0.1.0에서 위치 이동·순차로 떠오르는 효과는 쓰지 않음
+// 배경: 인트로와 같은 새벽 바다 일러스트(FirstLightBackground)를 화면 폭 끝까지 깔고, 아래쪽은 페이지 배경으로 옅어짐. 움직임은 없음
+//   글 목록 컨테이너(900px) 안에 있지만 배경만 화면 폭으로 넓힘. 스크롤바 자리(scrollbar-gutter)는 덮지 못해서 양옆에 좁은 띠가 남을 수 있음
 
 import React from "react";
 import type { HomeHeroCopy } from "@/types";
 import { staggerStyle } from "@/lib/motion";
+import FirstLightBackground from "./FirstLightBackground";
 
 interface HomeHeroProps {
   copy: HomeHeroCopy;
@@ -23,8 +26,15 @@ export default function HomeHero({ copy }: HomeHeroProps): React.JSX.Element {
   const parts = splitHighlight(copy.catchphrase, copy.highlight);
 
   return (
-    <section className="pt-6 pb-14 sm:pt-12 sm:pb-20">
-      <h1 className="text-display font-bold tracking-tight text-ink animate-fade-in" style={staggerStyle(0)}>
+    <section className="relative pt-6 pb-14 sm:pt-12 sm:pb-20">
+      {/* 배경 상자: 히어로 칸 + 위쪽으로 목록 컨테이너의 위 여백(py-12 = 3rem, posts/page.tsx)만큼 → 헤더 바로 아래부터 시작
+          w-screen + left-1/2 + -translate-x-1/2: 900px 컨테이너 가운데를 기준으로 화면 폭만큼 양옆으로 넓힘 (넘치는 부분은 body의 overflow-x: hidden이 자름) */}
+      <div className="pointer-events-none absolute -top-12 bottom-0 left-1/2 w-screen -translate-x-1/2" aria-hidden="true">
+        <FirstLightBackground variant="hero" />
+      </div>
+
+      {/* relative: 배경(absolute) 위로 올리기 — position이 없는 요소는 absolute 요소보다 먼저(아래에) 그려짐 */}
+      <h1 className="relative text-display font-bold tracking-tight text-ink animate-fade-in" style={staggerStyle(0)}>
         {parts ? (
           <>
             {parts[0]}
@@ -35,7 +45,7 @@ export default function HomeHero({ copy }: HomeHeroProps): React.JSX.Element {
           copy.catchphrase
         )}
       </h1>
-      <p className="mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(2)}>
+      <p className="relative mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(2)}>
         {copy.intro}
       </p>
     </section>

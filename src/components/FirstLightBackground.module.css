@@ -1,0 +1,160 @@
+/* First Light — FirstLightBackground.tsx의 색·움직임 (원본: design-system 레포 experiments/first-light-2)
+   원본 first-light.css(색) + first-light-motion.css(움직임)를 한 파일로 합침. 값은 원본 그대로
+   - 원본의 id 선택자(#sun, #fog-back-layer …)는 클래스로 바꿈 — 컴포넌트가 id를 useId()로 매번 다르게 만들기 때문
+   - CSS Module이라 클래스·keyframes 이름이 이 파일 안에서만 유효함 → .fog, .sun 같은 짧은 이름이 다른 곳과 겹치지 않음
+   - 색은 역할 토큰(--bg --surface --accent --accent-soft --sunrise)을 color-mix로 섞어서만 만든다 → light-dark() 토큰이라 테마(<html> .dark/.light)를 따라감
+   - 장식용 무한 반복은 디자인 시스템 0.1.0 규칙 밖 (의도된 예외, DESIGN_LOG.md) */
+
+/* ─── 자리 — 부모(position: relative) 상자를 꽉 채우는 배경. 글을 가리지 않게 클릭도 통과 ─── */
+.first-light {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* 안개·산 밑동 색: 배경과 면 중 밝은 쪽 (라이트 --bg, 다크 --surface) → 어느 테마든 하얗게 낀 안개 */
+  --fog-color: light-dark(var(--bg), var(--surface));
+  background: var(--bg);
+}
+
+/* 전체 화면 배경 양옆의 띠 없애기
+   globals.css의 html { scrollbar-gutter: stable both-edges }가 스크롤바가 없어도 양쪽에 자리를 비워 두는데,
+   그 자리는 배경이 못 덮어서(position: fixed여도 마찬가지 — 디자인 시스템 "떠 있는 층") 페이지 배경색 띠로 보임
+   → 홈 인트로(variant="intro")가 있는 페이지에서만 그 자리를 없앰. 인트로는 스크롤 없는 한 장이라 비워 둘 이유가 없음
+   :global(html) — CSS Module은 모든 선택자를 이 파일 클래스로 묶으려 해서, 바깥 요소인 html은 :global로 빼냄
+   글 목록 히어로(variant="hero")에는 걸지 않음 — 스크롤되는 페이지라 자리를 없애면 스크롤바가 생기고 없어질 때마다 레이아웃이 흔들림 */
+:global(html):has(.intro) {
+  scrollbar-gutter: auto;
+}
+
+/* 글 목록 히어로 — 아래쪽 45%가 투명해지며 페이지 배경(--bg)으로 이어짐
+   mask-image: 검정인 곳은 보이고 투명한 곳은 안 보임 → 색을 덧칠하지 않고 그림 자체를 옅게 함 */
+.hero {
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+
+/* ─── 하늘 — 위는 서늘한 새벽 파랑이 아주 조금, 수평선 쪽으로 새벽빛이 스밈 ─── */
+.sky-stop-top     { stop-color: color-mix(in oklab, var(--accent-soft) 45%, var(--bg)); }
+.sky-stop-mid     { stop-color: var(--bg); }
+.sky-stop-horizon { stop-color: color-mix(in oklab, var(--sunrise) 20%, var(--bg)); }
+
+/* ─── 빛 번짐 ─── */
+.glow-stop-core { stop-color: var(--sunrise); stop-opacity: 0.45; }
+.glow-stop-mid  { stop-color: var(--sunrise); stop-opacity: 0.14; }
+.glow-stop-edge { stop-color: var(--sunrise); stop-opacity: 0; }
+
+/* ─── 해 — 라이트는 안개에 가려 옅은 복숭아빛, 다크는 어두운 바탕이라 새벽빛 그대로 ─── */
+.sun {
+  fill: light-dark(color-mix(in oklab, var(--sunrise) 55%, var(--bg)), var(--sunrise));
+}
+
+/* ─── 산 — 멀수록 새벽빛이 섞인 옅은 색, 가까울수록 바다 파랑에 가까움 (공기 원근) ─── */
+.mountain-far-stop-top  { stop-color: color-mix(in oklab, var(--sunrise) 18%, var(--surface)); }
+.mountain-mid-stop-top  { stop-color: color-mix(in oklab, var(--accent) 16%, var(--surface)); }
+.mountain-near-stop-top { stop-color: color-mix(in oklab, var(--accent) 30%, var(--surface)); }
+.mountain-stop-base     { stop-color: var(--fog-color); }
+
+/* ─── 바다 ─── */
+.ocean-stop-near { stop-color: color-mix(in oklab, var(--accent-soft) 60%, var(--surface)); }
+.ocean-stop-deep { stop-color: color-mix(in oklab, var(--accent) 22%, var(--accent-soft)); }
+.ocean-swell     { fill: color-mix(in oklab, var(--accent) 10%, var(--accent-soft)); opacity: 0.5; }
+.ocean-lines     { fill: var(--fog-color); opacity: 0.5; }
+
+/* ─── 수평선 — 파란 선이 아니라 해 아래만 빛을 받는 이음매 ─── */
+.horizon-stop-edge { stop-color: var(--sunrise); stop-opacity: 0; }
+.horizon-stop-core { stop-color: var(--sunrise); stop-opacity: 0.6; }
+
+/* ─── 물빛 반사 (줄마다 opacity는 SVG에 있음) ─── */
+.reflection-layer { fill: var(--sunrise); }
+
+/* ─── 안개 ─── */
+.fog { fill: var(--fog-color); }
+.fog-back-layer  { opacity: 0.55; }
+.fog-front-layer { opacity: 0.7; }
+
+/* ─── 움직임 (원본 first-light-motion.css) ───
+   - 전부 CSS keyframes, JS 없음. 움직이는 값은 transform만 (opacity를 쓰는 건 빛 번짐 하나)
+   - 모든 움직임은 alternate(갔다가 그대로 돌아옴) + ease-in-out → 반복 이음매가 없음
+   - 레이어마다 길이(5~13s)와 시작 시점(음수 delay)을 다르게 해서 같이 움직이지 않음
+     (장면 고유의 느린 호흡이라 --motion-* 토큰으로 바꾸지 않음 — 토큰은 상태 변화·로딩용)
+   - 홈 인트로(.intro)에서만 움직임. 글 목록 히어로(.hero)는 위의 정적 장면 그대로
+   - 동작 줄이기를 켜면 이 블록 전체가 적용되지 않음 → 위의 정적 장면이 대체 화면
+     (globals.css의 reduced-motion 전역 규칙과 겹치지 않음 — 애초에 animation이 안 붙음)
+   SVG 요소의 transform 기준점: fill-box(자기 도형 상자) 또는 view-box(viewBox 좌표, px = SVG 좌표 단위) */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* 뒤 안개 — 느리게 옆으로 */
+  .intro .fog-back-layer {
+    animation: fl-drift-back 13s ease-in-out -4s infinite alternate;
+  }
+
+  /* 앞 안개 — 뒤와 반대 방향, 조금 빠르게, 위아래로도 아주 조금 */
+  .intro .fog-front-layer {
+    animation: fl-drift-front 9s ease-in-out -7s infinite alternate;
+  }
+
+  /* 해 — 몇 px 오르내리며 떠오르는 기운만 */
+  .intro .sun {
+    animation: fl-sun 12s ease-in-out -3s infinite alternate;
+  }
+
+  /* 빛 번짐 — 해를 중심으로 조금 커지며 밝아짐 */
+  .intro .sunrise-glow {
+    transform-box: view-box;
+    transform-origin: 1000px 560px;
+    animation: fl-glow 10s ease-in-out -6s infinite alternate;
+  }
+
+  /* 너울 — 두 장이 서로 다른 길이로 좌우 */
+  .intro .ocean-swell:nth-of-type(1) { animation: fl-swell 7s ease-in-out -2s infinite alternate; }
+  .intro .ocean-swell:nth-of-type(2) { animation: fl-swell 9.5s ease-in-out -5s infinite alternate-reverse; }
+  .intro .ocean-lines { animation: fl-lines 11s ease-in-out -1s infinite alternate; }
+
+  /* 물빛 반사 — 묶음은 천천히 좌우, 줄마다 폭이 따로 늘었다 줄어듦 */
+  .intro .reflection-layer { animation: fl-reflection 8s ease-in-out -2s infinite alternate; }
+  .intro .reflection-layer rect {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: fl-shimmer 5s ease-in-out infinite alternate;
+  }
+  .intro .reflection-layer rect:nth-child(2) { animation-duration: 6.5s; animation-delay: -3s; }
+  .intro .reflection-layer rect:nth-child(3) { animation-duration: 5.5s; animation-delay: -1s; }
+  .intro .reflection-layer rect:nth-child(4) { animation-duration: 7s;   animation-delay: -4s; }
+  .intro .reflection-layer rect:nth-child(5) { animation-duration: 6s;   animation-delay: -2s; }
+  .intro .reflection-layer rect:nth-child(6) { animation-duration: 4.5s; animation-delay: -3.5s; }
+
+  /* 산은 움직이지 않음 */
+}
+
+@keyframes fl-drift-back {
+  from { transform: translateX(-40px); }
+  to   { transform: translateX(40px); }
+}
+@keyframes fl-drift-front {
+  from { transform: translate(50px, 2px); }
+  to   { transform: translate(-50px, -3px); }
+}
+@keyframes fl-sun {
+  from { transform: translateY(8px); }
+  to   { transform: translateY(-4px); }
+}
+@keyframes fl-glow {
+  from { opacity: 0.8; transform: scale(0.96); }
+  to   { opacity: 1;   transform: scale(1.04); }
+}
+@keyframes fl-swell {
+  from { transform: translateX(-20px); }
+  to   { transform: translateX(20px); }
+}
+@keyframes fl-lines {
+  from { transform: translateX(-30px); }
+  to   { transform: translateX(30px); }
+}
+@keyframes fl-reflection {
+  from { transform: translateX(-6px); }
+  to   { transform: translateX(6px); }
+}
+@keyframes fl-shimmer {
+  from { transform: scaleX(0.85); }
+  to   { transform: scaleX(1.15); }
+}

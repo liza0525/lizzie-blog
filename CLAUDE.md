@@ -66,8 +66,10 @@ src/
 │   ├── ThemeProvider.tsx       # next-themes ThemeProvider 래퍼
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
-│   ├── HomeHero.tsx            # 글 목록 위 히어로 — 브랜드 헤드라인(새벽빛 강조) + 소개, 검색 결과 화면에서만 숨김
-│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 가운데 아래 "아래로 스크롤"
+│   ├── HomeHero.tsx            # 글 목록 위 히어로 — 브랜드 헤드라인(새벽빛 강조) + 소개 + 배경 First Light(정적, 아래쪽 옅어짐), 검색 결과 화면에서만 숨김
+│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 가운데 아래 "아래로 스크롤", 배경 First Light
+│   ├── FirstLightBackground.tsx        # 인트로 배경 일러스트 "First Light"(해무 낀 새벽 바다) — inline SVG, aria-hidden, id는 useId()로 인스턴스마다 다르게. variant intro(움직임)/hero(정적)
+│   ├── FirstLightBackground.module.css # 그 색·움직임(원본 first-light.css + first-light-motion.css), 움직임·html scrollbar-gutter: auto는 intro에서만
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 밑줄
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → fade out이 끝나면(transitionend) /posts로 이동, Context로 시작 함수 제공
 │   ├── IntroEnterLink.tsx      # 인트로의 "아래로 스크롤" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
