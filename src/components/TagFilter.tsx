@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CORE_TAGS } from "@/lib/config";
+import { postListHref } from "@/lib/postList";
 import type React from "react";
 
 interface Tag {
@@ -40,7 +41,7 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
   const hiddenCount = otherTags.length - (pinnedActiveTag ? 1 : 0);
 
   function handleClick(name: string): void {
-    router.push(activeTag === name ? "/" : `/?tag=${encodeURIComponent(name)}`);
+    router.push(activeTag === name ? postListHref() : postListHref({ tag: name }));
   }
 
   function itemClass(name: string): string {
@@ -56,7 +57,7 @@ export default function TagFilter({ tags }: TagFilterProps): React.JSX.Element {
       {/* 1줄: 전체 + 코어 태그 + 토글 — 토글이 항상 코어 태그 바로 뒤에 있어 펼쳐도 위치가 바뀌지 않음 */}
       <div className="flex flex-wrap items-center gap-1.5">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push(postListHref())}
           className={`text-sm font-sans transition-colors px-3 py-1 border-b-2 ${
             !activeTag
               ? "text-ink font-semibold border-accent"

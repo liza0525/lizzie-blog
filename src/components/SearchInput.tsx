@@ -4,6 +4,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { postListHref } from "@/lib/postList";
 
 export default function SearchInput() {
   const router = useRouter();
@@ -18,11 +19,8 @@ export default function SearchInput() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = value.trim();
-    if (trimmed) {
-      router.push(`/?q=${encodeURIComponent(trimmed)}`);
-    } else {
-      router.push("/");
-    }
+    // 검색 결과는 글 목록(/posts)에 나옴 — 홈(/)은 인트로 전용
+    router.push(trimmed ? postListHref({ q: trimmed }) : postListHref());
   }
 
   return (

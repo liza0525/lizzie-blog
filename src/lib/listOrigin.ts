@@ -4,15 +4,17 @@
 // - 이전/다음 글로 이어서 읽어도 글 상세는 값을 덮어쓰지 않으므로 처음 진입한 목록이 유지됨
 // - URL 쿼리(?from=)로 넘기지 않는 이유: 글 상세는 SSG라 searchParams를 읽으면 매 요청 동적 렌더링으로 바뀜
 
+import { postListHref } from "./postList";
+
 export interface ListOrigin {
-  href: string;   // 돌아갈 경로 (필터·검색어 포함, 예: "/?tag=백엔드", "/series/CS")
+  href: string;   // 돌아갈 경로 (필터·검색어 포함, 예: "/posts?tag=백엔드", "/series/CS")
   label: string;  // 버튼 문구 (예: "글 목록", "CS 시리즈")
 }
 
 const STORAGE_KEY = "blog:list-origin";
 
-// 외부 링크·새 탭으로 바로 들어와 기록이 없을 때의 기본값
-export const DEFAULT_LIST_ORIGIN: ListOrigin = { href: "/", label: "글 목록" };
+// 외부 링크·새 탭으로 바로 들어와 기록이 없을 때의 기본값 — 홈(/)은 인트로라서 글 목록(/posts)으로
+export const DEFAULT_LIST_ORIGIN: ListOrigin = { href: postListHref(), label: "글 목록" };
 
 export function saveListOrigin(origin: ListOrigin): void {
   try {

@@ -31,11 +31,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   return [
+    // 홈(/)은 인트로 전용이라 내용이 거의 안 바뀜 — 새 글이 자주 올라오는 곳은 글 목록(/posts)
     {
       url: SITE_URL,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "monthly",
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/posts`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     {
       url: `${SITE_URL}/series`,
