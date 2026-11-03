@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
@@ -42,14 +41,9 @@ export default function RootLayout({
       </head>
       <GoogleAnalytics />
       <body className="min-h-full flex flex-col">
+        {/* 헤더·푸터는 (site)/layout.tsx에 있음 — 홈 인트로(app/page.tsx)만 헤더 없이 화면 전체를 쓰게 하려고 분리 */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <footer className="border-t border-border mt-16">
-            <div className="max-w-[900px] mx-auto px-6 py-8 text-center text-xs text-muted">
-              © {new Date().getFullYear()} Lizzie
-            </div>
-          </footer>
+          {children}
         </ThemeProvider>
       </body>
     </html>
