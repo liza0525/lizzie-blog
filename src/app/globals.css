@@ -104,32 +104,27 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* 샤이닝 — components/IntroEnterLink.tsx의 "들어가기" 글자 위로 60° 사선 빛이 지나감 (의도된 예외: 로딩 외 반복 애니메이션)
-   - 글자 안쪽만 칠하는 배경(background-clip: text) = 회색(--muted) 바탕에 새벽빛(--sunrise) 사선 띠 하나
-     띠 기울기 60°(가로선 기준) = 그라데이션 진행 방향 120°(띠와 수직, 오른쪽 아래로 30°)
-   - 배경을 글자 폭의 3배로 늘려 두고 위치만 옮김 → 띠가 왼쪽 밖에서 오른쪽 밖으로 지나감
-     (배경 위치 100% = 띠가 글자 왼쪽 밖, 0% = 오른쪽 밖. 기본값 0%라 멈춰 있을 땐 띠가 안 보이고 회색 글자만 보임)
-   - 한 주기 3초 중 앞 0.5초(16.667%) 동안만 지나가고 나머지는 쉼. 첫 빛은 글자가 나타난 직후(순번 지연 + --motion-base)
-   - reduced-motion이면 전역 규칙이 한 번만 0초로 돌려 기본값(띠 없음)에 멈춤
-   - 글자색이 transparent라 hover 색은 color만으로 안 바뀜 → hover·focus 때는 배경을 끄고 accent 글자로 */
-.shine-text {
-  background-image: linear-gradient(120deg, var(--muted) 42%, var(--sunrise) 50%, var(--muted) 58%);
-  background-size: 300% 100%;
-  background-position: 0% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shine-sweep 3s linear calc(var(--i, 0) * var(--stagger-step) + var(--motion-base)) infinite;
+/* 통통 튀는 "아래로 스크롤" — components/IntroEnterLink.tsx (의도된 예외: 디자인 시스템은 로딩 외 무한 반복·위치 이동을 금지. 목표를 지나치지 않아 "바운스 easing" 금지에는 해당 안 함)
+   공이 튀듯 위치가 뒤집힌 포물선(∩)을 그리며 반복: 올라갈 땐 점점 느려지고(감속), 꼭대기에서 잠깐 멈칫, 내려올 땐 점점 빨라짐(가속)
+   - 구간마다 이징을 따로 줌: 0→50% easeOutQuad(위로 감속), 50→100% easeInQuad(아래로 가속) — 두 2차 곡선이 이어져 포물선이 됨
+   - 한 번 튀는 주기는 --motion-loop(1.2s, 시스템의 반복 주기 토큰), 높이는 6px
+   - 첫 바운스는 글자가 나타난 뒤(순번 지연 + --motion-base)부터
+   - reduced-motion이면 전역 규칙이 한 번만 0초로 돌려 제자리에 멈춤 */
+.intro-bounce {
+  animation: intro-bounce var(--motion-loop) linear calc(var(--i, 0) * var(--stagger-step) + var(--motion-base)) infinite;
 }
-.group:hover .shine-text,
-.group:focus-visible .shine-text {
-  background-image: none;
-  color: var(--accent);
-}
-@keyframes shine-sweep {
-  0%   { background-position: 100% 0; }
-  16.667% { background-position: 0% 0; }
-  100% { background-position: 0% 0; }
+@keyframes intro-bounce {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1);
+  }
+  50% {
+    transform: translateY(-6px);
+    animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* 타이핑 등장 — components/TypingText.tsx. 글자 하나 = 순번(--i) 하나, 간격은 순차 등장과 같은 --stagger-step

@@ -67,10 +67,10 @@ src/
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
 │   ├── HomeHero.tsx            # 글 목록 위 히어로 — 브랜드 헤드라인(새벽빛 강조) + 소개, 검색 결과 화면에서만 숨김
-│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 들어가기 링크 + 아래 화살표 힌트
+│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 가운데 아래 "아래로 스크롤"
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 밑줄
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → fade out이 끝나면(transitionend) /posts로 이동, Context로 시작 함수 제공
-│   ├── IntroEnterLink.tsx      # 인트로의 "들어가기" 링크(accent 밑줄 텍스트) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
+│   ├── IntroEnterLink.tsx      # 인트로의 "아래로 스크롤" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
 │   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
 │   ├── SeriesShelf.tsx         # 글 목록 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover는 색 변화만)
 │   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
@@ -224,7 +224,7 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. 끝 상태는 forwards가 아니라 기본 스타일로 둔다(타이핑 커서가 남던 버그)
   - "질문" 강조는 globals.css의 `.highlight-mark`(모서리 없는 직사각형 띠, 글자 높이의 75%, 세로 가운데 — 디자인 시스템 `.mark-sunrise` 대신 쓰는 블로그 전용 모양, 사용자 결정). 인트로는 `.highlight-swipe`를 더해 500ms 동안 왼쪽→오른쪽으로 그어짐. 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
   - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표·커서 깜빡임), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
-  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"들어가기" 샤이닝(3초마다 반복, `.shine-text`)과 인트로 → `/posts` fade(150ms + ease-motion-exit)는 0.1.0 원칙("움직임은 상태 변화에만", "페이지 이동은 fade 없이")과 다르지만 유지한다. 원칙에 맞춘다고 임의로 지우지 않는다
+  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"아래로 스크롤" 바운스(포물선 반복, `.intro-bounce`)과 인트로 → `/posts` fade(150ms + ease-motion-exit)는 0.1.0 원칙("움직임은 상태 변화에만", "로딩 외 무한 반복·위치 이동 금지", "페이지 이동은 fade 없이")과 다르지만 유지한다. 바운스는 overshoot가 없어 시스템의 "바운스 easing" 금지에는 해당하지 않음. 원칙에 맞춘다고 임의로 지우지 않는다
   - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)
   - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장 fade는 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 끈다
 - 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐

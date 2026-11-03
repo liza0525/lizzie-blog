@@ -1,8 +1,8 @@
-// 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "들어가기" 버튼
+// 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "아래로 스크롤" 링크
 // 버튼(또는 휠·스와이프·키보드)으로 넘기면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (전환은 감싸는 IntroStage가 담당)
 // 문구는 lib/config.ts의 HOME_HERO에서 관리. 헤드라인은 디자인 시스템 0.1.0 브랜드 "질문으로 접점을 찾는,"
 // highlight 부분은 새벽빛(sunrise) — 이 화면에서 가장 먼저 읽혀야 할 한 가지
-// 등장 순서: 헤드라인 전체가 한 글자씩 타이핑 → "질문"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 소개 → 들어가기·아래 화살표
+// 등장 순서: 헤드라인 전체가 한 글자씩 타이핑 → "질문"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 소개 → 아래로 스크롤(가운데 아래, 바운스)
 //   전부 CSS 애니메이션 + 같은 순번 단위(--i × --stagger-step)라 JS 없이도 재생되고, 하이드레이션 전 깜빡임이 없음
 
 import React from "react";
@@ -16,7 +16,7 @@ interface HomeIntroProps {
 }
 
 export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
-  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+2, TypingText 안, 500ms ≈ 순번 7칸 동안 칠해짐) → 소개(N+7) → 들어가기·화살표(N+8)
+  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+2, TypingText 안, 500ms ≈ 순번 7칸 동안 칠해짐) → 소개(N+7) → 아래로 스크롤(N+8)
   //   형광펜이 거의 다 그어질 즈음 소개가 나오도록 띄움 (끝까지 기다리면 첫 화면이 늦게 채워짐)
   const typedStep = typingEndStep(copy.catchphrase);
   const introStep = typedStep + 7;
@@ -35,32 +35,10 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
         </p>
       </div>
 
-      {/* 들어가기 — 화면 우측 하단. 본문과 같은 900px 기준선이 아니라 화면 모서리 기준으로 놓아 "다음 장으로 넘기는" 자리처럼 보이게 */}
-      <div className="absolute bottom-10 right-6 sm:bottom-14 sm:right-12 animate-fade-in" style={staggerStyle(actionStep)}>
+      {/* 아래로 스크롤 + ↓ — 화면 가운데 아래. 바깥은 등장(fade), 안쪽 링크는 바운스 — 한 요소에 두 animation을 겹치지 않으려고 나눔
+          가운데 정렬의 -translate-x-1/2는 translate 속성이라 바운스의 transform과 서로 덮어쓰지 않음 */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-fade-in" style={staggerStyle(actionStep)}>
         <IntroEnterLink />
-      </div>
-
-      {/* "아래로 넘기면 된다"는 힌트 — 장식이라 스크린리더에서 숨김 (같은 기능은 위 버튼이 맡음)
-          반복해서 움직이지 않음 — 로딩 외 무한 반복 애니메이션 금지(디자인 시스템 0.1.0) */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-fade-in"
-        style={staggerStyle(actionStep)}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-subtle"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
       </div>
     </section>
   );
