@@ -1,4 +1,4 @@
-// 타이핑 효과 문구 — 글자가 하나씩 쳐지듯 나타나고, 방금 친 글자 뒤에 커서가 따라붙음 (다 치면 커서도 사라짐)
+// 타이핑 효과 문구 — 글자가 하나씩 쳐지듯 나타나고, 방금 친 글자 뒤에 커서가 따라붙음 (다 치면 마지막 글자 뒤에서 커서가 계속 깜빡임)
 // CSS 애니메이션만 사용: 글자마다 순번(--i) × --stagger-step만큼 늦게 나타남 (globals.css의 .typing-char)
 //   → 서버 컴포넌트라 JS·하이드레이션 시점과 상관없이 같은 타이밍. 같은 순번 단위를 쓰므로 뒤따르는 요소도 staggerStyle로 이어 붙이면 됨
 // 글자 span은 inline이라 줄바꿈(word-break: keep-all)은 원문과 똑같이 어절 단위로 일어남 (inline-block이면 글자마다 끊길 수 있음)
@@ -35,8 +35,10 @@ export default function TypingText({ text, highlight }: TypingTextProps): React.
   const range = highlightRange(text, highlight);
 
   function renderChar(char: string, i: number): React.JSX.Element {
+    // 마지막 글자는 커서가 지나간 뒤에도 남아서 깜빡임 (globals.css의 .typing-char-last)
+    const className = i === chars.length - 1 ? "typing-char typing-char-last" : "typing-char";
     return (
-      <span key={i} className="typing-char" style={staggerStyle(i)}>
+      <span key={i} className={className} style={staggerStyle(i)}>
         {char}
       </span>
     );
