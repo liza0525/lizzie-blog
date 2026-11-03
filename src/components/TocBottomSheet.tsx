@@ -9,13 +9,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Heading } from "@/lib/toc";
 import type { SeriesPosition } from "@/types";
 import PostNavigator from "@/components/PostNavigator";
+import { readMotionMs } from "@/lib/motion";
 
 interface TocBottomSheetProps {
   headings: Heading[];
   series: SeriesPosition | null;
 }
-
-const TRANSITION_MS = 300;
 
 export default function TocBottomSheet({ headings, series }: TocBottomSheetProps): React.JSX.Element {
   // 목차가 하나라도 있으면 "목차"(시리즈는 그 안에 함께 표시), 시리즈만 있으면 "시리즈"
@@ -47,7 +46,7 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
   // 슬라이드다운 트랜지션이 끝난 뒤 언마운트
   useEffect(() => {
     if (open || !mounted) return;
-    const timer = setTimeout(() => setMounted(false), TRANSITION_MS);
+    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-base"));
     return () => clearTimeout(timer);
   }, [open, mounted]);
 
@@ -120,7 +119,7 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
             aria-modal="true"
             aria-label={label}
             tabIndex={-1}
-            className={`fixed inset-x-0 bottom-0 z-40 xl:hidden bg-bg border-t border-border shadow-lg max-h-[75vh] overflow-y-auto transition-transform duration-300 ease-out motion-reduce:transition-none ${
+            className={`fixed inset-x-0 bottom-0 z-40 xl:hidden bg-bg border-t border-border shadow-lg max-h-[75vh] overflow-y-auto transition-transform duration-(--motion-base) ease-motion motion-reduce:transition-none ${
               visible ? "translate-y-0" : "translate-y-full"
             }`}
           >

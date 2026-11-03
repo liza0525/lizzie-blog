@@ -6,13 +6,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { readMotionMs } from "@/lib/motion";
 
 interface ZoomableImageProps {
   src: string | undefined;
   alt: string;
 }
-
-const TRANSITION_MS = 200;
 
 export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
@@ -42,7 +41,7 @@ export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.J
   // 페이드아웃 트랜지션이 끝난 뒤 언마운트
   useEffect(() => {
     if (open || !mounted) return;
-    const timer = setTimeout(() => setMounted(false), TRANSITION_MS);
+    const timer = setTimeout(() => setMounted(false), readMotionMs("--motion-base"));
     return () => clearTimeout(timer);
   }, [open, mounted]);
 
@@ -96,7 +95,7 @@ export default function ZoomableImage({ src, alt }: ZoomableImageProps): React.J
             aria-label={alt || "이미지 크게 보기"}
             tabIndex={-1}
             onClick={closeLightbox}
-            className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 p-4 bg-bg cursor-zoom-out outline-none transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+            className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 p-4 bg-bg cursor-zoom-out outline-none transition-opacity duration-(--motion-base) ease-motion motion-reduce:transition-none ${
               visible ? "opacity-100" : "opacity-0"
             }`}
           >
