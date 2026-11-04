@@ -1,12 +1,12 @@
-// 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "아래로 스크롤" 링크
+// 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "Scroll down" 링크
 // 버튼(또는 휠·스와이프·키보드)으로 넘기면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (전환은 감싸는 IntroStage가 담당)
 // 문구는 lib/config.ts의 HOME_HERO에서 관리. 헤드라인은 브랜드 이름 "HAE MU", 그 아래 소개와 만든 사람(크레딧) 한 줄
 // 소개의 introHighlight("Meeting of Worlds")는 새벽빛(sunrise) 형광펜 — 이 화면의 유일한 새벽빛 (사용자 결정, 2026-11-04)
-// 등장 순서: 헤드라인이 한 글자씩 타이핑 → 소개 → "Meeting of Worlds"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 크레딧 → 아래로 스크롤(가운데 아래, 바운스)
+// 등장 순서: 헤드라인이 한 글자씩 타이핑 → 소개 → "Meeting of Worlds"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 크레딧 → Scroll down(가운데 아래, 바운스)
 //   전부 CSS 애니메이션 + 같은 순번 단위(--i × --stagger-step)라 JS 없이도 재생되고, 하이드레이션 전 깜빡임이 없음
 // 배경: 새벽 바다 일러스트(FirstLightBackground)를 화면 전체에 깔고, 글 상자는 relative로 그 위에 올림
 // 목록으로 넘어갈 때 배경·소개·크레딧은 히어로(HomeHero)의 같은 자리로, 헤드라인(HAE MU)은 헤더 로고 자리로 줄어들며 옮겨 감
-//   — vt-intro-* 클래스 (globals.css, IntroStage)
+//   — vt-intro-* 클래스 (globals.css, IntroStage). 직함 줄은 히어로에 없어서 흐려지며 사라짐
 
 import React from "react";
 import type { HomeHeroCopy } from "@/types";
@@ -23,7 +23,7 @@ interface HomeIntroProps {
 export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
   // 순번: 글자 N개(0 ~ N-1) → 한 박자 쉬고 소개(N+2)
   //   → 소개가 다 나타난 뒤(fade --motion-base ≈ 순번 3~4칸) 형광펜(N+6, 500ms ≈ 순번 7칸 동안 칠해짐)
-  //   → 형광펜이 거의 다 그어질 즈음 크레딧(N+11) → 아래로 스크롤(N+12)
+  //   → 형광펜이 거의 다 그어질 즈음 크레딧(N+11) → Scroll down(N+12)
   const typedStep = typingEndStep(copy.catchphrase);
   const introStep = typedStep + 2;
   const highlightStep = typedStep + 6;
@@ -46,16 +46,22 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
         <h1 className="vt-intro-headline w-fit text-display font-bold tracking-tight text-ink">
           <TypingText text={copy.catchphrase} />
         </h1>
-        <p className="vt-intro-copy mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(introStep)}>
+        {/* w-fit: 히어로 소개(굵게)로 옮겨 갈 때 비율대로 맞춰지도록 상자를 글자 폭에 맞춤 (HomeHero) */}
+        <p className="vt-intro-copy mt-1.25 w-fit max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(introStep)}>
           <SunriseHighlight text={copy.intro} highlight={copy.introHighlight} swipeStep={highlightStep} />
         </p>
         {/* 크레딧: 소개보다 두 단계 작은 보조 문구 — sm(14px), 시스템 최소 13px 위 */}
         <p className="vt-intro-credit mt-1.25 text-sm text-muted animate-fade-in" style={staggerStyle(creditStep)}>
           {copy.credit}
         </p>
+        {/* 직함: 크레딧 다음 줄. 히어로에는 없어서 전환 이름을 붙이지 않음 → 목록으로 넘어갈 때 나머지 인트로 화면과 함께 흐려지며 사라짐
+            크레딧과 따로 둬야 크레딧 한 줄만 히어로 자리로 옮겨 감 (한 문단이면 두 줄짜리 사진이 한 줄 자리로 찌그러짐) */}
+        <p className="text-sm text-muted animate-fade-in" style={staggerStyle(creditStep)}>
+          {copy.role}
+        </p>
       </div>
 
-      {/* 아래로 스크롤 + ↓ — 화면 가운데 아래. 바깥은 등장(fade), 안쪽 링크는 바운스 — 한 요소에 두 animation을 겹치지 않으려고 나눔
+      {/* Scroll down + ↓ — 화면 가운데 아래. 바깥은 등장(fade), 안쪽 링크는 바운스 — 한 요소에 두 animation을 겹치지 않으려고 나눔
           가운데 정렬의 -translate-x-1/2는 translate 속성이라 바운스의 transform과 서로 덮어쓰지 않음 */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-fade-in" style={staggerStyle(actionStep)}>
         <IntroEnterLink />

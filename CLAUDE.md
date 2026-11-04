@@ -67,13 +67,13 @@ src/
 │   ├── ThemeToggle.tsx         # 다크/라이트 모드 토글 버튼
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
 │   ├── HomeHero.tsx            # 글 목록 위 히어로 — 소개("Meeting of Worlds" 새벽빛 형광펜, 정적) + 크레딧 + 배경 (제목은 헤더 로고가 대신해 sr-only h1만) First Light(정적, 아래쪽 옅어짐), 검색 결과 화면에서만 숨김
-│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 이름(HAE MU) 타이핑 → 소개("Meeting of Worlds" 형광펜 긋기, 새벽빛) → 크레딧 + 가운데 아래 "아래로 스크롤", 배경 First Light
+│   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 이름(HAE MU) 타이핑 → 소개("Meeting of Worlds" 형광펜 긋기, 새벽빛) → 크레딧 + 가운데 아래 "Scroll down", 배경 First Light
 │   ├── FirstLightBackground.tsx        # 인트로 배경 일러스트 "First Light"(해무 낀 새벽 바다) — 수평으로 겹친 안개 능선 세 겹(Far/Mid/Near, 반투명 푸른 회색 능선)이 주인공, 화면 아래 절반에만. inline SVG, aria-hidden, id는 useId()로 인스턴스마다 다르게. variant intro(움직임)/hero(정적)
 │   ├── FirstLightBackground.module.css # 그 색·움직임 — 안개는 계속 흐름(시차), 해는 한 번 떠오른 뒤 아주 약하게 좌우 흔들림. 움직임·html scrollbar-gutter: auto는 intro에서만
 │   ├── SunriseHighlight.tsx    # 문장 속 한 부분에 새벽빛 형광펜 띠(.highlight-mark) — swipeStep을 주면 그 순번에 그어짐(인트로), 없으면 처음부터 칠함(히어로)
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 마지막 글자 뒤 커서가 계속 깜빡임
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → View Transition으로 /posts 이동(모바일 끌기·끝 튕김은 막음)(배경·소개·크레딧은 히어로로, 제목은 헤더 로고로 줄어들고 목록이 아래에서 올라옴), 미지원 브라우저는 fade out 뒤 이동, Context로 시작 함수 제공
-│   ├── IntroEnterLink.tsx      # 인트로의 "아래로 스크롤" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
+│   ├── IntroEnterLink.tsx      # 인트로의 "Scroll down" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
 │   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
 │   ├── SeriesShelf.tsx         # 글 목록 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover는 색 변화만)
 │   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
@@ -227,14 +227,14 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. 끝 상태는 forwards가 아니라 기본 스타일로 둔다(타이핑 커서가 남던 버그)
   - 소개의 "Meeting of Worlds" 강조(2026-11-04, 이전엔 헤드라인 "질문")는 `SunriseHighlight` + globals.css의 `.highlight-mark`(모서리 없는 직사각형 띠, 글자 높이의 75%, 세로 가운데 — 디자인 시스템 `.mark-sunrise` 대신 쓰는 블로그 전용 모양, 사용자 결정). 인트로는 `.highlight-swipe`를 더해 소개가 나타난 뒤 500ms 동안 왼쪽→오른쪽으로 그어지고, 히어로는 처음부터 칠해져 있음. 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
   - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표 — 커서 깜빡임은 2026-11-04 예외로 복원), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
-  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"아래로 스크롤" 바운스(포물선 반복, `.intro-bounce`)과 인트로 → `/posts` 전환은 0.1.0 원칙("움직임은 상태 변화에만", "로딩 외 무한 반복·위치 이동 금지", "페이지 이동은 fade 없이")과 다르지만 유지한다. 바운스는 overshoot가 없어 시스템의 "바운스 easing" 금지에는 해당하지 않음. 원칙에 맞춘다고 임의로 지우지 않는다
+  - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"Scroll down" 바운스(포물선 반복, `.intro-bounce`)과 인트로 → `/posts` 전환은 0.1.0 원칙("움직임은 상태 변화에만", "로딩 외 무한 반복·위치 이동 금지", "페이지 이동은 fade 없이")과 다르지만 유지한다. 바운스는 overshoot가 없어 시스템의 "바운스 easing" 금지에는 해당하지 않음. 원칙에 맞춘다고 임의로 지우지 않는다
     - 인트로 배경 해무(2026-11-04): 안개 세 겹이 계속 좌우로 흐르고, 해는 처음 한 번 떠오른 뒤(2.4s, `fill-mode: backwards`) ±1px로 좌우 바운스 반복(아래 스크롤 바운스와 같은 easing, 한 번 튀는 데 `--motion-loop`). 길이는 장면 고유 값이라 토큰 대신 숫자(`FirstLightBackground.module.css`)
     - 타이핑 커서 깜빡임(2026-11-04): 다 친 뒤 마지막 글자 뒤 커서가 `--motion-loop`(1.2s) 주기로 계속 깜빡임(`.typing-char-last`, step-end). reduced-motion이면 커서 없음
     - 인트로 → `/posts` 전환(2026-11-04 확장): View Transition으로 배경(`vt-intro-scene`)·소개·크레딧이 히어로 자리로, 헤드라인(`vt-intro-headline`, `w-fit`)은 헤더 로고 자리로 줄어들며 옮겨 가고(1s = `--motion-base`×4, globals.css `--intro-transition`), 나머지 목록은 아래에서 올라오며 fade in(translate 3rem). 배경은 두 전환 사진을 원래 크기로 가운데에 겹치고 상자 밖을 잘라 내며, 배율 차이는 IntroStage가 잰 `--intro-scene-scale`(`firstLightScale` 비율)로 맞춘다(가로 화면은 위아래가 잘려 나가고, 세로 화면은 그림이 실제로 작아짐 — `object-fit: cover`는 디졸브처럼 보여서 바꿈). 이름은 `<html data-intro-transition>` 동안만 붙고, 목록의 순차 등장은 `disableHomeIntro()`로 끈다. View Transition 미지원 브라우저는 예전 fade(150ms + ease-motion-exit) 뒤 이동
     - 인트로 스와이프(2026-11-04): 모바일에서 화면이 손가락을 따라 끌려갔다 튕겨 내려온 뒤 전환돼 덜컹거려서, 인트로 무대는 `touch-action: pinch-zoom`(세로 끌기 막고 확대만 허용), `<html>`은 `[data-intro-stage]`가 있는 동안 `overscroll-behavior: none`. 스와이프 감지는 touchmove로 그대로 동작
   - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)
   - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장 fade는 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 끈다
-- 인트로·히어로 문구(2026-11-04 교체, 사용자 결정): 제목 "HAE MU"(해무 — 배경 일러스트와 같은 이름, 로고라 글자 자체를 대문자로 씀), 소개 "Born from the Meeting of Worlds.", 크레딧 "Created and curated by Lizzie Chung, Curious Maker"(text-sm). 제목은 인트로에만 — 글 목록에선 헤더 로고(`SITE_NAME`)가 대신하고 히어로는 소개+크레딧. 탭 제목 "HAE MU: Lizzie Chung, Curious Maker"(`SITE_TITLE`), 다른 페이지 "%s | HAE MU", 메타 설명은 소개+크레딧(`lib/config.ts`). 크레딧은 대문자로 꾸미지 않음(디자인 시스템 uppercase 금지)
+- 인트로·히어로 문구(2026-11-04 교체, 사용자 결정): 제목 "HAE MU"(해무 — 배경 일러스트와 같은 이름, 로고라 글자 자체를 대문자로 씀), 소개 "Born from the Meeting of Worlds.", 크레딧 "Created and curated by Lizzie Chung"(text-sm) + 다음 줄 직함 "Backend Engineer & Curious Maker"는 인트로에만 — 전환 이름이 없어 넘어갈 때 fade out(크레딧과 다른 문단이어야 크레딧만 히어로로 옮겨 감). 제목은 인트로에만 — 글 목록에선 헤더 로고(`SITE_NAME`)가 대신하고 히어로는 소개(text-xl + font-bold, 인트로는 text-xl 보통 굵기 — 둘 다 `w-fit`이라 전환 때 비율대로 맞춰짐)+크레딧. 탭 제목·메타 설명 모두 "HAE MU: Lizzie Chung"(`SITE_TITLE`·`SITE_DESCRIPTION`), 다른 페이지 탭은 "%s | HAE MU"(`lib/config.ts`). 크레딧은 대문자로 꾸미지 않음(디자인 시스템 uppercase 금지)
 - 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐
   - 헤더·푸터가 필요한 새 페이지는 `app/(site)/` 아래에 만든다 (그룹 밖이면 헤더가 안 붙음)
 - Notion 콜아웃 9색은 globals.css의 `.notion-callout[data-color]`에서 3톤(기본/accent/warning)으로 매핑한다

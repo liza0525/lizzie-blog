@@ -1,4 +1,4 @@
-// 홈 인트로의 "아래로 스크롤" 링크 — 화면 가운데 아래에 "아래로 스크롤" + ↓ 를 한 묶음으로 두고, 통통 튀는 바운스로 "여기서 넘어간다"를 알림
+// 홈 인트로의 "Scroll down" 링크 — 화면 가운데 아래에 "Scroll down" + ↓ 를 한 묶음으로 두고, 통통 튀는 바운스로 "여기서 넘어간다"를 알림
 // 문구대로 휠을 내리거나 위로 스와이프해도 넘어감(IntroStage) — 누르는 것도 같은 전환
 // 누르면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (위치는 HomeIntro가 정함, 바운스는 globals.css의 .intro-bounce)
 // 기본은 /posts로 가는 평범한 링크 → JS가 없어도, 새 탭(Ctrl/⌘+클릭)으로 열어도 그대로 동작
@@ -27,8 +27,8 @@ export default function IntroEnterLink(): React.JSX.Element {
       // 문구와 ↓ 가 같은 링크라 둘 중 어디를 눌러도 넘어가고, 바운스도 함께 튐
       className="intro-bounce flex flex-col items-center gap-1 text-lg leading-none font-semibold tracking-tight font-sans text-muted transition-colors hover:text-accent"
     >
-      아래로 스크롤
-      {/* ↓ 꺾쇠 — 장식이라 스크린리더에서 숨김("아래로 스크롤"이 링크 이름 역할) */}
+      Scroll down
+      {/* ↓ 꺾쇠 — 장식이라 스크린리더에서 숨김("Scroll down"이 링크 이름 역할) */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="20"

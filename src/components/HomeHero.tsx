@@ -1,5 +1,5 @@
 // 글 목록(/posts) 위 히어로 — 짧은 소개 + 만든 사람(크레딧)
-// 문구는 lib/config.ts의 HOME_HERO에서 관리 (홈 인트로와 같은 소개·크레딧). 브랜드 이름(HAE MU)은 헤더 로고가 보여 줘서 여기선 화면에 다시 쓰지 않음
+// 문구는 lib/config.ts의 HOME_HERO에서 관리 (홈 인트로와 같은 소개·크레딧. 직함 줄은 인트로에만). 브랜드 이름(HAE MU)은 헤더 로고가 보여 줘서 여기선 화면에 다시 쓰지 않음
 //   대신 페이지 제목(h1)이 없으면 스크린리더·검색엔진이 페이지 주제를 못 잡아서 h1은 화면에서만 숨겨 둠(sr-only)
 // 소개의 introHighlight는 새벽빛 형광펜(SunriseHighlight). 인트로와 달리 긋는 애니메이션 없이 처음부터 칠해져 있음
 // 등장은 투명도만 바뀌는 fade (제목 → 소개). 디자인 시스템 0.1.0에서 위치 이동·순차로 떠오르는 효과는 쓰지 않음
@@ -28,7 +28,10 @@ export default function HomeHero({ copy }: HomeHeroProps): React.JSX.Element {
 
       {/* relative: 배경(absolute) 위로 올리기 — position이 없는 요소는 absolute 요소보다 먼저(아래에) 그려짐 */}
       <h1 className="sr-only">{copy.catchphrase}</h1>
-      <p className="vt-intro-copy relative max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(0)}>
+      {/* 소개는 인트로와 같은 크기(xl)에 굵게 — 히어로엔 보이는 제목이 없어 이 문장이 첫 줄 (사용자 결정, 2026-11-04: 크기보다 굵기 문제였음)
+          굵은 글씨는 디자인 시스템 제목 규칙대로 700 + 좁은 자간(tracking-tight)
+          w-fit: 상자를 글자 폭에 맞춰야 전환 때 인트로 소개 사진이 굵어진 글자 폭에 비율대로 맞춰짐 */}
+      <p className="vt-intro-copy relative w-fit max-w-reading text-xl font-bold tracking-tight text-muted animate-fade-in" style={staggerStyle(0)}>
         <SunriseHighlight text={copy.intro} highlight={copy.introHighlight} />
       </p>
       <p className="vt-intro-credit relative mt-1.25 text-sm text-muted animate-fade-in" style={staggerStyle(2)}>

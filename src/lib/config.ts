@@ -14,12 +14,13 @@ export const HOME_HERO: HomeHeroCopy = {
   catchphrase: SITE_NAME,
   intro: "Born from the Meeting of Worlds.",
   introHighlight: "Meeting of Worlds",
-  credit: "Created and curated by Lizzie Chung, Curious Maker",
+  credit: "Created and curated by Lizzie Chung",
+  role: "Backend Engineer & Curious Maker",
 };
 
-// 기본 탭 제목·링크 미리보기 제목, 메타 설명(소개 + 크레딧 — 제목과 같은 말이 미리보기에 두 번 나오지 않게)
-export const SITE_TITLE = `${SITE_NAME}: Lizzie Chung, Curious Maker`;
-export const SITE_DESCRIPTION = `${HOME_HERO.intro} ${HOME_HERO.credit}`;
+// 기본 탭 제목·링크 미리보기 제목과 메타 설명 — 둘 다 같은 문구 (사용자 결정, 2026-11-04)
+export const SITE_TITLE = `${SITE_NAME}: Lizzie Chung`;
+export const SITE_DESCRIPTION = SITE_TITLE;
 
 // 최상위 카테고리 태그 — accent-soft 면 태그로 표시 (그 외 태그는 선만 있는 태그)
 // 자주 바꾸는 값이라 코드 대신 env(쉼표 구분)로 관리. 적힌 순서가 홈 태그 바 순서가 된다

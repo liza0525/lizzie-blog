@@ -19,6 +19,7 @@ export interface HomeHeroCopy {
   intro: string;            // 제목 아래 짧은 소개 1~2문장
   introHighlight: string;   // intro 안에서 새벽빛(sunrise) 형광펜을 그을 부분 (intro에 그대로 들어 있어야 함)
   credit: string;           // 소개 아래 만든 사람 한 줄
+  role: string;             // 크레딧 다음 줄 직함 — 첫 화면에서 무슨 일을 하는 사람인지 바로 보이게. 인트로에만 표시
 }
 
 // 시리즈 — 같은 Series 값을 가진 글 묶음

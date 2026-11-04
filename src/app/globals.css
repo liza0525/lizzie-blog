@@ -107,7 +107,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* 통통 튀는 "아래로 스크롤" — components/IntroEnterLink.tsx (의도된 예외: 디자인 시스템은 로딩 외 무한 반복·위치 이동을 금지. 목표를 지나치지 않아 "바운스 easing" 금지에는 해당 안 함)
+/* 통통 튀는 "Scroll down" — components/IntroEnterLink.tsx (의도된 예외: 디자인 시스템은 로딩 외 무한 반복·위치 이동을 금지. 목표를 지나치지 않아 "바운스 easing" 금지에는 해당 안 함)
    공이 튀듯 위치가 뒤집힌 포물선(∩)을 그리며 반복: 올라갈 땐 점점 느려지고(감속), 꼭대기에서 잠깐 멈칫, 내려올 땐 점점 빨라짐(가속)
    - 구간마다 이징을 따로 줌: 0→50% easeOutQuad(위로 감속), 50→100% easeInQuad(아래로 가속) — 두 2차 곡선이 이어져 포물선이 됨
    - 한 번 튀는 주기는 --motion-loop(1.2s, 시스템의 반복 주기 토큰), 높이는 6px
@@ -195,9 +195,9 @@ html:has([data-intro-stage]) {
    브라우저가 이전 화면(인트로)과 새 화면(목록)을 각각 찍고, 같은 이름(view-transition-name)이 붙은 요소끼리 자리·크기를 이어 줌
    - 배경(vt-intro-scene): 화면 전체 → 히어로 띠로 줄어듦 / 소개·크레딧: 화면 가운데 → 히어로 자리로 옮겨 감 (HomeIntro ↔ HomeHero)
    - 헤드라인(HAE MU): 화면 가운데 큰 제목 → 헤더 로고로 줄어듦 (HomeIntro ↔ Header)
-   - 이름 없는 나머지(root): 인트로의 "아래로 스크롤"은 흐려지고, 헤더·시리즈·태그·목록은 아래에서 올라오며 나타남
+   - 이름 없는 나머지(root): 인트로의 "Scroll down"은 흐려지고, 헤더·시리즈·태그·목록은 아래에서 올라오며 나타남
    - 길이는 --intro-transition(--motion-base의 4배, 1s) + ease-motion — 500ms는 넘기자마자 끝나 버려 "천천히 내려가는" 느낌이 없었음(사용자 피드백)
-     사라지는 쪽("아래로 스크롤")은 --motion-fast + ease-motion-exit
+     사라지는 쪽("Scroll down")은 --motion-fast + ease-motion-exit
    이름은 IntroStage가 <html data-intro-transition>을 붙인 동안만 붙임 → 다른 곳에 영향 없음
    reduced-motion이면 IntroStage가 전환 없이 바로 이동 */
 html[data-intro-transition] {
