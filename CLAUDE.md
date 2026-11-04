@@ -68,8 +68,8 @@ src/
 │   ├── SearchInput.tsx         # 제목 검색 입력창 (?q= URL 기반)
 │   ├── HomeHero.tsx            # 글 목록 위 히어로 — 브랜드 헤드라인(새벽빛 강조) + 소개 + 배경 First Light(정적, 아래쪽 옅어짐), 검색 결과 화면에서만 숨김
 │   ├── HomeIntro.tsx           # 홈 전체 화면 인트로(랜딩) — 브랜드 헤드라인 타이핑 → "질문" 형광펜 긋기(새벽빛) + 소개 + 가운데 아래 "아래로 스크롤", 배경 First Light
-│   ├── FirstLightBackground.tsx        # 인트로 배경 일러스트 "First Light"(해무 낀 새벽 바다) — inline SVG, aria-hidden, id는 useId()로 인스턴스마다 다르게. variant intro(움직임)/hero(정적)
-│   ├── FirstLightBackground.module.css # 그 색·움직임(원본 first-light.css + first-light-motion.css), 움직임·html scrollbar-gutter: auto는 intro에서만
+│   ├── FirstLightBackground.tsx        # 인트로 배경 일러스트 "First Light"(해무 낀 새벽 바다) — 수평으로 겹친 안개 능선 세 겹(Far/Mid/Near, 반투명 푸른 회색 능선)이 주인공, 화면 아래 절반에만. inline SVG, aria-hidden, id는 useId()로 인스턴스마다 다르게. variant intro(움직임)/hero(정적)
+│   ├── FirstLightBackground.module.css # 그 색·움직임 — 안개는 계속 흐름(시차), 해는 한 번 떠오른 뒤 아주 약하게 좌우 흔들림. 움직임·html scrollbar-gutter: auto는 intro에서만
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 마지막 글자 뒤 커서가 계속 깜빡임 + "질문" 형광펜
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → View Transition으로 /posts 이동(배경·헤드라인이 히어로로 줄어들고 목록이 아래에서 올라옴), 미지원 브라우저는 fade out 뒤 이동, Context로 시작 함수 제공
 │   ├── IntroEnterLink.tsx      # 인트로의 "아래로 스크롤" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
@@ -227,6 +227,7 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - "질문" 강조는 globals.css의 `.highlight-mark`(모서리 없는 직사각형 띠, 글자 높이의 75%, 세로 가운데 — 디자인 시스템 `.mark-sunrise` 대신 쓰는 블로그 전용 모양, 사용자 결정). 인트로는 `.highlight-swipe`를 더해 500ms 동안 왼쪽→오른쪽으로 그어짐. 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
   - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표 — 커서 깜빡임은 2026-11-04 예외로 복원), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
   - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"아래로 스크롤" 바운스(포물선 반복, `.intro-bounce`)과 인트로 → `/posts` 전환은 0.1.0 원칙("움직임은 상태 변화에만", "로딩 외 무한 반복·위치 이동 금지", "페이지 이동은 fade 없이")과 다르지만 유지한다. 바운스는 overshoot가 없어 시스템의 "바운스 easing" 금지에는 해당하지 않음. 원칙에 맞춘다고 임의로 지우지 않는다
+    - 인트로 배경 해무(2026-11-04): 안개 세 겹이 계속 좌우로 흐르고, 해는 처음 한 번 떠오른 뒤(2.4s, `fill-mode: backwards`) ±1px로 좌우 바운스 반복(아래 스크롤 바운스와 같은 easing, 한 번 튀는 데 `--motion-loop`). 길이는 장면 고유 값이라 토큰 대신 숫자(`FirstLightBackground.module.css`)
     - 타이핑 커서 깜빡임(2026-11-04): 다 친 뒤 마지막 글자 뒤 커서가 `--motion-loop`(1.2s) 주기로 계속 깜빡임(`.typing-char-last`, step-end). reduced-motion이면 커서 없음
     - 인트로 → `/posts` 전환(2026-11-04 확장): View Transition으로 배경(`vt-intro-scene`)·헤드라인·소개가 히어로 자리로 줄어들며 옮겨 가고(1s = `--motion-base`×4, globals.css `--intro-transition`), 나머지 목록은 아래에서 올라오며 fade in(translate 3rem). 배경은 두 전환 사진을 원래 크기로 가운데에 겹치고 상자 밖을 잘라 내며, 배율 차이는 IntroStage가 잰 `--intro-scene-scale`(`firstLightScale` 비율)로 맞춘다(가로 화면은 위아래가 잘려 나가고, 세로 화면은 그림이 실제로 작아짐 — `object-fit: cover`는 디졸브처럼 보여서 바꿈). 이름은 `<html data-intro-transition>` 동안만 붙고, 목록의 순차 등장은 `disableHomeIntro()`로 끈다. View Transition 미지원 브라우저는 예전 fade(150ms + ease-motion-exit) 뒤 이동
   - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)

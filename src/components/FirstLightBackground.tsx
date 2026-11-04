@@ -1,5 +1,6 @@
 // 홈 인트로 배경 일러스트 "First Light" — 해무 낀 새벽 바다 위로 첫 빛이 번지는 장면 (장식이라 스크린리더에서 숨김, 클릭은 통과)
-// 원본: design-system 레포 experiments/first-light-2 (first-light.svg + first-light.css + first-light-motion.css). 모양·색·움직임은 원본 그대로
+// 원본: design-system 레포 experiments/first-light-2. 산을 걷어내고 수평으로 겹친 안개 세 겹(Layered Mist: Far/Mid/Near)이 주인공이 되도록 재해석함
+//   안개는 반투명한 능선으로 겹치되 화면 아래쪽 절반(y ≥ 470)에만 → 위쪽 글자 영역은 하늘만 보임 (안개가 화면 전체를 덮지 않게)
 //   원본은 SVG가 CSS를 xml-stylesheet로 불러오는 별도 문서라 블로그 테마(<html>의 .dark/.light)가 안까지 닿지 않음
 //   → SVG를 페이지에 직접(inline) 넣고, 색·움직임은 FirstLightBackground.module.css에서 칠함 (토큰이 light-dark()라 테마를 그대로 따라감)
 // 부모는 position: relative(또는 absolute)여야 함 — 이 배경이 부모 상자를 꽉 채우고(absolute inset-0), 글 상자는 relative로 그 위에 올림
@@ -24,6 +25,26 @@ export function firstLightScale(width: number, height: number): number {
   return Math.max(width / VIEWBOX_WIDTH, height / VIEWBOX_HEIGHT);
 }
 
+// 안개 능선(윗가장자리) 곡선
+// viewBox보다 양옆으로 200씩 넓게 그림 → 옆으로 흘러가도(최대 ±50) 끝이 화면에 드러나지 않음
+// 세 겹이 서로 겹쳐 앞 겹이 뒤 겹의 아래쪽을 가림 → 수평선(y=610)은 중간 겹 뒤로 숨고, 바다는 가까운 겹 아래로 조금만 비침
+const MIST_CRESTS = {
+  // 먼 능선: 해(x=1000, 중심 y=520) 근처가 y≈522 → 해가 반쯤 잠김
+  far: "M -200 520 C -40 492 120 470 300 482 C 480 494 600 520 760 512 C 900 505 960 520 1060 526 C 1200 534 1320 500 1480 488 C 1620 478 1720 496 1800 504",
+  // 중간 능선: 수평선 위(y 548~596)에서 굴러 수평선을 덮음
+  mid: "M -200 584 C -20 560 160 548 340 560 C 520 572 640 596 820 588 C 960 582 1060 556 1200 552 C 1360 548 1500 574 1640 582 C 1720 586 1770 580 1800 576",
+  // 가까운 능선: 굴곡이 가장 큼 — 바다 위를 덮고 아래 끝으로 갈수록 비침
+  near: "M -200 664 C 0 640 180 628 380 640 C 580 652 720 676 920 668 C 1100 660 1240 632 1420 630 C 1580 628 1700 648 1800 656",
+};
+
+// 띠의 아래 끝(y) — 먼·중간 겹은 다음 겹 뒤까지, 가까운 겹은 화면 끝까지
+const MIST_BASES = { far: 640, mid: 720, near: 900 };
+
+// 능선 곡선 끝에서 아래로 내려가 닫은 띠 모양
+function mistBand(crest: string, baseY: number): string {
+  return `${crest} L 1800 ${baseY} L -200 ${baseY} Z`;
+}
+
 interface FirstLightBackgroundProps {
   variant: FirstLightVariant;
 }
@@ -35,18 +56,17 @@ export default function FirstLightBackground({ variant }: FirstLightBackgroundPr
   const ids = {
     sky: `${uid}sky-gradient`,
     glow: `${uid}glow-gradient`,
-    mountainFar: `${uid}mountain-far-gradient`,
-    mountainMid: `${uid}mountain-mid-gradient`,
-    mountainNear: `${uid}mountain-near-gradient`,
     ocean: `${uid}ocean-gradient`,
-    horizon: `${uid}horizon-gradient`,
-    fogBlur: `${uid}fog-blur`,
+    mistFar: `${uid}mist-far-gradient`,
+    mistMid: `${uid}mist-mid-gradient`,
+    mistNear: `${uid}mist-near-gradient`,
   };
 
   return (
     // 좌표: viewBox 1600×900, 수평선 y=610, 해 x=1000 (세로 화면에서 잘려도 보이도록 가운데에서 조금만 오른쪽)
     // xMidYMid slice: 어느 비율이든 상자를 꽉 채우고, 넘치는 쪽을 가운데 기준으로 자름
-    // 그리는 순서(아래 → 위): 하늘 → 빛 번짐 → 해 → 산 → 뒤 안개 → 바다 → 수평선 → 물빛 반사 → 앞 안개
+    // 그리는 순서(아래 → 위): 하늘 → 빛 번짐 → 해 → 먼 안개 → 바다 → 물빛 반사 → 중간 안개 → 가까운 안개
+    //   (수평선에 따로 빛 선을 긋지 않음 — 하늘과 바다가 만나는 경계만. 반사는 안개에 대부분 가려지지만 바다 장면은 남겨 둠)
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
@@ -68,36 +88,27 @@ export default function FirstLightBackground({ variant }: FirstLightBackgroundPr
           <stop offset="1" className={styles["glow-stop-edge"]} />
         </radialGradient>
 
-        {/* 산마다 아래로 갈수록 안개 색으로 옅어짐 → 능선 사이에 해무가 낀 것처럼 보임 */}
-        <linearGradient id={ids.mountainFar} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" className={styles["mountain-far-stop-top"]} />
-          <stop offset="1" className={styles["mountain-stop-base"]} />
-        </linearGradient>
-        <linearGradient id={ids.mountainMid} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" className={styles["mountain-mid-stop-top"]} />
-          <stop offset="1" className={styles["mountain-stop-base"]} />
-        </linearGradient>
-        <linearGradient id={ids.mountainNear} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0.2" className={styles["mountain-near-stop-top"]} />
-          <stop offset="1" className={styles["mountain-stop-base"]} />
-        </linearGradient>
-
         <linearGradient id={ids.ocean} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" className={styles["ocean-stop-near"]} />
           <stop offset="1" className={styles["ocean-stop-deep"]} />
         </linearGradient>
 
-        {/* 수평선: 해 아래쪽만 빛을 받아 밝아지는 이음매 (가로 그라데이션, 해 위치 x=1000에서 가장 밝음) */}
-        <linearGradient id={ids.horizon} x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0" className={styles["horizon-stop-edge"]} />
-          <stop offset="0.625" className={styles["horizon-stop-core"]} />
-          <stop offset="1" className={styles["horizon-stop-edge"]} />
+        {/* 안개 능선 몸통: 맨 위(rim)는 새벽빛을 받아 밝고, 그 아래는 겹마다 정한 푸른 회색으로 꽉 참
+            가까운 겹만 아래 끝으로 갈수록 옅어져 바다가 조금 비침 */}
+        <linearGradient id={ids.mistFar} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className={styles["mist-far-stop-rim"]} />
+          <stop offset="0.25" className={styles["mist-far-stop-body"]} />
+        </linearGradient>
+        <linearGradient id={ids.mistMid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className={styles["mist-mid-stop-rim"]} />
+          <stop offset="0.25" className={styles["mist-mid-stop-body"]} />
+        </linearGradient>
+        <linearGradient id={ids.mistNear} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className={styles["mist-near-stop-rim"]} />
+          <stop offset="0.25" className={styles["mist-near-stop-body"]} />
+          <stop offset="1" className={styles["mist-near-stop-base"]} />
         </linearGradient>
 
-        {/* 안개 가장자리를 흐리게 하는 필터 하나 — 안개 두 층만 씀 */}
-        <filter id={ids.fogBlur} x="-10%" y="-60%" width="120%" height="220%">
-          <feGaussianBlur stdDeviation="14" />
-        </filter>
       </defs>
 
       <g className={styles["sky-layer"]}>
@@ -108,38 +119,14 @@ export default function FirstLightBackground({ variant }: FirstLightBackgroundPr
         <rect x="0" y="0" width="1600" height="610" fill={`url(#${ids.glow})`} />
       </g>
 
+      {/* 해: 바깥 g는 처음 한 번 떠오름, 안쪽 원은 그 뒤 아주 약하게 좌우로 흔들림 — 두 움직임을 다른 요소에 걸어 transform이 겹치지 않게 함 */}
       <g className={styles["sun-layer"]}>
         <circle className={styles["sun"]} cx="1000" cy="520" r="30" />
       </g>
 
-      <g className={styles["mountain-layer"]}>
-        <path
-          fill={`url(#${ids.mountainFar})`}
-          d="M -40 610 L -40 440 C 20 430 60 400 110 404 C 160 408 200 432 260 440 C 340 450 400 470 480 478 C 560 486 620 470 700 482 C 780 494 860 530 960 548 C 1040 562 1120 560 1200 572 C 1300 586 1400 596 1640 600 L 1640 610 Z"
-        />
-        <path
-          fill={`url(#${ids.mountainMid})`}
-          d="M -40 610 L -40 520 C 40 510 100 486 170 492 C 240 498 290 528 360 534 C 440 540 520 520 600 528 C 680 536 740 562 820 570 C 900 578 980 572 1040 584 C 1100 596 1160 604 1220 610 Z"
-        />
-        <path
-          fill={`url(#${ids.mountainNear})`}
-          d="M -40 610 L -40 572 C 60 566 140 548 220 556 C 300 564 360 586 440 590 C 520 594 600 598 680 610 Z"
-        />
-        <path
-          fill={`url(#${ids.mountainNear})`}
-          d="M 1060 610 C 1140 600 1220 580 1300 576 C 1380 572 1440 584 1500 596 C 1540 604 1580 608 1640 610 Z"
-        />
-      </g>
-
-      <g className={styles["fog-back-layer"]} filter={`url(#${ids.fogBlur})`}>
-        <path
-          className={styles["fog"]}
-          d="M -120 540 C 60 512 260 516 420 530 C 560 542 700 532 820 544 C 900 552 880 572 780 576 C 600 584 300 580 80 578 C -60 576 -140 560 -120 540 Z"
-        />
-        <path
-          className={styles["fog"]}
-          d="M 1080 560 C 1200 540 1380 538 1520 548 C 1640 556 1720 566 1700 584 C 1680 598 1500 598 1340 594 C 1200 590 1060 584 1080 560 Z"
-        />
+      {/* 안개 한 겹 = 능선 몸통 하나. 겹마다 불투명도를 낮춰 뒤 겹·해·바다가 비침. 바깥 g가 옆으로 흐르는 움직임을 받음 */}
+      <g className={`${styles["mist"]} ${styles["mist-far"]}`}>
+        <path d={mistBand(MIST_CRESTS.far, MIST_BASES.far)} fill={`url(#${ids.mistFar})`} />
       </g>
 
       <g className={styles["ocean-layer"]}>
@@ -162,29 +149,22 @@ export default function FirstLightBackground({ variant }: FirstLightBackgroundPr
         </g>
       </g>
 
-      <g className={styles["horizon-layer"]}>
-        <rect x="0" y="609" width="1600" height="2" fill={`url(#${ids.horizon})`} />
-      </g>
-
-      {/* 해 아래 수면에 부서진 빛 — 아래로 갈수록 짧고 옅어짐 */}
+      {/* 해 아래 수면에 부서진 빛 — 아래로 갈수록 짧고 옅어짐. 줄 간격은 첫 줄(y=618) 기준 원본의 70% */}
       <g className={styles["reflection-layer"]}>
         <rect x="945" y="618" width="110" height="3" rx="1.5" opacity="0.7" />
-        <rect x="960" y="632" width="80" height="3" rx="1.5" opacity="0.6" />
-        <rect x="935" y="650" width="130" height="3" rx="1.5" opacity="0.5" />
-        <rect x="968" y="672" width="64" height="3" rx="1.5" opacity="0.4" />
-        <rect x="952" y="698" width="96" height="3" rx="1.5" opacity="0.3" />
-        <rect x="978" y="730" width="44" height="3" rx="1.5" opacity="0.2" />
+        <rect x="960" y="627.8" width="80" height="3" rx="1.5" opacity="0.6" />
+        <rect x="935" y="640.4" width="130" height="3" rx="1.5" opacity="0.5" />
+        <rect x="968" y="655.8" width="64" height="3" rx="1.5" opacity="0.4" />
+        <rect x="952" y="674" width="96" height="3" rx="1.5" opacity="0.3" />
+        <rect x="978" y="696.4" width="44" height="3" rx="1.5" opacity="0.2" />
       </g>
 
-      <g className={styles["fog-front-layer"]} filter={`url(#${ids.fogBlur})`}>
-        <path
-          className={styles["fog"]}
-          d="M -120 618 C 120 596 420 600 680 608 C 900 614 1100 600 1320 604 C 1520 608 1720 606 1720 626 C 1720 648 1480 652 1200 648 C 900 644 500 652 200 650 C -20 648 -140 640 -120 618 Z"
-        />
-        <path
-          className={styles["fog"]}
-          d="M 200 700 C 360 686 560 690 700 698 C 780 703 760 716 640 718 C 480 720 300 720 220 714 C 170 710 160 704 200 700 Z"
-        />
+      <g className={`${styles["mist"]} ${styles["mist-mid"]}`}>
+        <path d={mistBand(MIST_CRESTS.mid, MIST_BASES.mid)} fill={`url(#${ids.mistMid})`} />
+      </g>
+
+      <g className={`${styles["mist"]} ${styles["mist-near"]}`}>
+        <path d={mistBand(MIST_CRESTS.near, MIST_BASES.near)} fill={`url(#${ids.mistNear})`} />
       </g>
     </svg>
   );
