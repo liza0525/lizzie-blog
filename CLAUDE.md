@@ -71,7 +71,7 @@ src/
 │   ├── FirstLightBackground.tsx        # 인트로 배경 일러스트 "First Light"(해무 낀 새벽 바다) — 수평으로 겹친 안개 능선 세 겹(Far/Mid/Near, 반투명 푸른 회색 능선)이 주인공, 화면 아래 절반에만. inline SVG, aria-hidden, id는 useId()로 인스턴스마다 다르게. variant intro(움직임)/hero(정적)
 │   ├── FirstLightBackground.module.css # 그 색·움직임 — 안개는 계속 흐름(시차), 해는 한 번 떠오른 뒤 아주 약하게 좌우 흔들림. 움직임·html scrollbar-gutter: auto는 intro에서만
 │   ├── TypingText.tsx          # 타이핑 효과 문구 (서버 컴포넌트, CSS만) — 글자마다 순번 지연 + 따라가는 커서, 다 치면 마지막 글자 뒤 커서가 계속 깜빡임 + "질문" 형광펜
-│   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → View Transition으로 /posts 이동(배경·헤드라인이 히어로로 줄어들고 목록이 아래에서 올라옴), 미지원 브라우저는 fade out 뒤 이동, Context로 시작 함수 제공
+│   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → View Transition으로 /posts 이동(모바일 끌기·끝 튕김은 막음)(배경·헤드라인이 히어로로 줄어들고 목록이 아래에서 올라옴), 미지원 브라우저는 fade out 뒤 이동, Context로 시작 함수 제공
 │   ├── IntroEnterLink.tsx      # 인트로의 "아래로 스크롤" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
 │   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
 │   ├── SeriesShelf.tsx         # 글 목록 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover는 색 변화만)
@@ -230,6 +230,7 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
     - 인트로 배경 해무(2026-11-04): 안개 세 겹이 계속 좌우로 흐르고, 해는 처음 한 번 떠오른 뒤(2.4s, `fill-mode: backwards`) ±1px로 좌우 바운스 반복(아래 스크롤 바운스와 같은 easing, 한 번 튀는 데 `--motion-loop`). 길이는 장면 고유 값이라 토큰 대신 숫자(`FirstLightBackground.module.css`)
     - 타이핑 커서 깜빡임(2026-11-04): 다 친 뒤 마지막 글자 뒤 커서가 `--motion-loop`(1.2s) 주기로 계속 깜빡임(`.typing-char-last`, step-end). reduced-motion이면 커서 없음
     - 인트로 → `/posts` 전환(2026-11-04 확장): View Transition으로 배경(`vt-intro-scene`)·헤드라인·소개가 히어로 자리로 줄어들며 옮겨 가고(1s = `--motion-base`×4, globals.css `--intro-transition`), 나머지 목록은 아래에서 올라오며 fade in(translate 3rem). 배경은 두 전환 사진을 원래 크기로 가운데에 겹치고 상자 밖을 잘라 내며, 배율 차이는 IntroStage가 잰 `--intro-scene-scale`(`firstLightScale` 비율)로 맞춘다(가로 화면은 위아래가 잘려 나가고, 세로 화면은 그림이 실제로 작아짐 — `object-fit: cover`는 디졸브처럼 보여서 바꿈). 이름은 `<html data-intro-transition>` 동안만 붙고, 목록의 순차 등장은 `disableHomeIntro()`로 끈다. View Transition 미지원 브라우저는 예전 fade(150ms + ease-motion-exit) 뒤 이동
+    - 인트로 스와이프(2026-11-04): 모바일에서 화면이 손가락을 따라 끌려갔다 튕겨 내려온 뒤 전환돼 덜컹거려서, 인트로 무대는 `touch-action: pinch-zoom`(세로 끌기 막고 확대만 허용), `<html>`은 `[data-intro-stage]`가 있는 동안 `overscroll-behavior: none`. 스와이프 감지는 touchmove로 그대로 동작
   - 테마 전환 순간 전환 끄기는 next-themes `disableTransitionOnChange`로 처리(base.css의 `data-theme-switching` 대신)
   - 글 목록(`/posts`, `[data-intro]` 컨테이너)의 등장 fade는 페이지를 새로 불러온 뒤 처음 볼 때만 재생된다(새로고침하면 다시). 목록 안에서 이동하거나 떠나면 `HomeIntroMarker`가 `<html data-intro-seen>`을 붙여 CSS로 끈다
 - 홈(`/`)은 헤더 없는 인트로 전용, 글 목록은 `/posts`다. **목록으로 가는 링크는 전부 `postListHref()`(`lib/postList.ts`)로 만든다** — `"/"`로 보내면 인트로로 간다. `"/"`(인트로)로 가는 링크는 헤더 블로그 제목뿐

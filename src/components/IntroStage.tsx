@@ -11,6 +11,7 @@
 //   - 동작 줄이기(reduced motion) 설정이면 애니메이션 없이 바로 이동
 // 버튼 말고도 휠을 아래로 굴리기 / 화면을 위로 밀기(스와이프) / ↓·PageDown·Space 키로 같은 전환을 시작함
 //   인트로는 스크롤되는 페이지가 아니라 "넘기는" 한 장이라서, 아래로 가려는 동작을 전부 "목록으로 넘기기"로 해석
+//   그래서 모바일에서 화면이 손가락을 따라 끌려가지 않게 브라우저 스크롤·끝 튕김을 끔 (touch-action·overscroll-behavior)
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -195,10 +196,14 @@ export default function IntroStage({ children }: IntroStageProps): React.JSX.Ele
 
   return (
     <IntroLeaveContext.Provider value={leave}>
-      {/* View Transition 미지원 브라우저의 흐려짐. 사라짐 규칙(디자인 시스템 0.1.0): --motion-fast(150ms) + ease-motion-exit — 천천히 떠나기 시작해서 빠르게 끝남 */}
+      {/* View Transition 미지원 브라우저의 흐려짐. 사라짐 규칙(디자인 시스템 0.1.0): --motion-fast(150ms) + ease-motion-exit — 천천히 떠나기 시작해서 빠르게 끝남
+          touch-pinch-zoom(touch-action: pinch-zoom): 손가락으로 화면을 끌어 스크롤하는 건 막고 두 손가락 확대만 허용
+            → 스와이프해도 화면이 끌려 올라갔다 튕겨 내려오지 않고 전환만 보임. touchmove 이벤트는 그대로 와서 스와이프 감지는 동작함
+          data-intro-stage: 인트로에 있는 동안 <html>의 끝 튕김을 끄는 표시 (globals.css) */}
       <div
         ref={stageRef}
-        className={`transition-opacity duration-(--motion-fast) ease-motion-exit ${leaving ? "opacity-0" : "opacity-100"}`}
+        data-intro-stage
+        className={`touch-pinch-zoom transition-opacity duration-(--motion-fast) ease-motion-exit ${leaving ? "opacity-0" : "opacity-100"}`}
       >
         {children}
       </div>

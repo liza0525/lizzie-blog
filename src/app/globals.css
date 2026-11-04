@@ -183,6 +183,13 @@ html[data-intro-seen] [data-intro] *::after {
   animation: none !important;
 }
 
+/* 인트로에서는 브라우저의 끝 튕김(iOS 고무줄 바운스·안드로이드 오버스크롤·당겨서 새로고침)을 끔 — components/IntroStage.tsx
+   인트로는 스크롤하는 페이지가 아니라 넘기는 한 장이라서, 밀면 화면이 손가락을 따라 끌려갔다가 되돌아온 뒤 전환이 시작돼 덜컹거렸음
+   세로 끌기 자체는 IntroStage 무대의 touch-action이 막고, 이건 무대 밖(주소창이 접혀 늘어난 아래 띠 등)에서 시작한 끌기까지 막는 안전장치 */
+html:has([data-intro-stage]) {
+  overscroll-behavior: none;
+}
+
 /* 인트로 → 글 목록 전환 (View Transition) — components/IntroStage.tsx
    의도된 예외(사용자 결정, 2026-11-04): 디자인 시스템 0.1.0은 페이지 이동에 모션을 쓰지 않고, 위치 이동·크기 변화도 금지하지만 이 전환만은 유지
    브라우저가 이전 화면(인트로)과 새 화면(목록)을 각각 찍고, 같은 이름(view-transition-name)이 붙은 요소끼리 자리·크기를 이어 줌
