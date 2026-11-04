@@ -2,15 +2,24 @@
 
 import type { HomeHeroCopy } from "@/types";
 
-// 홈 히어로(랜딩) 문구 — 디자인 시스템 0.1.0 브랜드 철학 기준
-// intro는 쉼표로 열어 둔 헤드라인을 받아 완성하는 말 → "질문으로 접점을 찾는, 일단 해 보는 사람의 이야기"
-//   "이야기"는 기술 글과 나중에 올릴 소개 글을 둘 다 품는 말이라 골랐음 (직함·"정리한다"는 쓰지 않음)
-// highlight는 catchphrase 안에 그대로 들어 있는 부분이어야 새벽빛 강조가 붙음 (없으면 강조 없이 표시)
+// 사이트 이름 — 헤더 로고, 인트로 제목, 탭 제목(글 상세는 "글 제목 | HAE MU")이 같이 씀 (2026-11-04, 사용자 결정)
+export const SITE_NAME = "HAE MU";
+
+// 홈 인트로·글 목록 히어로 문구 (2026-11-04 교체, 사용자 결정)
+// "HAE MU"(해무, 바다 안개) — 배경 일러스트 First Light의 해무와 같은 이름. 로고 같은 이름이라 글자 자체를 대문자로 씀
+//   (디자인 시스템이 금지하는 건 CSS uppercase·넓은 자간으로 문장을 꾸미는 것 — 크레딧은 일반 표기)
+// catchphrase(큰 제목)는 인트로에만 — 글 목록에선 헤더 로고가 같은 이름이라 히어로는 소개 + 크레딧만 보여 줌
+// introHighlight는 intro 안에 그대로 들어 있는 부분이어야 새벽빛 형광펜이 붙음 (없으면 강조 없이 표시)
 export const HOME_HERO: HomeHeroCopy = {
-  catchphrase: "질문으로 접점을 찾는,",
-  highlight: "질문",
-  intro: "일단 해 보는 사람의 이야기",
+  catchphrase: SITE_NAME,
+  intro: "Born from the Meeting of Worlds.",
+  introHighlight: "Meeting of Worlds",
+  credit: "Created and curated by Lizzie Chung, Curious Maker",
 };
+
+// 기본 탭 제목·링크 미리보기 제목, 메타 설명(소개 + 크레딧 — 제목과 같은 말이 미리보기에 두 번 나오지 않게)
+export const SITE_TITLE = `${SITE_NAME}: Lizzie Chung, Curious Maker`;
+export const SITE_DESCRIPTION = `${HOME_HERO.intro} ${HOME_HERO.credit}`;
 
 // 최상위 카테고리 태그 — accent-soft 면 태그로 표시 (그 외 태그는 선만 있는 태그)
 // 자주 바꾸는 값이라 코드 대신 env(쉼표 구분)로 관리. 적힌 순서가 홈 태그 바 순서가 된다

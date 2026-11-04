@@ -1,17 +1,19 @@
 // 홈 전체 화면 인트로(랜딩) — 헤더 없이 화면 전체에 캐치프레이즈 + 짧은 소개 + "아래로 스크롤" 링크
 // 버튼(또는 휠·스와이프·키보드)으로 넘기면 인트로가 흐려진 뒤 글 목록(/posts)으로 넘어감 (전환은 감싸는 IntroStage가 담당)
-// 문구는 lib/config.ts의 HOME_HERO에서 관리. 헤드라인은 디자인 시스템 0.1.0 브랜드 "질문으로 접점을 찾는,"
-// highlight 부분은 새벽빛(sunrise) — 이 화면에서 가장 먼저 읽혀야 할 한 가지
-// 등장 순서: 헤드라인 전체가 한 글자씩 타이핑 → "질문"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 소개 → 아래로 스크롤(가운데 아래, 바운스)
+// 문구는 lib/config.ts의 HOME_HERO에서 관리. 헤드라인은 브랜드 이름 "HAE MU", 그 아래 소개와 만든 사람(크레딧) 한 줄
+// 소개의 introHighlight("Meeting of Worlds")는 새벽빛(sunrise) 형광펜 — 이 화면의 유일한 새벽빛 (사용자 결정, 2026-11-04)
+// 등장 순서: 헤드라인이 한 글자씩 타이핑 → 소개 → "Meeting of Worlds"에 형광펜 긋듯 새벽빛이 왼쪽→오른쪽으로 칠해짐 → 크레딧 → 아래로 스크롤(가운데 아래, 바운스)
 //   전부 CSS 애니메이션 + 같은 순번 단위(--i × --stagger-step)라 JS 없이도 재생되고, 하이드레이션 전 깜빡임이 없음
 // 배경: 새벽 바다 일러스트(FirstLightBackground)를 화면 전체에 깔고, 글 상자는 relative로 그 위에 올림
-// 목록으로 넘어갈 때 배경·헤드라인·소개는 히어로(HomeHero)의 같은 자리로 줄어들며 옮겨 감 — vt-intro-* 클래스 (globals.css, IntroStage)
+// 목록으로 넘어갈 때 배경·소개·크레딧은 히어로(HomeHero)의 같은 자리로, 헤드라인(HAE MU)은 헤더 로고 자리로 줄어들며 옮겨 감
+//   — vt-intro-* 클래스 (globals.css, IntroStage)
 
 import React from "react";
 import type { HomeHeroCopy } from "@/types";
 import { staggerStyle } from "@/lib/motion";
 import FirstLightBackground from "./FirstLightBackground";
 import IntroEnterLink from "./IntroEnterLink";
+import SunriseHighlight from "./SunriseHighlight";
 import TypingText, { typingEndStep } from "./TypingText";
 
 interface HomeIntroProps {
@@ -19,11 +21,14 @@ interface HomeIntroProps {
 }
 
 export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
-  // 순번: 글자 N개(0 ~ N-1) → 형광펜(N+2, TypingText 안, 500ms ≈ 순번 7칸 동안 칠해짐) → 소개(N+7) → 아래로 스크롤(N+8)
-  //   형광펜이 거의 다 그어질 즈음 소개가 나오도록 띄움 (끝까지 기다리면 첫 화면이 늦게 채워짐)
+  // 순번: 글자 N개(0 ~ N-1) → 한 박자 쉬고 소개(N+2)
+  //   → 소개가 다 나타난 뒤(fade --motion-base ≈ 순번 3~4칸) 형광펜(N+6, 500ms ≈ 순번 7칸 동안 칠해짐)
+  //   → 형광펜이 거의 다 그어질 즈음 크레딧(N+11) → 아래로 스크롤(N+12)
   const typedStep = typingEndStep(copy.catchphrase);
-  const introStep = typedStep + 7;
-  const actionStep = typedStep + 8;
+  const introStep = typedStep + 2;
+  const highlightStep = typedStep + 6;
+  const creditStep = typedStep + 11;
+  const actionStep = typedStep + 12;
 
   return (
     // 높이 = 화면 높이 전체 (이 페이지엔 헤더가 없음)
@@ -37,11 +42,16 @@ export default function HomeIntro({ copy }: HomeIntroProps): React.JSX.Element {
 
       {/* relative: 배경(absolute) 위로 올리기 — position이 없는 요소는 absolute 요소보다 먼저(아래에) 그려짐 */}
       <div className="relative max-w-[900px] w-full mx-auto px-6 py-16">
-        <h1 className="vt-intro-headline text-display font-bold tracking-tight text-ink">
-          <TypingText text={copy.catchphrase} highlight={copy.highlight} />
+        {/* w-fit: 제목 상자를 글자 폭에 맞춤 — 전환 사진이 상자 크기대로 찍혀서, 줄 전체 폭이면 헤더 로고로 줄어들 때 글자가 너무 작아짐 */}
+        <h1 className="vt-intro-headline w-fit text-display font-bold tracking-tight text-ink">
+          <TypingText text={copy.catchphrase} />
         </h1>
         <p className="vt-intro-copy mt-1.25 max-w-reading text-xl text-muted animate-fade-in" style={staggerStyle(introStep)}>
-          {copy.intro}
+          <SunriseHighlight text={copy.intro} highlight={copy.introHighlight} swipeStep={highlightStep} />
+        </p>
+        {/* 크레딧: 소개보다 두 단계 작은 보조 문구 — sm(14px), 시스템 최소 13px 위 */}
+        <p className="vt-intro-credit mt-1.25 text-sm text-muted animate-fade-in" style={staggerStyle(creditStep)}>
+          {copy.credit}
         </p>
       </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ThemeProvider from "@/components/ThemeProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/config";
 import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
@@ -8,23 +9,23 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Lizzie's Blog",
-    // 글 상세 페이지에서 "글 제목 | Lizzie's Blog" 형태로 표시
-    template: "%s | Lizzie's Blog",
+    default: SITE_TITLE,
+    // 다른 페이지는 "글 제목 | HAE MU" — 탭이 좁아서 뒤는 사이트 이름만
+    template: `%s | ${SITE_NAME}`,
   },
-  description: "Lizzie의 개인 개발 기술 블로그",
+  description: SITE_DESCRIPTION,
   openGraph: {
-    siteName: "Lizzie's Blog",
+    siteName: SITE_NAME,
     locale: "ko_KR",
     type: "website",
     url: SITE_URL,
-    title: "Lizzie's Blog",
-    description: "Lizzie의 개인 개발 기술 블로그",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lizzie's Blog",
-    description: "Lizzie의 개인 개발 기술 블로그",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
 };
 

@@ -1,5 +1,6 @@
-// 전역 헤더 — 블로그 제목, 검색창, 홈 아이콘, 다크모드 토글 포함
-// 블로그 제목은 홈 인트로(/)로, 홈 아이콘은 글 목록(/posts)으로 감 → 글을 찾으러 온 사람은 아이콘으로 인트로를 건너뜀
+// 전역 헤더 — 블로그 로고(HAE MU), 검색창, 홈 아이콘, 다크모드 토글 포함
+// 인트로에서 글 목록으로 넘어올 때 인트로의 큰 HAE MU가 이 로고 자리로 줄어들며 옮겨 옴 — vt-intro-headline (globals.css, IntroStage)
+// 블로그 로고는 홈 인트로(/)로, 홈 아이콘은 글 목록(/posts)으로 감 → 글을 찾으러 온 사람은 아이콘으로 인트로를 건너뜀
 // (site) 레이아웃에만 들어 있어서 홈 인트로 화면에는 헤더가 없음
 // sticky top-0으로 스크롤해도 항상 상단 고정
 
@@ -8,6 +9,7 @@ import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import SearchInput from "./SearchInput";
 import { postListHref } from "@/lib/postList";
+import { SITE_NAME } from "@/lib/config";
 
 export default function Header(): React.JSX.Element {
   return (
@@ -15,9 +17,9 @@ export default function Header(): React.JSX.Element {
       <div className="max-w-[900px] mx-auto px-6 h-16 flex items-center justify-between">
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight text-ink hover:text-accent transition-colors"
+          className="vt-intro-headline text-lg font-bold tracking-tight text-ink hover:text-accent transition-colors"
         >
-          Lizzie
+          {SITE_NAME}
         </Link>
         <div className="flex items-center gap-4">
           <div className="hidden sm:block">

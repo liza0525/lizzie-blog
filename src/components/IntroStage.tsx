@@ -4,7 +4,7 @@
 //   (인트로 본문 HomeIntro는 서버 컴포넌트라 함수를 props로 넘길 수 없어서 Context를 씀)
 // 전환은 두 가지 (의도된 예외, 사용자 결정 2026-11-04):
 //   - View Transition(브라우저 기본 기능): 브라우저가 인트로 화면을 찍어 두고, 목록이 다 그려지면 두 화면을 애니메이션으로 이어 줌
-//     → 배경·헤드라인·소개가 히어로 자리로 줄어들며 옮겨 가고, 나머지 목록은 아래에서 올라오며 나타남 (모양은 globals.css)
+//     → 배경·소개·크레딧은 히어로 자리로, 헤드라인은 헤더 로고 자리로 줄어들며 옮겨 가고, 나머지 목록은 아래에서 올라오며 나타남 (모양은 globals.css)
 //     → 목록을 서버에서 받는 동안엔 인트로가 그대로 보여서, 흐려진 뒤 빈 화면으로 기다리는 공백이 없음
 //     → 배경은 두 그림을 같은 배율로 겹쳐 둔 채 상자만 줄어듦(setSceneScale). 가로 화면은 위아래가 잘려 나가고, 세로 화면은 그림이 실제로 작아짐
 //   - 지원하지 않는 브라우저: 인트로가 흐려진 뒤(fade out) 이동. 끝나는 시점은 transitionend로 받아 길이를 JS에 복사하지 않음
@@ -88,7 +88,7 @@ export default function IntroStage({ children }: IntroStageProps): React.JSX.Ele
     const root = document.documentElement;
     // 목록의 순차 등장(data-intro)은 끔 — 켜 두면 전환 애니메이션 위에 등장 fade가 한 번 더 겹침
     disableHomeIntro();
-    // 이 표시가 있는 동안만 배경·헤드라인·소개에 전환 이름(view-transition-name)이 붙음 (globals.css)
+    // 이 표시가 있는 동안만 배경·헤드라인·소개·크레딧에 전환 이름(view-transition-name)이 붙음 (globals.css)
     root.dataset.introTransition = "";
     // 인트로 배경 상자 크기 — 목록으로 바뀌면 사라지므로 미리 재 둠
     const fromScene = document.querySelector(SCENE_SELECTOR)?.getBoundingClientRect();

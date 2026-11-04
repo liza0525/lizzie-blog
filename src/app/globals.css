@@ -75,7 +75,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* 형광펜 강조 — 히어로·인트로의 "질문". 디자인 시스템 .mark-sunrise(둥근 면) 대신 쓰는 블로그 전용 모양(사용자 결정, 2026-11-03)
+/* 형광펜 강조 — 인트로·히어로 소개의 "Meeting of Worlds" (components/SunriseHighlight.tsx). 디자인 시스템 .mark-sunrise(둥근 면) 대신 쓰는 블로그 전용 모양(사용자 결정, 2026-11-03)
    - 모서리 없는 직사각형, 높이는 글자 줄의 75%로 세로 가운데 → 형광펜으로 그은 띠처럼 보임
    - 면은 배경 이미지(단색 그라데이션) 한 장 → 크기·위치만으로 띠 높이를 정하고, 애니메이션도 크기만 바꿈
    - 글자색은 면 위 색(--on-sunrise) — 다크모드에서 밝은 글자가 밝은 면 위에 남지 않게
@@ -88,13 +88,13 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 100% 75%;
   color: var(--on-sunrise);
   /* 띠를 글자보다 양옆으로 살짝 넓게 칠하되(padding), 같은 만큼 음수 margin으로 상쇄 → 글자 위치는 강조 없을 때와 똑같음
-     (padding만 두면 타이핑 중 "질문 으로"처럼 띄어 보이고, padding을 애니메이션하면 그어질 때 뒤 글자가 오른쪽으로 밀림) */
+     (padding만 두면 강조 앞뒤 글자와 띄어 보이고, padding을 애니메이션하면 그어질 때 뒤 글자가 오른쪽으로 밀림) */
   padding-inline: 0.08em;
   margin-inline: -0.08em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
-/* 인트로 전용: 다 쳐진 뒤 왼쪽 → 오른쪽으로 쫙 그어짐
+/* 인트로 전용: 소개가 나타난 뒤 왼쪽 → 오른쪽으로 쫙 그어짐
    길이는 --motion-base의 2배(500ms) + 빠르게 출발해 부드럽게 멈추는 ease-motion → "쫙" 긋는 느낌 (의도된 예외)
    기본 스타일(.highlight-mark)이 "칠해진 뒤" 모습이고, 애니메이션은 backwards로 시작 전(칠 없음)·재생 중만 덮어씀 → 끝 상태가 반올림에 흔들리지 않음 */
 .highlight-swipe {
@@ -193,7 +193,8 @@ html:has([data-intro-stage]) {
 /* 인트로 → 글 목록 전환 (View Transition) — components/IntroStage.tsx
    의도된 예외(사용자 결정, 2026-11-04): 디자인 시스템 0.1.0은 페이지 이동에 모션을 쓰지 않고, 위치 이동·크기 변화도 금지하지만 이 전환만은 유지
    브라우저가 이전 화면(인트로)과 새 화면(목록)을 각각 찍고, 같은 이름(view-transition-name)이 붙은 요소끼리 자리·크기를 이어 줌
-   - 배경(vt-intro-scene): 화면 전체 → 히어로 띠로 줄어듦 / 헤드라인·소개: 화면 가운데 → 히어로 자리로 옮겨 감 (HomeIntro ↔ HomeHero)
+   - 배경(vt-intro-scene): 화면 전체 → 히어로 띠로 줄어듦 / 소개·크레딧: 화면 가운데 → 히어로 자리로 옮겨 감 (HomeIntro ↔ HomeHero)
+   - 헤드라인(HAE MU): 화면 가운데 큰 제목 → 헤더 로고로 줄어듦 (HomeIntro ↔ Header)
    - 이름 없는 나머지(root): 인트로의 "아래로 스크롤"은 흐려지고, 헤더·시리즈·태그·목록은 아래에서 올라오며 나타남
    - 길이는 --intro-transition(--motion-base의 4배, 1s) + ease-motion — 500ms는 넘기자마자 끝나 버려 "천천히 내려가는" 느낌이 없었음(사용자 피드백)
      사라지는 쪽("아래로 스크롤")은 --motion-fast + ease-motion-exit
@@ -206,6 +207,7 @@ html[data-intro-transition] {
 html[data-intro-transition] .vt-intro-scene { view-transition-name: intro-scene; }
 html[data-intro-transition] .vt-intro-headline { view-transition-name: intro-headline; }
 html[data-intro-transition] .vt-intro-copy { view-transition-name: intro-copy; }
+html[data-intro-transition] .vt-intro-credit { view-transition-name: intro-credit; }
 
 /* 모든 전환 묶음(group)의 길이·곡선 — 안쪽의 이전/새 화면 그림은 기본값(inherit)으로 이 값을 따라감 */
 html[data-intro-transition]::view-transition-group(*) {

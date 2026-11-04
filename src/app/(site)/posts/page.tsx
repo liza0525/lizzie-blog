@@ -24,7 +24,7 @@ const LIST_SERIES_LIMIT = 5;
 
 export const revalidate = 3600;
 
-// 루트 layout의 title 템플릿에 따라 "글 목록 | Lizzie's Blog"로 표시
+// 루트 layout의 title 템플릿에 따라 "글 목록 | HAE MU"로 표시
 export const metadata: Metadata = {
   title: "글 목록",
 };
