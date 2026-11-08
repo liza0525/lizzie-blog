@@ -1,5 +1,5 @@
 // 홈 상단 트레일 진입점 — 섹션 제목 줄 오른쪽 "모든 트레일 보기"(/trails) + 최근 트레일 카드 가로 줄
-// 카드는 폭 고정으로 왼쪽부터 채워서 트레일이 1개여도 늘어나지 않음
+// 카드는 면 색 없이 테두리만, 폭 고정으로 왼쪽부터 채워서 트레일이 1개여도 늘어나지 않음
 // 카드가 넘치면 ScrollFadeRow가 오른쪽 끝에 페이드를 깔아 가로 스크롤 가능함을 알림 (데스크톱·모바일 동일 구조)
 // hover는 색 변화만 (카드 테두리·제목이 accent로) — 디자인 시스템 0.1.0: hover 시 위치 이동·확대·그림자 금지
 
@@ -41,7 +41,7 @@ export default function TrailShelf({ trails }: TrailShelfProps): React.JSX.Eleme
               <Link
                 key={s.name}
                 href={`/trails/${encodeURIComponent(s.name)}`}
-                className="group shrink-0 w-56 bg-surface border border-border rounded-box px-4 py-3 hover:border-accent transition-colors font-sans"
+                className="group shrink-0 w-56 border border-border rounded-box px-4 py-3 hover:border-accent transition-colors font-sans"
               >
                 <p className="text-[15px] font-semibold text-ink leading-snug truncate transition-colors group-hover:text-accent">
                   {s.name}
