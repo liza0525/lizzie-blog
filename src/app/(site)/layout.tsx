@@ -1,5 +1,5 @@
 // 사이트 공통 레이아웃 — 헤더 + 본문(main) + 푸터
-// (site)는 route group: 괄호 폴더는 URL에 나타나지 않고(/posts, /series 그대로), 그 안의 페이지끼리 이 레이아웃을 공유함
+// (site)는 route group: 괄호 폴더는 URL에 나타나지 않고(/posts, /trails 그대로), 그 안의 페이지끼리 이 레이아웃을 공유함
 //   Flask로 치면 Blueprint마다 다른 base 템플릿을 쓰는 것과 같음
 // 홈 인트로(app/page.tsx)는 이 그룹 밖에 있어서 헤더·푸터 없이 화면 전체를 씀
 

@@ -12,7 +12,7 @@ import {
 
 // 같은 요청 내에서 fetchAllPosts() 중복 호출 방지 (getAllTags/searchPosts/getAdjacentPosts가 각각 호출)
 const fetchAllPosts = cache(fetchAllPostsRaw);
-import type { Post, PostListPage, Series, SeriesPosition } from "@/types";
+import type { Post, PostListPage, Trail, TrailPosition } from "@/types";
 import { STATIC_BUILD_POST_LIMIT } from "@/lib/config";
 
 // 페이지네이션 포스트 목록 (홈 카드 그리드, 무한 스크롤)
@@ -87,9 +87,9 @@ export async function getAllTags(): Promise<{ name: string; count: number }[]> {
     .sort((a, b) => b.count - a.count);
 }
 
-// ── 시리즈 ────────────────────────────────────────────────
-// Series는 페이지 속성이라 전체 글 목록만 있으면 메모리에서 묶을 수 있음 (Notion 추가 호출 없음)
-// 시리즈 페이지·글 상세 헤더가 매 렌더마다 전체 목록을 다시 긁지 않도록 글 상세와 같은 정책(2시간, "post" 태그)으로 캐싱
+// ── 트레일 ────────────────────────────────────────────────
+// Notion Series 속성은 페이지 속성이라 전체 글 목록만 있으면 메모리에서 묶을 수 있음 (Notion 추가 호출 없음)
+// 트레일 페이지·글 상세 헤더가 매 렌더마다 전체 목록을 다시 긁지 않도록 글 상세와 같은 정책(2시간, "post" 태그)으로 캐싱
 // → /api/revalidate의 revalidateTag("post")로 함께 무효화됨
 const getCachedAllPosts = unstable_cache(
   () => fetchAllPostsRaw(),
@@ -97,19 +97,19 @@ const getCachedAllPosts = unstable_cache(
   { revalidate: 7200, tags: ["post"] }
 );
 
-// 전체 글 → 시리즈 목록으로 묶기
-function groupBySeries(posts: Post[]): Series[] {
+// 전체 글 → 트레일 목록으로 묶기
+function groupByTrail(posts: Post[]): Trail[] {
   const map = new Map<string, Post[]>();
   for (const post of posts) {
-    if (!post.series) continue;
-    const list = map.get(post.series) ?? [];
+    if (!post.trail) continue;
+    const list = map.get(post.trail) ?? [];
     list.push(post);
-    map.set(post.series, list);
+    map.set(post.trail, list);
   }
 
-  return Array.from(map.entries()).map(([name, seriesPosts]) => {
+  return Array.from(map.entries()).map(([name, trailPosts]) => {
     // 목록은 최신순으로 오므로 1편부터 읽히도록 오름차순으로 다시 정렬
-    const ordered = [...seriesPosts].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt));
+    const ordered = [...trailPosts].sort((a, b) => a.publishedAt.localeCompare(b.publishedAt));
     return {
       name,
       posts: ordered,
@@ -118,32 +118,32 @@ function groupBySeries(posts: Post[]): Series[] {
   });
 }
 
-// 전체 시리즈 목록 — 최근에 새 편이 올라온 시리즈가 위로
-export async function getAllSeries(): Promise<Series[]> {
+// 전체 트레일 목록 — 최근에 새 편이 올라온 트레일이 위로
+export async function getAllTrails(): Promise<Trail[]> {
   const posts = await getCachedAllPosts();
-  return groupBySeries(posts).sort((a, b) =>
+  return groupByTrail(posts).sort((a, b) =>
     b.latestPublishedAt.localeCompare(a.latestPublishedAt)
   );
 }
 
-// 이름으로 시리즈 하나 조회 — /series/[name]
-export async function getSeries(name: string): Promise<Series | null> {
-  const all = await getAllSeries();
+// 이름으로 트레일 하나 조회 — /trails/[name]
+export async function getTrail(name: string): Promise<Trail | null> {
+  const all = await getAllTrails();
   return all.find((s) => s.name === name) ?? null;
 }
 
-// 글 slug로 소속 시리즈와 위치 조회 — 글 상세의 헤더·사이드바·하단 카드에서 사용
-// 시리즈에 속하지 않은 글이면 null
-export async function getSeriesPosition(slug: string): Promise<SeriesPosition | null> {
-  const all = await getAllSeries();
-  for (const series of all) {
-    const index = series.posts.findIndex((p) => p.slug === slug);
+// 글 slug로 소속 트레일과 위치 조회 — 글 상세의 헤더·사이드바·하단 카드에서 사용
+// 트레일에 속하지 않은 글이면 null
+export async function getTrailPosition(slug: string): Promise<TrailPosition | null> {
+  const all = await getAllTrails();
+  for (const trail of all) {
+    const index = trail.posts.findIndex((p) => p.slug === slug);
     if (index === -1) continue;
     return {
-      series,
+      trail,
       index,
-      prev: series.posts[index - 1] ?? null,
-      next: series.posts[index + 1] ?? null,
+      prev: trail.posts[index - 1] ?? null,
+      next: trail.posts[index + 1] ?? null,
     };
   }
   return null;

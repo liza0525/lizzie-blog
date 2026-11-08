@@ -1,24 +1,24 @@
 // 모바일/세로화면(<xl) 전용 목차 진입점 — 우하단 플로팅 버튼 + 바텀시트
 // 데스크톱 사이드바(PostContentClient의 aside)와 별개 UI로, xl 미만 화면에서만 노출
 // 배경 dimming 없이 border/shadow로만 시각적 분리 (기존 note 오버레이 카드와 동일한 하우스 스타일)
-// 시리즈 글이면 시트 안에 시리즈 → 목차 순으로 쌓음 (PostNavigator), 목차 없이 시리즈만 있으면 레이블을 "시리즈"로
+// 트레일 글이면 시트 안에 트레일 → 목차 순으로 쌓음 (PostNavigator), 목차 없이 트레일만 있으면 레이블을 "트레일"로
 // 플로팅 버튼은 아이콘만 있는 원형 — 디자인 시스템(버튼 4px 모서리)의 의도적 예외. 레이블은 aria-label과 시트 제목에만 쓰임
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import type { Heading } from "@/lib/toc";
-import type { SeriesPosition } from "@/types";
+import type { TrailPosition } from "@/types";
 import PostNavigator from "@/components/PostNavigator";
 import { readMotionMs } from "@/lib/motion";
 
 interface TocBottomSheetProps {
   headings: Heading[];
-  series: SeriesPosition | null;
+  trail: TrailPosition | null;
 }
 
-export default function TocBottomSheet({ headings, series }: TocBottomSheetProps): React.JSX.Element {
-  // 목차가 하나라도 있으면 "목차"(시리즈는 그 안에 함께 표시), 시리즈만 있으면 "시리즈"
-  const label = headings.length > 0 ? "목차" : "시리즈";
+export default function TocBottomSheet({ headings, trail }: TocBottomSheetProps): React.JSX.Element {
+  // 목차가 하나라도 있으면 "목차"(트레일은 그 안에 함께 표시), 트레일만 있으면 "트레일"
+  const label = headings.length > 0 ? "목차" : "트레일";
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -149,7 +149,7 @@ export default function TocBottomSheet({ headings, series }: TocBottomSheetProps
               </button>
             </div>
             <div className="px-5 py-4">
-              <PostNavigator headings={headings} series={series} onNavigate={closeSheet} />
+              <PostNavigator headings={headings} trail={trail} onNavigate={closeSheet} />
             </div>
           </div>
         </>

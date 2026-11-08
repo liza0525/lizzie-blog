@@ -3,7 +3,7 @@
 
 import type { MetadataRoute } from "next";
 import { fetchAllPosts } from "@/lib/notion/repository";
-import { getAllSeries } from "@/lib/services/post.service";
+import { getAllTrails } from "@/lib/services/post.service";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
 
@@ -11,7 +11,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, allSeries] = await Promise.all([fetchAllPosts(), getAllSeries()]);
+  const [posts, allTrails] = await Promise.all([fetchAllPosts(), getAllTrails()]);
 
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE_URL}/posts/${post.slug}`,
@@ -20,11 +20,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // 시리즈 페이지 — 소속 글 중 가장 최근 수정 시각을 lastModified로
-  const seriesEntries: MetadataRoute.Sitemap = allSeries.map((series) => ({
-    url: `${SITE_URL}/series/${encodeURIComponent(series.name)}`,
+  // 트레일 페이지 — 소속 글 중 가장 최근 수정 시각을 lastModified로
+  const trailEntries: MetadataRoute.Sitemap = allTrails.map((trail) => ({
+    url: `${SITE_URL}/trails/${encodeURIComponent(trail.name)}`,
     lastModified: new Date(
-      Math.max(...series.posts.map((p) => new Date(p.updatedAt).getTime()))
+      Math.max(...trail.posts.map((p) => new Date(p.updatedAt).getTime()))
     ),
     changeFrequency: "weekly",
     priority: 0.6,
@@ -45,12 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/series`,
+      url: `${SITE_URL}/trails`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.5,
     },
     ...postEntries,
-    ...seriesEntries,
+    ...trailEntries,
   ];
 }

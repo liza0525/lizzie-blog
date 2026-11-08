@@ -1,5 +1,5 @@
 // "글을 어느 목록에서 열었는지" 기억하는 클라이언트 전용 유틸 (sessionStorage)
-// 글 상세의 돌아가기 버튼이 처음 들어온 목록(전체 글 목록 / 시리즈 목록)으로 돌아가게 하기 위함
+// 글 상세의 돌아가기 버튼이 처음 들어온 목록(전체 글 목록 / 트레일 목록)으로 돌아가게 하기 위함
 // - 목록 화면이 열릴 때 ListOriginMarker가 저장하고, 글 상세(BackToListLink)는 읽기만 함
 // - 이전/다음 글로 이어서 읽어도 글 상세는 값을 덮어쓰지 않으므로 처음 진입한 목록이 유지됨
 // - URL 쿼리(?from=)로 넘기지 않는 이유: 글 상세는 SSG라 searchParams를 읽으면 매 요청 동적 렌더링으로 바뀜
@@ -7,8 +7,8 @@
 import { postListHref } from "./postList";
 
 export interface ListOrigin {
-  href: string;   // 돌아갈 경로 (필터·검색어 포함, 예: "/posts?tag=백엔드", "/series/CS")
-  label: string;  // 버튼 문구 (예: "글 목록", "CS 시리즈")
+  href: string;   // 돌아갈 경로 (필터·검색어 포함, 예: "/posts?tag=백엔드", "/trails/CS")
+  label: string;  // 버튼 문구 (예: "글 목록", "CS 트레일")
 }
 
 const STORAGE_KEY = "blog:list-origin";

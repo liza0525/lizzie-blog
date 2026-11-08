@@ -70,7 +70,8 @@ export function mapPageToPost(page: PageObjectResponse): Post {
     updatedAt: page.last_edited_time,
     tags: extractMultiSelect(props["Tags"]),
     coverImage: extractCoverImage(page),
-    // Series 속성이 없는 DB(추가 전)에서도 undefined 접근으로 깨지지 않도록 가드
-    series: props["Series"] ? extractSelect(props["Series"]) : null,
+    // 화면·코드에서는 "트레일"이지만 Notion 속성 이름은 아직 Series — 별도 DB로 구조를 바꿀 때 함께 정리
+    // 속성이 없는 DB에서도 undefined 접근으로 깨지지 않도록 가드
+    trail: props["Series"] ? extractSelect(props["Series"]) : null,
   };
 }

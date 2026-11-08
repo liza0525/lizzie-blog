@@ -1,6 +1,6 @@
 // 포스트 본문 렌더러 (client component)
 // PostContent(server)에서 마크다운 content와 headings를 받아 렌더링
-// 시리즈 글이면 우측 네비게이터(데스크톱)·바텀시트(모바일)에 시리즈 목록을 목차 위에 함께 표시
+// 트레일 글이면 우측 네비게이터(데스크톱)·바텀시트(모바일)에 트레일 목록을 목차 위에 함께 표시
 
 "use client";
 
@@ -17,24 +17,24 @@ import CodeBlock from "@/components/CodeBlock";
 import PostNavigator from "@/components/PostNavigator";
 import TocBottomSheet from "@/components/TocBottomSheet";
 import ZoomableImage from "@/components/ZoomableImage";
-import type { SeriesPosition } from "@/types";
+import type { TrailPosition } from "@/types";
 
 interface PostContentClientProps {
   content: string;
   headings: Heading[];
   pageId: string;
-  series: SeriesPosition | null;
+  trail: TrailPosition | null;
 }
 
 export default function PostContentClient({
   content,
   headings,
   pageId: _pageId,
-  series,
+  trail,
 }: PostContentClientProps): React.JSX.Element {
   // 데스크톱 사이드바와 모바일 바텀시트가 동일 조건을 공유 — 조건 중복 방지
-  // 헤딩이 없어도 시리즈 글이면 시리즈 목록을 보여주기 위해 네비게이터를 띄움
-  const showNav = headings.length > 0 || series !== null;
+  // 헤딩이 없어도 트레일 글이면 트레일 목록을 보여주기 위해 네비게이터를 띄움
+  const showNav = headings.length > 0 || trail !== null;
 
   return (
     <div className="flex gap-12">
@@ -95,14 +95,14 @@ export default function PostContentClient({
 
       {showNav && (
         <aside className="w-[140px] shrink-0 hidden xl:block">
-          {/* 시리즈 + 목차가 화면보다 길어질 수 있어 sticky 영역 안에서 따로 스크롤 */}
+          {/* 트레일 + 목차가 화면보다 길어질 수 있어 sticky 영역 안에서 따로 스크롤 */}
           <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
-            <PostNavigator headings={headings} series={series} />
+            <PostNavigator headings={headings} trail={trail} />
           </div>
         </aside>
       )}
 
-      {showNav && <TocBottomSheet headings={headings} series={series} />}
+      {showNav && <TocBottomSheet headings={headings} trail={trail} />}
     </div>
   );
 }

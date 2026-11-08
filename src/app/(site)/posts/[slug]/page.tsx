@@ -2,17 +2,17 @@
 // ISR: 2시간마다 재생성 (CLAUDE.md 참고)
 // 메타데이터(제목/태그/커버)는 서버에서 즉시 렌더링
 // 본문은 PostContent(client)가 스트리밍 API에서 받아 점진적으로 렌더링
-// 시리즈 글이면 제목 위 한 줄 표시 + 네비게이터 시리즈 섹션 + 하단 시리즈 카드를 함께 렌더링
+// 트레일 글이면 제목 위 한 줄 표시 + 네비게이터 트레일 섹션 + 하단 트레일 카드를 함께 렌더링
 
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPost, getAllSlugs, getSeriesPosition } from "@/lib/services/post.service";
+import { getPost, getAllSlugs, getTrailPosition } from "@/lib/services/post.service";
 import { CORE_TAGS } from "@/lib/config";
 import PostContent from "./PostContent";
 import AdjacentPosts from "./AdjacentPosts";
-import SeriesPager from "@/components/SeriesPager";
+import TrailPager from "@/components/TrailPager";
 import BackToListLink from "@/components/BackToListLink";
 import FormattedDate from "@/components/FormattedDate";
 import GiscusComments from "@/components/GiscusComments";
@@ -63,10 +63,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PostPage({ params }: PageProps): Promise<React.JSX.Element> {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  // 시리즈 위치는 헤더에 바로 쓰이므로 Suspense로 미루지 않고 글 메타데이터와 병렬 조회 (둘 다 캐싱됨)
-  const [post, series] = await Promise.all([
+  // 트레일 위치는 헤더에 바로 쓰이므로 Suspense로 미루지 않고 글 메타데이터와 병렬 조회 (둘 다 캐싱됨)
+  const [post, trail] = await Promise.all([
     getPost(decodedSlug),
-    getSeriesPosition(decodedSlug),
+    getTrailPosition(decodedSlug),
   ]);
 
   if (!post) notFound();
@@ -74,22 +74,22 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <article>
-        {/* 처음 들어온 목록으로 돌아가기 (전체 글 목록 / 시리즈 목록) */}
+        {/* 처음 들어온 목록으로 돌아가기 (전체 글 목록 / 트레일 목록) */}
         <BackToListLink />
 
         <header className="mb-10">
-          {/* 시리즈 표시 — 사이드바는 xl 이상에서만 보이므로 작은 화면에서도 시리즈 글임을 알 수 있게 제목 위에 한 줄로 */}
-          {series && (
+          {/* 트레일 표시 — 사이드바는 xl 이상에서만 보이므로 작은 화면에서도 트레일 글임을 알 수 있게 제목 위에 한 줄로 */}
+          {trail && (
             <p className="flex items-baseline gap-2 text-sm mb-2 font-sans">
-              <span className="text-xs font-semibold text-muted shrink-0">시리즈</span>
+              <span className="text-xs font-semibold text-muted shrink-0">트레일</span>
               <Link
-                href={`/series/${encodeURIComponent(series.series.name)}`}
+                href={`/trails/${encodeURIComponent(trail.trail.name)}`}
                 className="font-semibold text-ink hover:text-accent transition-colors truncate"
               >
-                {series.series.name}
+                {trail.trail.name}
               </Link>
               <span className="text-xs text-subtle tabular-nums shrink-0">
-                {series.index + 1}/{series.series.posts.length}
+                {trail.index + 1}/{trail.trail.posts.length}
               </span>
             </p>
           )}
@@ -131,8 +131,8 @@ export default async function PostPage({ params }: PageProps): Promise<React.JSX
         )}
 
         <div>
-          <PostContent pageId={post.id} series={series} />
-          {series && <SeriesPager position={series} />}
+          <PostContent pageId={post.id} trail={trail} />
+          {trail && <TrailPager position={trail} />}
           <Suspense fallback={null}>
             <AdjacentPosts slug={decodedSlug} />
           </Suspense>

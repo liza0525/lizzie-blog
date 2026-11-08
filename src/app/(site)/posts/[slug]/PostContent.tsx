@@ -5,14 +5,14 @@ import React from "react";
 import { getPostContent } from "@/lib/services/post.service";
 import { extractHeadings } from "@/lib/toc";
 import PostContentClient from "@/components/PostContentClient";
-import type { SeriesPosition } from "@/types";
+import type { TrailPosition } from "@/types";
 
 interface PostContentProps {
   pageId: string;
-  series: SeriesPosition | null;  // page.tsx에서 이미 조회한 값을 그대로 전달 (네비게이터용)
+  trail: TrailPosition | null;  // page.tsx에서 이미 조회한 값을 그대로 전달 (네비게이터용)
 }
 
-export default async function PostContent({ pageId, series }: PostContentProps): Promise<React.JSX.Element> {
+export default async function PostContent({ pageId, trail }: PostContentProps): Promise<React.JSX.Element> {
   const content = await getPostContent(pageId);
   const headings = extractHeadings(content);
 
@@ -21,7 +21,7 @@ export default async function PostContent({ pageId, series }: PostContentProps):
       content={content}
       headings={headings}
       pageId={pageId}
-      series={series}
+      trail={trail}
     />
   );
 }
