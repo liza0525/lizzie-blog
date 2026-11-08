@@ -34,15 +34,15 @@ src/
 │   │   ├── admin/
 │   │   │   └── page.tsx        # 캐시 수동 무효화 UI
 │   │   ├── posts/
-│   │   │   ├── page.tsx        # 글 목록(/posts) — 히어로 + 시리즈 카드 + 태그 필터 + 글 목록
+│   │   │   ├── page.tsx        # 글 목록(/posts) — 히어로 + 트레일 카드 + 태그 필터 + 글 목록
 │   │   │   └── [slug]/
 │   │   │       ├── page.tsx        # 글 상세
 │   │   │       ├── PostContent.tsx # 본문 서버 컴포넌트 (fetch → PostContentClient 전달)
 │   │   │       ├── AdjacentPosts.tsx # 이전/다음 글 네비게이션
 │   │   │       └── loading.tsx     # 글 상세 로딩 UI
-│   │   └── series/
-│   │       ├── page.tsx        # 시리즈 목록 (최근 발행 순)
-│   │       └── [name]/page.tsx # 시리즈 상세 (1편부터 순서대로)
+│   │   └── trails/
+│   │       ├── page.tsx        # 트레일 목록 (최근 발행 순)
+│   │       └── [name]/page.tsx # 트레일 상세 (1편부터 순서대로)
 │   ├── api/
 │   │   ├── notion-image/       # Notion S3 이미지 프록시 (signed URL 만료 우회)
 │   │   ├── posts/              # 무한 스크롤용 포스트 목록 API
@@ -51,7 +51,7 @@ src/
 │   └── sitemap.ts              # sitemap.xml 생성
 ├── lib/
 │   ├── config.ts               # 전역 설정 (CORE_TAGS, HOME_HERO 문구 등)
-│   ├── listOrigin.ts           # 글을 연 목록(전체/시리즈) 기억 — sessionStorage, 돌아가기 버튼용
+│   ├── listOrigin.ts           # 글을 연 목록(전체/트레일) 기억 — sessionStorage, 돌아가기 버튼용
 │   ├── postList.ts             # 글 목록 주소(postListHref → /posts?tag=…) — 태그·검색·돌아가기·헤더 홈 아이콘이 사용
 │   ├── motion.ts               # 애니메이션 헬퍼 — 등장 순번(staggerStyle), motion 토큰 길이 읽기(readMotionMs)
 │   ├── toc.ts                  # 마크다운 헤딩 추출 + rehype slug 플러그인
@@ -75,7 +75,7 @@ src/
 │   ├── IntroStage.tsx          # 인트로 전환 무대 — 버튼·휠·스와이프·↓/PageDown/Space → View Transition으로 /posts 이동(모바일 끌기·끝 튕김은 막음)(배경·소개·크레딧은 히어로로, 제목은 헤더 로고로 줄어들고 목록이 아래에서 올라옴), 미지원 브라우저는 fade out 뒤 이동, Context로 시작 함수 제공
 │   ├── IntroEnterLink.tsx      # 인트로의 "Scroll down" + ↓ 링크(바운스) — /posts 일반 링크, 일반 클릭만 IntroStage 전환에 맡김
 │   ├── HomeIntroMarker.tsx     # 글 목록(/posts)을 떠나거나 태그·검색이 바뀌면 이후 등장 애니메이션을 끔 (새로고침하면 다시 재생, 렌더링 없음)
-│   ├── SeriesShelf.tsx         # 글 목록 위 시리즈 카드 줄 (제목 줄 "모든 시리즈 보기" + 최근 시리즈 카드, hover는 색 변화만)
+│   ├── TrailShelf.tsx          # 글 목록 위 트레일 카드 줄 (제목 줄 "모든 트레일 보기" + 최근 트레일 카드, hover는 색 변화만)
 │   ├── ScrollFadeRow.tsx       # 가로 스크롤 줄 — 넘칠 때만 오른쪽 끝 페이드 표시, 스크롤바는 처음엔 숨김(마우스는 hover 시 표시)
 │   ├── TagFilter.tsx           # 홈 수평 태그 필터 바 (코어 태그 기본 노출, 더 보기 펼침 — 펼치기/접기 애니메이션)
 │   ├── PostGrid.tsx            # 포스트 리스트 (무한 스크롤)
@@ -85,11 +85,11 @@ src/
 │   ├── CodeBlock.tsx           # 마크다운 코드 블록 렌더러 (Prism) — mermaid는 MermaidBlock으로 위임
 │   ├── MermaidBlock.tsx        # Mermaid 다이어그램 SVG 렌더러 (다크/라이트 테마 대응)
 │   ├── TableOfContents.tsx     # 포스트 우측 목차 (IntersectionObserver 활성화)
-│   ├── PostNavigator.tsx       # 글 상세 네비게이터 패널 — 시리즈 + 목차 섹션 (사이드바·바텀시트 공용)
-│   ├── SeriesNav.tsx           # 네비게이터의 시리즈 섹션 (편 목록, 현재 글 하이라이트)
-│   ├── SeriesPager.tsx         # 글 상세 하단 시리즈 카드 (시리즈 내 이전편/다음편)
+│   ├── PostNavigator.tsx       # 글 상세 네비게이터 패널 — 트레일 + 목차 섹션 (사이드바·바텀시트 공용)
+│   ├── TrailNav.tsx            # 네비게이터의 트레일 섹션 (편 목록, 현재 글 하이라이트)
+│   ├── TrailPager.tsx          # 글 상세 하단 트레일 카드 (트레일 내 이전편/다음편)
 │   ├── ListOriginMarker.tsx    # 목록 화면이 열릴 때 "마지막으로 본 목록"을 기록 (렌더링 없음)
-│   ├── BackToListLink.tsx      # 글 상세 돌아가기 링크 — 처음 들어온 목록으로 (‹ 글 목록 / ‹ CS 시리즈)
+│   ├── BackToListLink.tsx      # 글 상세 돌아가기 링크 — 처음 들어온 목록으로 (‹ 글 목록 / ‹ CS 트레일)
 │   ├── TocBottomSheet.tsx      # 모바일/세로화면(<xl)용 네비게이터 진입점 — 우하단 FAB + 바텀시트
 │   ├── GiscusComments.tsx      # Giscus 댓글 (GitHub Discussions 기반)
 │   ├── GoogleAnalytics.tsx     # GA4 스크립트 삽입 (프로덕션 환경에서만 활성화)
@@ -157,8 +157,9 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 (운영 환경에서만)
 - 글 상세 페이지(`(site)/posts/[slug]/page.tsx`): SSG (`generateStaticParams`) — 최신 `STATIC_BUILD_POST_LIMIT`(`lib/config.ts`, 현재 20)개만 빌드 시 정적 생성, 나머지는 `dynamicParams`(기본값)로 첫 방문 시 생성 후 캐싱
   - 전체를 다 빌드하면 포스트마다 Notion 블록 트리를 병렬로 가져오는 구조라 글이 쌓일수록 빌드 중 Notion rate limit(429)에 걸림 — 이를 피하기 위한 제한
 - 포스트 데이터: `post.service.ts`의 `unstable_cache`로 캐싱 (글 상세 2시간)
-- 시리즈: Notion `Series`(select) 속성 기반. 전체 글 목록을 `unstable_cache`(2시간, `post` 태그)로 캐싱한 뒤 메모리에서 묶음 — Notion 추가 호출 없음
-  - `/series/[name]`은 글 상세와 같은 이유(한글 경로)로 `revalidate` export 없음, 전체 시리즈를 `generateStaticParams`로 빌드
+- 트레일(작성자가 의도를 갖고 엮은 글 묶음, 예전 이름 "시리즈"): Notion `Series`(select) 속성 기반 — 화면·코드·URL은 "트레일", Notion 속성 이름만 아직 `Series`. 전체 글 목록을 `unstable_cache`(2시간, `post` 태그)로 캐싱한 뒤 메모리에서 묶음 — Notion 추가 호출 없음
+  - `/trails/[name]`은 글 상세와 같은 이유(한글 경로)로 `revalidate` export 없음, 전체 트레일을 `generateStaticParams`로 빌드
+  - 예전 주소 `/series`, `/series/:name`은 `next.config.ts` redirects가 `/trails`로 보냄
 - `fetchAllPosts()`: `React.cache()`로 같은 요청 내 중복 호출 방지
 
 ---
@@ -226,7 +227,7 @@ UI, 스타일, 컴포넌트를 만들거나 고치기 전에 `design-system/desi
   - JS가 길이를 알아야 하면(닫힘 트랜지션 뒤 언마운트 타이머 등) 값을 복사하지 말고 `readMotionMs("--motion-fast")`로 토큰을 읽는다
   - 순차 등장은 `style={staggerStyle(n)}`(`lib/motion.ts`)로 순번 `--i`를 주면 `--i × --stagger-step`(`--motion-fast`/2)만큼 늦게 시작. 끝 상태는 forwards가 아니라 기본 스타일로 둔다(타이핑 커서가 남던 버그)
   - 소개의 "Meeting of Worlds" 강조(2026-11-04, 이전엔 헤드라인 "질문")는 `SunriseHighlight` + globals.css의 `.highlight-mark`(모서리 없는 직사각형 띠, 글자 높이의 75%, 세로 가운데 — 디자인 시스템 `.mark-sunrise` 대신 쓰는 블로그 전용 모양, 사용자 결정). 인트로는 `.highlight-swipe`를 더해 소개가 나타난 뒤 500ms 동안 왼쪽→오른쪽으로 그어지고, 히어로는 처음부터 칠해져 있음. 타이핑은 globals.css의 `.typing-char`(글자마다 `--i` × `--stagger-step`). 뒤따르는 요소는 `staggerStyle(typingEndStep(text) + n)`으로 이어 붙인다
-  - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표 — 커서 깜빡임은 2026-11-04 예외로 복원), hover 위치 이동(SeriesShelf), 500ms 인트로 fade
+  - 0.1.0에서 걷어낸 것: 스크롤 진입(Reveal), 위로 떠오르는 fade-up(translate), 밑줄 그리기, 무한 반복(인트로 화살표 — 커서 깜빡임은 2026-11-04 예외로 복원), hover 위치 이동(TrailShelf), 500ms 인트로 fade
   - **의도된 예외(사용자 결정, 2026-11-03):** 홈 인트로의 타이핑 효과·형광펜 긋기·"Scroll down" 바운스(포물선 반복, `.intro-bounce`)과 인트로 → `/posts` 전환은 0.1.0 원칙("움직임은 상태 변화에만", "로딩 외 무한 반복·위치 이동 금지", "페이지 이동은 fade 없이")과 다르지만 유지한다. 바운스는 overshoot가 없어 시스템의 "바운스 easing" 금지에는 해당하지 않음. 원칙에 맞춘다고 임의로 지우지 않는다
     - 인트로 배경 해무(2026-11-04): 안개 세 겹이 계속 좌우로 흐르고, 해는 처음 한 번 떠오른 뒤(2.4s, `fill-mode: backwards`) ±1px로 좌우 바운스 반복(아래 스크롤 바운스와 같은 easing, 한 번 튀는 데 `--motion-loop`). 길이는 장면 고유 값이라 토큰 대신 숫자(`FirstLightBackground.module.css`)
     - 타이핑 커서 깜빡임(2026-11-04): 다 친 뒤 마지막 글자 뒤 커서가 `--motion-loop`(1.2s) 주기로 계속 깜빡임(`.typing-char-last`, step-end). reduced-motion이면 커서 없음
