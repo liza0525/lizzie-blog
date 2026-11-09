@@ -196,13 +196,14 @@ html:has([data-intro-stage]) {
    - 배경(vt-intro-scene): 화면 전체 → 히어로 띠로 줄어듦 / 소개·크레딧: 화면 가운데 → 히어로 자리로 옮겨 감 (HomeIntro ↔ HomeHero)
    - 헤드라인(HAE MU): 화면 가운데 큰 제목 → 헤더 로고로 줄어듦 (HomeIntro ↔ Header)
    - 이름 없는 나머지(root): 인트로의 "Scroll down"은 흐려지고, 헤더·트레일·태그·목록은 아래에서 올라오며 나타남
-   - 길이는 --intro-transition(--motion-base의 4배, 1s) + ease-motion — 500ms는 넘기자마자 끝나 버려 "천천히 내려가는" 느낌이 없었음(사용자 피드백)
+   - 길이는 --intro-transition(--motion-base의 3배, 750ms) + ease-motion — 500ms는 넘기자마자 끝나 버려 "천천히 내려가는" 느낌이 없었고(사용자 피드백),
+     1s는 넘긴 뒤 기다리는 느낌이 있어서 그 사이로 줄임(2026-11-09)
      사라지는 쪽("Scroll down")은 --motion-fast + ease-motion-exit
    이름은 IntroStage가 <html data-intro-transition>을 붙인 동안만 붙임 → 다른 곳에 영향 없음
    reduced-motion이면 IntroStage가 전환 없이 바로 이동 */
 html[data-intro-transition] {
   /* 전환 그림(::view-transition-*)은 <html>에서 값을 물려받으므로 여기 한 곳에서 길이를 정함 */
-  --intro-transition: calc(var(--motion-base) * 4);
+  --intro-transition: calc(var(--motion-base) * 3);
 }
 html[data-intro-transition] .vt-intro-scene { view-transition-name: intro-scene; }
 html[data-intro-transition] .vt-intro-headline { view-transition-name: intro-headline; }
@@ -253,7 +254,7 @@ html[data-intro-transition]::view-transition-new(intro-scene) {
   }
 }
 
-/* 이전 화면의 나머지: 빨리 흐려짐. 전환(1s)보다 먼저 끝나므로 forwards로 끝 상태(투명)를 유지 — 안 그러면 다시 보였다가 사라짐
+/* 이전 화면의 나머지: 빨리 흐려짐. 전환(750ms)보다 먼저 끝나므로 forwards로 끝 상태(투명)를 유지 — 안 그러면 다시 보였다가 사라짐
    (전환 그림은 전환이 끝나면 통째로 없어져서, 타이핑 커서 때의 "forwards 끝 상태" 문제는 생기지 않음) */
 html[data-intro-transition]::view-transition-old(root) {
   animation: intro-leave var(--motion-fast) var(--motion-ease-exit) forwards;

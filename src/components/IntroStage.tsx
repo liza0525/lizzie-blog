@@ -23,8 +23,8 @@ import { firstLightScale } from "./FirstLightBackground";
 // transitionend가 어떤 이유로 오지 않아도(탭 전환 등) 전환이 멈춰 있지 않게 하는 안전장치
 const LEAVE_FALLBACK_MS = 1000;
 // View Transition은 목록이 그려질 때까지 화면을 멈춰 두므로, 목록이 늦으면(Notion 응답 지연 등) 이만큼만 기다리고 멈춤을 풂
-//   → 그 뒤엔 애니메이션 없이 목록이 준비되는 대로 바뀜
-const ARRIVAL_FALLBACK_MS = 3000;
+//   → 그 뒤엔 애니메이션 없이 목록이 준비되는 대로 바뀜. 3초는 손을 떼고 멈춰 있는 시간이 너무 길어 1.5초로 줄임(2026-11-09)
+const ARRIVAL_FALLBACK_MS = 1500;
 // 배경 상자에 붙는 전환 이름표 (HomeIntro·HomeHero, globals.css)
 const SCENE_SELECTOR = ".vt-intro-scene";
 const SCENE_SCALE_VAR = "--intro-scene-scale";
