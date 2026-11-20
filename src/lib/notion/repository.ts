@@ -2,6 +2,7 @@
 // 다른 파일에서 @notionhq/client를 직접 import하지 말 것
 
 import { NotionToMarkdown } from "notion-to-md";
+import { APIErrorCode, APIResponseError } from "@notionhq/client";
 import type {
   PageObjectResponse,
   QueryDatabaseParameters,
@@ -21,6 +22,54 @@ type FilterItem = Extract<
   { and: unknown[] }
 >["and"][number];
 
+// ── rate limit 재시도 ─────────────────────────────────────
+// Notion API는 평균 초당 3회까지만 허용하고, 넘으면 429(rate_limited)를 돌려준다.
+// 빌드 때 글 여러 개를 동시에 정적 생성하면서 블록 트리를 병렬로 가져오다 보면 이 한도를 넘는데,
+// @notionhq/client 4.x는 재시도를 하지 않아 429 한 번에 페이지 생성이 실패하고 빌드가 깨진다.
+// → 이 파일의 모든 Notion 호출을 withRateLimitRetry로 감싸, 429일 때만 잠시 기다렸다 다시 시도한다.
+
+// 재시도 횟수 상한 — 대기 시간이 쌓여 Next 정적 생성 타임아웃(페이지당 60초)을 넘지 않을 정도로
+const RATE_LIMIT_MAX_RETRIES = 4;
+// Retry-After 헤더가 없을 때의 첫 대기 시간 — 시도마다 2배(1s → 2s → 4s → 8s)
+const RATE_LIMIT_BASE_DELAY_MS = 1000;
+// 동시에 429를 받은 요청들이 같은 순간에 한꺼번에 다시 몰리지 않도록 대기 시간에 더하는 무작위 폭
+const RATE_LIMIT_JITTER_MS = 500;
+
+function isRateLimitError(error: unknown): error is APIResponseError {
+  return APIResponseError.isAPIResponseError(error) && error.code === APIErrorCode.RateLimited;
+}
+
+// 기다릴 시간(ms) — Notion이 Retry-After(초)를 주면 그대로 따르고, 없으면 지수 백오프
+function rateLimitDelayMs(error: APIResponseError, attempt: number): number {
+  // headers 타입이 unknown으로 선언돼 있어 fetch의 Headers인지 확인 후 읽음
+  const retryAfter = error.headers instanceof Headers ? Number(error.headers.get("retry-after")) : NaN;
+  const baseMs = Number.isFinite(retryAfter) && retryAfter > 0
+    ? retryAfter * 1000
+    : RATE_LIMIT_BASE_DELAY_MS * 2 ** attempt;
+  return baseMs + Math.random() * RATE_LIMIT_JITTER_MS;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Notion 호출 하나를 받아 429일 때만 재시도 — 다른 에러(404, 권한 등)는 바로 던짐
+// request를 함수로 받는 이유: 재시도마다 요청을 새로 보내야 해서 (Promise는 한 번 끝나면 재사용 불가)
+async function withRateLimitRetry<T>(request: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await request();
+    } catch (error) {
+      if (!isRateLimitError(error) || attempt >= RATE_LIMIT_MAX_RETRIES) throw error;
+      const delayMs = rateLimitDelayMs(error, attempt);
+      console.warn(
+        `[notion] rate limited — ${Math.round(delayMs)}ms 뒤 재시도 (${attempt + 1}/${RATE_LIMIT_MAX_RETRIES})`
+      );
+      await sleep(delayMs);
+    }
+  }
+}
+
 // 페이지네이션 포스트 목록 조회 (20개씩, 태그 필터 선택)
 export async function fetchPostPage(options: {
   pageSize: number;
@@ -35,13 +84,15 @@ export async function fetchPostPage(options: {
   const filter: QueryDatabaseParameters["filter"] =
     extraFilters.length > 0 ? { and: [baseFilter, ...extraFilters] } : baseFilter;
 
-  const response = await notionClient.databases.query({
-    database_id: DATABASE_ID,
-    filter,
-    sorts: [{ property: "PublishedAt", direction: "descending" }],
-    page_size: options.pageSize,
-    ...(options.cursor ? { start_cursor: options.cursor } : {}),
-  });
+  const response = await withRateLimitRetry(() =>
+    notionClient.databases.query({
+      database_id: DATABASE_ID,
+      filter,
+      sorts: [{ property: "PublishedAt", direction: "descending" }],
+      page_size: options.pageSize,
+      ...(options.cursor ? { start_cursor: options.cursor } : {}),
+    })
+  );
 
   return {
     posts: response.results
@@ -68,15 +119,17 @@ export async function fetchAllPosts(): Promise<Post[]> {
 
 // slug로 단일 포스트 조회
 export async function fetchPostBySlug(slug: string): Promise<Post | null> {
-  const response = await notionClient.databases.query({
-    database_id: DATABASE_ID,
-    filter: {
-      and: [
-        { property: "Slug", rich_text: { equals: slug } },
-        { property: "Status", status: { equals: "Published" } },
-      ],
-    },
-  });
+  const response = await withRateLimitRetry(() =>
+    notionClient.databases.query({
+      database_id: DATABASE_ID,
+      filter: {
+        and: [
+          { property: "Slug", rich_text: { equals: slug } },
+          { property: "Status", status: { equals: "Published" } },
+        ],
+      },
+    })
+  );
 
   const page = response.results.find(
     (p): p is PageObjectResponse => "properties" in p
@@ -92,11 +145,13 @@ export async function fetchAllChildren(blockId: string): Promise<BlockObjectResp
   let cursor: string | undefined;
 
   do {
-    const response = await notionClient.blocks.children.list({
-      block_id: blockId,
-      page_size: 100,
-      ...(cursor ? { start_cursor: cursor } : {}),
-    });
+    const response = await withRateLimitRetry(() =>
+      notionClient.blocks.children.list({
+        block_id: blockId,
+        page_size: 100,
+        ...(cursor ? { start_cursor: cursor } : {}),
+      })
+    );
     results.push(
       ...response.results.filter((b): b is BlockObjectResponse => "type" in b)
     );
