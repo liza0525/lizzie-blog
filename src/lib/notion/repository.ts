@@ -7,6 +7,7 @@ import type {
   QueryDatabaseParameters,
   BlockObjectResponse,
   CalloutBlockObjectResponse,
+  CodeBlockObjectResponse,
   EmbedBlockObjectResponse,
   ImageBlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
@@ -220,6 +221,22 @@ export async function fetchPostContent(pageId: string): Promise<string> {
     return `<div class="notion-callout"${colorAttr}><span class="notion-callout-icon">${emoji}</span><div class="notion-callout-body">\n\n${body}\n\n</div></div>`;
   });
 
+  // code 블록 — 펜스 길이를 내용에 맞춰 늘린다
+  // notion-to-md 기본 변환은 항상 ```로 감싸서, 코드 내용에 ```(예: 프롬프트 안의 마크다운 예시)가 있으면
+  // 그 줄에서 코드 블록이 일찍 닫힌다. 펜스 짝이 밀리면 뒤따르는 </details>까지 코드로 삼켜져
+  // 토글이 닫히지 않고 이후 본문 전체가 접힌 토글 안에 들어가 버린다.
+  // CommonMark 규칙: 닫는 펜스는 여는 펜스 이상 길이여야 하므로, 내용의 가장 긴 백틱 줄보다 길게 잡으면 안전하다.
+  n2m.setCustomTransformer("code", async (block) => {
+    const codeBlock = block as CodeBlockObjectResponse;
+    // 아래 두 줄은 notion-to-md 기본 변환과 동일하게 유지 (다른 글의 출력이 바뀌지 않도록)
+    const text = codeBlock.code.rich_text.map((t) => t.plain_text).join("\n").trim();
+    if (!text) return "";
+    const lang = codeBlock.code.language?.trim() ? codeBlock.code.language.toLowerCase() : "plaintext";
+
+    const fence = "`".repeat(Math.max(3, longestBacktickRun(text) + 1));
+    return `${fence}${lang}\n${text}\n${fence}`;
+  });
+
   // embed 블록 → <iframe> HTML로 변환 (rehype-raw가 렌더링)
   // 다른 블로그 글 등 외부 URL을 Notion에서 embed했을 때 iframe으로 표시
   n2m.setCustomTransformer("embed", async (block) => {
@@ -230,6 +247,12 @@ export async function fetchPostContent(pageId: string): Promise<string> {
   const mdBlocks = await n2m.pageToMarkdown(pageId);
   const { parent } = n2m.toMarkdownString(mdBlocks);
   return parent;
+}
+
+// 문자열 안에서 연속된 백틱(`)의 최대 길이 — 코드 블록 펜스 길이 계산용
+function longestBacktickRun(text: string): number {
+  const runs = text.match(/`+/g) ?? [];
+  return runs.reduce((max, run) => Math.max(max, run.length), 0);
 }
 
 type Annotations = Parameters<NotionToMarkdown["annotatePlainText"]>[1];
